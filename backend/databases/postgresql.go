@@ -55,6 +55,7 @@ func createSchema() error {
 	schemas := []interface{}{
 		(*models.User)(nil),
 		(*models.AccessToken)(nil),
+		(*models.Journal)(nil),
 	}
 	for _, model := range schemas {
 		err := postgresClient.CreateTable(model, &orm.CreateTableOptions{

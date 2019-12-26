@@ -12,6 +12,7 @@ import (
 func ListenHTTP() {
 	http.HandleFunc("/", rootHandler)
 	http.HandleFunc("/user", UserInfoHandler)
+	http.HandleFunc("/journal", JournalHandler)
 	http.HandleFunc("/login", LoginHandler)
 	http.HandleFunc("/register", RegisterHandler)
 	http.HandleFunc("/logout", LogoutHandler)
