@@ -1,0 +1,25 @@
+<style>
+  .example-icon mat-icon {
+    color: white;
+  }
+  .example-spacer {
+    flex: 1 1 auto;
+  }
+</style>
+<mat-toolbar color="primary">
+  <mat-toolbar-row>
+    <a mat-icon-button routerLink="/">
+      <mat-icon aria-hidden="false" aria-label="Example home icon">home</mat-icon>
+    </a>
+    <span *ngIf="user">
+      Hi, {{user.email}}
+    </span>
+    <span class="example-spacer"></span>
+    <a mat-icon-button routerLink="/settings">
+      <mat-icon aria-hidden="false" aria-label="Example home icon">settings</mat-icon>
+    </a>
+    <a mat-icon-button href="/logout">
+      <mat-icon aria-hidden="false" aria-label="Example home icon">logout</mat-icon>
+    </a>
+  </mat-toolbar-row>
+</mat-toolbar>
