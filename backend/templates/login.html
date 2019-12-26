@@ -1,0 +1,33 @@
+{{define "title"}}Login{{end}}
+{{define "body"}}
+    <style>
+        .login-form {
+            width: 400px;
+        }
+    </style>
+    {{if .Error}}
+        <div>{{.Error}}</div>
+    {{else}}
+    {{end}}
+    <div class="d-flex flex-row justify-content-center mt-4">
+        <div class="login-form card">
+            <form class="card-body" method="POST">
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" name="email" id="email" class="form-control" placeholder="Enter Email"/>
+                </div>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" name="password" id="password" class="form-control" placeholder="Enter Password"/>
+                </div>
+                <button type="submit" class="btn btn-primary">Login</button>
+                <div class="text-center">
+                    <span>or</span><br />
+                    <a href="/forgotpassword">Forgot your password</a><br />
+                    <span>or</span><br />
+                    <a href="/register">Register via email</a>
+                </div>
+            </form>
+        </div>
+    </div>
+{{end}}

@@ -1,0 +1,5 @@
+{
+    "POSTGRES_URL": "postgres://journal:journal@localhost:5432/journal",
+    "ENVIRONMENT": "DEVELOPMENT",
+    "BIND_ADDRESS":"127.0.0.1:4001"
+}
