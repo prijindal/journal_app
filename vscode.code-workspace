@@ -1,0 +1,19 @@
+{
+	"folders": [
+		{
+			"path": "backend"
+		},
+		{
+			"path": "frontend"
+		},
+		{
+			"path": "protobufs"
+		},
+		{
+			"path": "ui"
+		},
+		{
+			"path": "scripts"
+		}
+	]
+}
