@@ -1,30 +1,22 @@
-<style>
-  :host {
-    display: flex;
-    justify-content: space-evenly;
-    flex-direction: row;
-    height: 100%;
-  }
-  .textarea-container {
-    flex: 1 1 auto;
-    display: flex;
-    flex-direction: column;
-  }
-  .textarea {
-    flex: 1 1 auto;
-  }
-</style>
-<form class="textarea-container" (submit)="addJournal($event)">
+<form *ngIf="isModeCreating()" class="textarea-container" (submit)="addJournal($event)">
   <textarea class="textarea" (change)="doTextareaValueChange($event)" placeholder="Write your journal">{{content}}</textarea>
-  <button mat-raised-button color="primary">Submit</button>
+  <button mat-raised-button color="primary">Add New</button>
 </form>
-<div style="flex: 1 1 auto">
+<form *ngIf="!isModeCreating() && journal" class="textarea-container" (submit)="editSubmitJournal($event)">
+  <textarea class="textarea" (change)="doTextareaValueChange($event)" placeholder="Write your journal">{{journal.content}}</textarea>
+  <button mat-raised-button color="primary">Save</button>
+</form>
+<div class="journal-list">
   <mat-list role="list" *ngIf="journalResponse">
     <h3 mat-subheader>Journal Entries</h3>
     <mat-list-item *ngFor="let journal of journalResponse.journals">
-      <mat-icon mat-list-icon (click)="deleteJournal(journal.id)">delete</mat-icon>
       <h4 mat-line>{{journal.content}}</h4>
       <p mat-line> {{fromNow(journal.createdAt)}} </p>
+      <mat-icon (click)="deleteJournalConfirm(journal)">delete</mat-icon>
+      <mat-icon (click)="editJournal(journal)">edit</mat-icon>
+    </mat-list-item>
+    <mat-list-item *ngIf="journalResponse.journals.length == 0">
+      <p mat-line>No Entries found</p>
     </mat-list-item>
   </mat-list>
 </div>

@@ -1,0 +1,23 @@
+:host {
+    display: flex;
+    justify-content: space-evenly;
+    flex-direction: row;
+    height: calc(100% - 64px);
+}
+.textarea-container {
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: column;
+}
+.textarea {
+    flex: 1 1 auto;
+    padding: 10px;
+}
+.journal-list {
+    flex: 1 1 auto;
+    max-width: 500px;
+    overflow-y: auto;
+    mat-list {
+        padding-bottom: 32px;
+    }
+}

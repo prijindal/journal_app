@@ -9,10 +9,13 @@ import { MatIconModule } from "@angular/material/icon"
 import { MatToolbarModule } from "@angular/material/toolbar";
 import { MatButtonModule } from "@angular/material/button";
 import { MatListModule } from "@angular/material/list";
+import { MatDialogModule } from "@angular/material/dialog";
+import {MatSnackBarModule} from '@angular/material/snack-bar';
 
 import { HomeComponent } from './home/home.component';
 import { SettingsComponent } from './settings/settings.component';
 import { ToolbarComponent } from './toolbar/toolbar.component';
+import { ConfirmDialogComponent } from './confirm-dialog/confirm-dialog.component';
 
 @NgModule({
   declarations: [
@@ -20,6 +23,7 @@ import { ToolbarComponent } from './toolbar/toolbar.component';
     HomeComponent,
     SettingsComponent,
     ToolbarComponent,
+    ConfirmDialogComponent,
   ],
   imports: [
     BrowserModule,
@@ -29,8 +33,11 @@ import { ToolbarComponent } from './toolbar/toolbar.component';
     MatIconModule,
     MatToolbarModule,
     MatButtonModule,
-    MatListModule
+    MatListModule,
+    MatDialogModule,
+    MatSnackBarModule
   ],
+  entryComponents: [ConfirmDialogComponent],
   providers: [],
   bootstrap: [AppComponent]
 })

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"os"
 	"os/signal"
 
@@ -12,8 +13,14 @@ func main() {
 
 	c := make(chan os.Signal, 1)
 	signal.Notify(c, os.Interrupt)
-	quit := make(chan struct{})
 	databases.InitPostgreSQL()
+	go func() {
+		<-c
+		fmt.Println("Cleaning up")
+		databases.CleanUpPostgreSQL()
+		os.Exit(1)
+	}()
+	quit := make(chan struct{})
 	go web.ListenHTTP()
 	<-quit // hang until an error
 }

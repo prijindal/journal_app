@@ -18,7 +18,14 @@ export class JournalService {
     return this.http.post('/journal', form, {responseType:"arraybuffer"}).toPromise().then(data => protobufs.Journal.decode(new Uint8Array(data)))
   }
 
-  deleteJournal(id:number) {
+  deleteJournal(id:number | Long) {
     return this.http.delete('/journal', {params:{"id":id.toString()},responseType:"arraybuffer"}).toPromise().then(data => protobufs.Journal.decode(new Uint8Array(data)))
+  }
+
+  editJournal(journal:protobufs.Journal) {
+    var form = new FormData()
+    form.append("id", journal.id.toString())
+    form.append("content", journal.content)
+    return this.http.put('/journal', form, {responseType:"arraybuffer"}).toPromise().then(data => protobufs.Journal.decode(new Uint8Array(data)))
   }
 }

@@ -3,6 +3,7 @@ package web
 import (
 	"fmt"
 	"net/http"
+	"strconv"
 
 	"github.com/golang/protobuf/proto"
 	"github.com/prijindal/journal_app_backend/databases"
@@ -81,6 +82,94 @@ func JournalHandler(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 			w.Write(res)
+		} else if r.Method == "PUT" {
+			idTxt := r.FormValue("id")
+			id, err := strconv.Atoi(idTxt)
+			if err != nil {
+				w.WriteHeader(500)
+				fmt.Fprintf(w, err.Error())
+				return
+			}
+			content := r.FormValue("content")
+			if content == "" {
+				w.WriteHeader(500)
+				fmt.Fprintf(w, err.Error())
+				return
+			}
+			var journal models.Journal
+			err = databases.GetPostgresClient().Model(&journal).Where("id = ?", id).Select()
+			if err != nil {
+				w.WriteHeader(500)
+				fmt.Fprintf(w, err.Error())
+				return
+			}
+			journal.ID = id
+			journal.Content = content
+			_, err = databases.GetPostgresClient().Model(&journal).Where("id = ?", id).Update()
+			if err != nil {
+				w.WriteHeader(500)
+				fmt.Fprintf(w, err.Error())
+				return
+			}
+			err = databases.GetPostgresClient().Model(&journal).Where("id = ?", id).Select()
+			if err != nil {
+				w.WriteHeader(500)
+				fmt.Fprintf(w, err.Error())
+				return
+			}
+			journalData := &protobufs.Journal{
+				Id:        int64(journal.ID),
+				UserId:    int64(journal.UserID),
+				SaveType:  protobufs.Journal_JournalSaveType(protobufs.Journal_JournalSaveType_value[journal.SaveType]),
+				Content:   journal.Content,
+				CreatedAt: journal.CreatedAt.Unix(),
+				UpdatedAt: journal.UpdatedAt.Unix(),
+			}
+			res, err := proto.Marshal(journalData)
+			if err != nil {
+				w.WriteHeader(500)
+				fmt.Fprintf(w, err.Error())
+				return
+			}
+			w.Write(res)
+		} else if r.Method == "DELETE" {
+			idTxt := r.URL.Query().Get("id")
+			id, err := strconv.Atoi(idTxt)
+			if err != nil {
+				w.WriteHeader(500)
+				fmt.Fprintf(w, err.Error())
+				return
+			}
+			var journal models.Journal
+			err = databases.GetPostgresClient().Model(&journal).Where("id = ?", id).Select()
+			if err != nil {
+				w.WriteHeader(500)
+				fmt.Fprintf(w, err.Error())
+				return
+			}
+			_, err = databases.GetPostgresClient().Model(&journal).Where("id = ?", id).Delete()
+			if err != nil {
+				w.WriteHeader(500)
+				fmt.Fprintf(w, err.Error())
+				return
+			}
+			journalData := &protobufs.Journal{
+				Id:        int64(journal.ID),
+				UserId:    int64(journal.UserID),
+				SaveType:  protobufs.Journal_JournalSaveType(protobufs.Journal_JournalSaveType_value[journal.SaveType]),
+				Content:   journal.Content,
+				CreatedAt: journal.CreatedAt.Unix(),
+				UpdatedAt: journal.UpdatedAt.Unix(),
+			}
+			res, err := proto.Marshal(journalData)
+			if err != nil {
+				w.WriteHeader(500)
+				fmt.Fprintf(w, err.Error())
+				return
+			}
+			w.Write(res)
+		} else {
+			w.WriteHeader(405)
 		}
 	}
 }
