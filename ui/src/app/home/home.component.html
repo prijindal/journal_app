@@ -1,16 +1,20 @@
 <form *ngIf="isModeCreating()" class="textarea-container" (submit)="addJournal($event)">
-  <textarea class="textarea" (change)="doTextareaValueChange($event)" placeholder="Write your journal">{{content}}</textarea>
+  <textarea name="content" class="textarea" [(ngModel)]="content" placeholder="Write your journal"></textarea>
   <button mat-raised-button color="primary">Add New</button>
 </form>
-<form *ngIf="!isModeCreating() && journal" class="textarea-container" (submit)="editSubmitJournal($event)">
-  <textarea class="textarea" (change)="doTextareaValueChange($event)" placeholder="Write your journal">{{journal.content}}</textarea>
+<form *ngIf="!isModeCreating()" class="textarea-container" (submit)="editSubmitJournal($event)">
+  <textarea name="content" class="textarea" [(ngModel)]="content" placeholder="Write your journal"></textarea>
   <button mat-raised-button color="primary">Save</button>
 </form>
 <div class="journal-list">
   <mat-list role="list" *ngIf="journalResponse">
-    <h3 mat-subheader>Journal Entries</h3>
+    <h3 *ngIf="selectedJournalLength() == 0" mat-subheader>Journal Entries</h3>
+    <h3 *ngIf="selectedJournalLength() > 0" mat-subheader>
+      <mat-icon (click)="deleteJournalSelectedConfirm()">delete</mat-icon>
+    </h3>
     <mat-list-item *ngFor="let journal of journalResponse.journals">
-      <h4 mat-line>{{journal.content}}</h4>
+      <mat-checkbox mat-list-icon [(ngModel)]="selectedJournals[journal.id]"></mat-checkbox>
+      <h4 class="overflow-2-rows" mat-line>{{journal.content}}</h4>
       <p mat-line> {{fromNow(journal.createdAt)}} </p>
       <mat-icon (click)="deleteJournalConfirm(journal)">delete</mat-icon>
       <mat-icon (click)="editJournal(journal)">edit</mat-icon>

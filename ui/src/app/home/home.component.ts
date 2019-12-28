@@ -2,10 +2,10 @@ import { Component, OnInit } from '@angular/core';
 import { ConfirmDialogModel, ConfirmDialogComponent } from '../confirm-dialog/confirm-dialog.component';
 import {MatDialog} from '@angular/material/dialog';
 import {MatSnackBar} from '@angular/material/snack-bar';
-import * as moment from "moment";
+import * as moment from 'moment';
 
-import { protobufs } from "../../protobufs"
-import {JournalService} from "../journal.service"
+import { protobufs } from '../../protobufs';
+import {JournalService} from '../journal.service';
 
 enum TextAreaMode {
   EDITING,
@@ -18,113 +18,143 @@ enum TextAreaMode {
   styleUrls: ['./home.component.scss']
 })
 export class HomeComponent implements OnInit {
-  private mode: TextAreaMode = TextAreaMode.CREATING
-  private journal:protobufs.Journal
-  private journalResponse:protobufs.JournalResponse;
-  private content:string = ""
+  private mode: TextAreaMode = TextAreaMode.CREATING;
+  private journalId: number | Long;
+  public journalResponse: protobufs.JournalResponse;
+  public selectedJournals: Record<number, boolean> = {};
+  public content = '';
   constructor(
-    private journalService:JournalService,
+    private journalService: JournalService,
     private dialog: MatDialog,
     private snackBar: MatSnackBar
   ) { }
 
   isModeCreating() {
-    return this.mode == TextAreaMode.CREATING
+    return this.mode === TextAreaMode.CREATING;
+  }
+
+  selectedJournalLength() {
+    return Object.values(this.selectedJournals).filter(a => a === true).length;
   }
 
   ngOnInit() {
     this.journalService.getJournals()
     .then((data) => {
-      this.journalResponse = data
-    })
+      this.journalResponse = data;
+    });
   }
 
   addJournal(e) {
-    e.preventDefault()
+    e.preventDefault();
     this.journalService.addJournal(this.content)
     .then((data) => {
-      this.content = "a"
-      this.journalResponse.journals.unshift(data)
-    })
+      this.content = '';
+      this.journalResponse.journals.unshift(data);
+    });
   }
 
-  editJournal(journal:protobufs.Journal) {
-    this.journal = journal
-    this.mode = TextAreaMode.EDITING
+  editJournal(journal: protobufs.Journal) {
+    this.journalId = journal.id;
+    this.mode = TextAreaMode.EDITING;
+    this.content = journal.content;
   }
 
   editSubmitJournal(e) {
-    e.preventDefault()
-    this.journalService.editJournal(this.journal)
+    e.preventDefault();
+    this.journalService.editJournal(this.journalId, this.content)
     .then((data) => {
-      this.mode = TextAreaMode.CREATING
-      this.journal = null
-      this.journalResponse.journals.map((a) => {
-        if(a.id == data.id) {
-          return data
+      this.mode = TextAreaMode.CREATING;
+      this.journalId = null;
+      this.content = '';
+      this.journalResponse.journals = this.journalResponse.journals.map((a) => {
+        if (a.id === data.id) {
+          return data;
         } else {
-          return a
+          return a;
         }
-      })
-    })
+      });
+    });
   }
 
   deleteJournalConfirm(journal: protobufs.Journal) {
-    const dialogData = new ConfirmDialogModel(`Delete Journal ${journal.id}`, "Are you sure you want to delete?");
+    const dialogData = new ConfirmDialogModel(`Delete Journal ${journal.id}`, 'Are you sure you want to delete?');
     const dialogRef = this.dialog.open(ConfirmDialogComponent, {
-      maxWidth: "400px",
+      maxWidth: '400px',
       data: dialogData
     });
 
     dialogRef.afterClosed().subscribe(dialogResult => {
-      if(dialogResult) {
-        this.deleteJournal(journal)
+      if (dialogResult) {
+        this.deleteJournal(journal);
       }
     });
+  }
+
+  deleteJournalSelectedConfirm() {
+    const dialogData = new ConfirmDialogModel(`Delete ${this.selectedJournalLength()} Journal Entries`, 'Are you sure you want to delete?');
+    const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+      maxWidth: '400px',
+      data: dialogData
+    });
+
+    dialogRef.afterClosed().subscribe(dialogResult => {
+      if (dialogResult) {
+        this.deleteJournalSelected();
+      }
+    });
+  }
+
+  deleteJournalSelected() {
+    Object.keys(this.selectedJournals).forEach((key) => {
+      if (this.selectedJournals[key]) {
+        const id = parseInt(key, 10);
+        this.journalService.deleteJournal(id)
+        .then((data) => {
+          this.journalResponse.journals = this.journalResponse.journals.filter((a) => a.id !== id);
+        });
+      }
+    });
+    this.selectedJournals = {};
   }
 
   deleteJournal(journal: protobufs.Journal) {
     return this.journalService.deleteJournal(journal.id)
     .then((data) => {
-      this.journalResponse.journals = this.journalResponse.journals.filter((a) => a.id != journal.id)
+      this.journalResponse.journals = this.journalResponse.journals.filter((a) => a.id !== journal.id);
     })
     .then(() => {
-      this.snackBar.open(`Deleted journal entry ${journal.id}`, "Undo", {
+      this.snackBar.open(`Deleted journal entry ${journal.id}`, 'Undo', {
         duration: 2000
       })
       .onAction().subscribe(() => {
-        this.undoDeleteJournal(journal)
-      })
+        this.undoDeleteJournal(journal);
+      });
     })
     .catch((err) => {
-      console.dir(err)
-      this.snackBar.open(err.message, "Retry", {
+      console.dir(err);
+      this.snackBar.open(err.message, 'Retry', {
         duration: 2000
       })
       .onAction().subscribe(() => {
-        this.deleteJournal(journal)
-      })
-    })
+        this.deleteJournal(journal);
+      });
+    });
   }
 
   undoDeleteJournal(journal: protobufs.Journal) {
     // TODO: Better undo delete
     this.journalService.addJournal(journal.content)
     .then((data) => {
-      this.journalResponse.journals.unshift(data)
-    })
+      this.journalResponse.journals.unshift(data);
+    });
   }
 
   doTextareaValueChange(e) {
-    if(this.isModeCreating()) {
-      this.content = e.target.value
-    } else {
-      this.journal.content = e.target.value
-    }
+    this.content = e.target.value;
   }
 
   fromNow(date) {
-    return moment.unix(date).fromNow()
+    return moment.unix(date).fromNow();
   }
 
 }

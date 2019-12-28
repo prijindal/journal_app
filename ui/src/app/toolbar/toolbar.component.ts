@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-import {protobufs} from "../../protobufs"
+import {protobufs} from '../../protobufs';
 
-import { UserService } from "../user.service"
+import { UserService } from '../user.service';
 
 @Component({
   selector: 'app-toolbar',
@@ -9,14 +9,14 @@ import { UserService } from "../user.service"
   styleUrls: ['./toolbar.component.scss']
 })
 export class ToolbarComponent implements OnInit {
-  private user:protobufs.User;
-  constructor(private userService:UserService) { }
+  public user: protobufs.User;
+  constructor(private userService: UserService) { }
 
   ngOnInit() {
     this.userService.getUser()
     .then((user) => {
       this.user = user;
-    })
+    });
   }
 
 }
