@@ -1,9 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import {BreakpointObserver, Breakpoints} from '@angular/cdk/layout';
 
-import {protobufs} from '../../protobufs';
-
 import { UserService } from '../user.service';
+import { JournalService } from '../journal.service';
 import { SidebarService } from '../sidebar.service';
 
 @Component({
@@ -13,10 +12,10 @@ import { SidebarService } from '../sidebar.service';
 })
 export class ToolbarComponent implements OnInit {
   public isHandset: boolean;
-  public user: protobufs.User;
   constructor(
     private sidebarService: SidebarService,
     private userService: UserService,
+    private journalService: JournalService,
     breakpointObserver: BreakpointObserver,
   ) {
     const layoutChanges = breakpointObserver.observe([
@@ -28,14 +27,20 @@ export class ToolbarComponent implements OnInit {
     });
   }
 
+  get user() {
+    return this.userService.user;
+  }
+
   ngOnInit() {
-    this.userService.getUser()
-    .then((user) => {
-      this.user = user;
-    });
+    this.userService.getUser();
   }
 
   toggleSidebar() {
     this.sidebarService.myNav.toggle();
+  }
+
+  refresh() {
+    this.userService.getUser();
+    this.journalService.getJournals();
   }
 }

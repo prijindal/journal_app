@@ -59,6 +59,9 @@ export class EditJournalComponent implements OnInit {
     this.journalService.editJournal(this.journalId, newContent)
     .then((data) => {
       this.journalId = null;
+      this.snackBar.open(`Succesfully edited journal ${data.id}`, 'Undo', {
+        duration: 2000
+      });
     });
   }
 }

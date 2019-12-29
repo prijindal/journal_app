@@ -54,6 +54,7 @@ export class JournalService {
           return a;
         }
       });
+      return data;
     });
   }
 }

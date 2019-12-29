@@ -15,6 +15,9 @@
       Hi, {{user.email}}
     </span>
     <span class="example-spacer"></span>
+    <a mat-icon-button (click)="refresh()">
+      <mat-icon>refresh</mat-icon>
+    </a>
     <a mat-icon-button routerLink="/settings">
       <mat-icon>settings</mat-icon>
     </a>
@@ -34,6 +37,10 @@
       <mat-icon>more_vert</mat-icon>
     </button>
     <mat-menu #menu="matMenu">
+      <button mat-menu-item (click)="refresh()">
+        <mat-icon>refresh</mat-icon>
+        <span>Refresh</span>
+      </button>
       <button routerLink="/settings" mat-menu-item>
         <mat-icon>settings</mat-icon>
         <span>Settings</span>

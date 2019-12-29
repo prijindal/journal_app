@@ -3,6 +3,7 @@ import {BreakpointObserver, Breakpoints} from '@angular/cdk/layout';
 import { Router } from '@angular/router';
 
 import {JournalService} from '../journal.service';
+import { MatSnackBar } from '@angular/material';
 
 enum TextAreaMode {
   EDITING,
@@ -18,6 +19,7 @@ export class HomeComponent implements OnInit {
   public isHandset: boolean;
   public content = '';
   constructor(
+    private snackBar: MatSnackBar,
     private journalService: JournalService,
     private router: Router,
     breakpointObserver: BreakpointObserver,
@@ -32,11 +34,15 @@ export class HomeComponent implements OnInit {
   }
 
   ngOnInit() {
+    this.journalService.getJournals();
   }
 
   addJournal(newContent: string) {
     this.journalService.addJournal(newContent)
     .then((data) => {
+      this.snackBar.open(`Succesfully added journal ${data.id}`, 'Undo', {
+        duration: 2000
+      });
       this.router.navigate(['/journal', data.id]);
       this.content = '';
     });
