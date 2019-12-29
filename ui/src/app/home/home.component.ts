@@ -16,6 +16,7 @@ enum TextAreaMode {
 })
 export class HomeComponent implements OnInit {
   public isHandset: boolean;
+  public content = '';
   constructor(
     private journalService: JournalService,
     private router: Router,
@@ -37,6 +38,7 @@ export class HomeComponent implements OnInit {
     this.journalService.addJournal(newContent)
     .then((data) => {
       this.router.navigate(['/journal', data.id]);
+      this.content = '';
     });
   }
 }
