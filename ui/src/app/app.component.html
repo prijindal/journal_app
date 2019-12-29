@@ -1,10 +1,30 @@
-<style>
-  :host {
-    display: flex;
-    justify-content: start;
-    flex-direction: column;
-    height: 100%;
-  }
-</style>
-<app-toolbar></app-toolbar>
-<router-outlet></router-outlet>
+<mat-sidenav-container *ngIf="isHandset" class="container">
+  <mat-sidenav #sidenav>
+    <mat-list role="list">
+      <mat-list-item routerLink="/">
+        <mat-icon mat-list-icon>add</mat-icon>
+        <h4>New</h4>
+      </mat-list-item>
+      <mat-list-item routerLink="/settings">
+        <mat-icon mat-list-icon>settings</mat-icon>
+        <h4>Settings</h4>
+      </mat-list-item>
+      <mat-list-item routerLink="/journal">
+        <mat-icon mat-list-icon>notes</mat-icon>
+        <h4>Journals</h4>
+      </mat-list-item>
+      <a mat-list-item href="/logout">
+        <mat-icon mat-list-icon>logout</mat-icon>
+        <h4>Logout</h4>
+      </a>
+    </mat-list>
+  </mat-sidenav>
+  <mat-sidenav-content>
+    <app-toolbar></app-toolbar>
+    <router-outlet></router-outlet>
+  </mat-sidenav-content>
+</mat-sidenav-container>
+<div class="container" *ngIf="!isHandset">
+  <app-toolbar></app-toolbar>
+  <router-outlet></router-outlet>
+</div>

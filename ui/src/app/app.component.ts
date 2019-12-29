@@ -1,9 +1,30 @@
-import { Component } from '@angular/core';
+import { Component, ViewChild, AfterViewInit } from '@angular/core';
+import { MatSidenav } from '@angular/material/sidenav';
+import {BreakpointObserver, Breakpoints} from '@angular/cdk/layout';
+import { SidebarService } from './sidebar.service';
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss']
 })
-export class AppComponent{
+export class AppComponent implements AfterViewInit {
+  public isHandset: boolean;
+  @ViewChild('sidenav', {static: false}) public myNav: MatSidenav;
+  constructor(
+    public sidebarService: SidebarService,
+    breakpointObserver: BreakpointObserver,
+  ) {
+    const layoutChanges = breakpointObserver.observe([
+      Breakpoints.HandsetLandscape,
+      Breakpoints.HandsetPortrait
+    ]);
+    layoutChanges.subscribe(result => {
+      this.isHandset = result.matches;
+    });
+  }
+
+  ngAfterViewInit() {
+    this.sidebarService.myNav = this.myNav;
+  }
 }

@@ -1,0 +1,9 @@
+:host,.container {
+    display: flex;
+    justify-content: flex-start;
+    flex-direction: column;
+    height: 100%;
+}
+.mat-sidenav {
+    min-width: 250px;
+}

@@ -4,6 +4,7 @@ import { Routes, RouterModule } from '@angular/router';
 import { HomeComponent } from './home/home.component';
 import { SettingsComponent } from './settings/settings.component';
 import { EditJournalComponent } from './edit-journal/edit-journal.component';
+import { JournalListComponent } from './journal-list/journal-list.component';
 
 const routes: Routes = [{
   path: '',
@@ -11,6 +12,9 @@ const routes: Routes = [{
 }, {
   path: 'settings',
   component: SettingsComponent
+}, {
+  path: 'journal',
+  component: JournalListComponent
 }, {
   path: 'journal/:id',
   component: EditJournalComponent

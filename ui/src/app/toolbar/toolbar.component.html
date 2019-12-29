@@ -7,19 +7,41 @@
   }
 </style>
 <mat-toolbar color="primary">
-  <mat-toolbar-row>
+  <mat-toolbar-row *ngIf="!isHandset">
     <a mat-icon-button routerLink="/">
-      <mat-icon aria-hidden="false" aria-label="Example home icon">home</mat-icon>
+      <mat-icon>home</mat-icon>
     </a>
-    <span *ngIf="user">
+    <span *ngIf="user" class="user-email-text">
       Hi, {{user.email}}
     </span>
     <span class="example-spacer"></span>
     <a mat-icon-button routerLink="/settings">
-      <mat-icon aria-hidden="false" aria-label="Example home icon">settings</mat-icon>
+      <mat-icon>settings</mat-icon>
     </a>
     <a mat-icon-button href="/logout">
-      <mat-icon aria-hidden="false" aria-label="Example home icon">logout</mat-icon>
+      <mat-icon>logout</mat-icon>
     </a>
+  </mat-toolbar-row>
+  <mat-toolbar-row *ngIf="isHandset">
+    <a mat-icon-button (click)="toggleSidebar()">
+      <mat-icon>menu</mat-icon>
+    </a>
+    <span *ngIf="user" class="user-email-text" style="font-size: 18px;">
+      Hi, {{user.email}}
+    </span>
+    <span class="example-spacer"></span>
+    <button mat-icon-button [matMenuTriggerFor]="menu">
+      <mat-icon>more_vert</mat-icon>
+    </button>
+    <mat-menu #menu="matMenu">
+      <button routerLink="/settings" mat-menu-item>
+        <mat-icon>settings</mat-icon>
+        <span>Settings</span>
+      </button>
+      <button href="/logout" mat-menu-item>
+        <mat-icon>logout</mat-icon>
+        <span>Logout</span>
+      </button>
+    </mat-menu>
   </mat-toolbar-row>
 </mat-toolbar>
