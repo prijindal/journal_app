@@ -1,0 +1,16 @@
+<mat-list role="list" *ngIf="journalResponse">
+  <h3 *ngIf="selectedJournalLength() == 0" mat-subheader>Journal Entries</h3>
+  <h3 *ngIf="selectedJournalLength() > 0" mat-subheader>
+    <mat-icon (click)="deleteJournalSelectedConfirm()">delete</mat-icon>
+  </h3>
+  <mat-list-item *ngFor="let journal of journalResponse.journals">
+    <mat-checkbox mat-list-icon [(ngModel)]="selectedJournals[journal.id]"></mat-checkbox>
+    <h4 class="overflow-2-rows" mat-line>{{journal.content}}</h4>
+    <p mat-line> {{fromNow(journal.createdAt)}} </p>
+    <mat-icon (click)="deleteJournalConfirm(journal)">delete</mat-icon>
+    <mat-icon [routerLink]="['/journal',journal.id]">edit</mat-icon>
+  </mat-list-item>
+  <mat-list-item *ngIf="journalResponse.journals.length == 0">
+    <p mat-line>No Entries found</p>
+  </mat-list-item>
+</mat-list>

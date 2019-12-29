@@ -1,0 +1,16 @@
+:host {
+    flex: 1 1 auto;
+    max-width: 500px;
+    overflow-y: auto;
+    mat-list {
+        padding-bottom: 32px;
+    }
+}
+.overflow-2-rows.mat-line {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: normal;
+}

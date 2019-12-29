@@ -1,0 +1,9 @@
+<form class="textarea-container" (submit)="onSubmit($event)">
+  <textarea name="content" class="textarea" [(ngModel)]="content" placeholder="Write your journal"></textarea>
+  <button *ngIf="!isHandset" class="save-icon" mat-raised-button color="{{btnColor}}">
+    <mat-icon aria-hidden="false" aria-label="Save">save</mat-icon>
+  </button>
+  <button *ngIf="isHandset" class="save-icon-fab" mat-fab color="{{btnColor}}">
+    <mat-icon aria-hidden="false" aria-label="Save">save</mat-icon>
+  </button>
+</form>

@@ -1,26 +1,2 @@
-<form *ngIf="isModeCreating()" class="textarea-container" (submit)="addJournal($event)">
-  <textarea name="content" class="textarea" [(ngModel)]="content" placeholder="Write your journal"></textarea>
-  <button mat-raised-button color="primary">Add New</button>
-</form>
-<form *ngIf="!isModeCreating()" class="textarea-container" (submit)="editSubmitJournal($event)">
-  <textarea name="content" class="textarea" [(ngModel)]="content" placeholder="Write your journal"></textarea>
-  <button mat-raised-button color="primary">Save</button>
-</form>
-<div class="journal-list">
-  <mat-list role="list" *ngIf="journalResponse">
-    <h3 *ngIf="selectedJournalLength() == 0" mat-subheader>Journal Entries</h3>
-    <h3 *ngIf="selectedJournalLength() > 0" mat-subheader>
-      <mat-icon (click)="deleteJournalSelectedConfirm()">delete</mat-icon>
-    </h3>
-    <mat-list-item *ngFor="let journal of journalResponse.journals">
-      <mat-checkbox mat-list-icon [(ngModel)]="selectedJournals[journal.id]"></mat-checkbox>
-      <h4 class="overflow-2-rows" mat-line>{{journal.content}}</h4>
-      <p mat-line> {{fromNow(journal.createdAt)}} </p>
-      <mat-icon (click)="deleteJournalConfirm(journal)">delete</mat-icon>
-      <mat-icon (click)="editJournal(journal)">edit</mat-icon>
-    </mat-list-item>
-    <mat-list-item *ngIf="journalResponse.journals.length == 0">
-      <p mat-line>No Entries found</p>
-    </mat-list-item>
-  </mat-list>
-</div>
+<app-journal-textarea (save)="addJournal($event)" [content]="content"></app-journal-textarea>
+<app-journal-list *ngIf="!isHandset"></app-journal-list>
