@@ -40,11 +40,19 @@ func ParseJwtToken(r *http.Request) (*models.User, *models.AccessToken, error) {
 	}
 
 	accessToken := new(models.AccessToken)
-	databases.GetPostgresClient().Model(accessToken).Where("token = ?", claims.Token).Select()
+	err = databases.GetPostgresClient().Model(accessToken).Where("token = ?", claims.Token).Select()
+
+	if err != nil {
+		return nil, nil, err
+	}
 
 	user := new(models.User)
 
-	databases.GetPostgresClient().Model(user).Where("id = ?", accessToken.UserID).Select()
+	err = databases.GetPostgresClient().Model(user).Where("id = ?", accessToken.UserID).Select()
+
+	if err != nil {
+		return nil, nil, err
+	}
 
 	return user, accessToken, nil
 }

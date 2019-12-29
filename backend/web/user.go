@@ -1,6 +1,7 @@
 package web
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/dgrijalva/jwt-go"
@@ -41,37 +42,62 @@ func RegisterHandler(w http.ResponseWriter, r *http.Request) {
 		if r.Method == "GET" {
 			HandleTemplate(w, "register", LoginPageData{})
 		} else if r.Method == "POST" {
+			isAPITXT := r.URL.Query().Get("api")
+			isAPI := false
+			if isAPITXT == "true" {
+				isAPI = true
+			}
 			r.ParseForm()
 			userForm := &UserForm{}
 			userForm.Email = r.FormValue("email")
 			userForm.Password = r.FormValue("password")
 			confirmPassword := r.FormValue("confirm_password")
 			if confirmPassword != userForm.Password {
-				HandleTemplate(w, "register", LoginPageData{
-					Error: "Password do not match",
-				})
+				if isAPI {
+					w.WriteHeader(500)
+					fmt.Fprintf(w, "Password do not match")
+				} else {
+					HandleTemplate(w, "register", LoginPageData{
+						Error: "Password do not match",
+					})
+				}
 			}
 			user := new(models.User)
 			err := databases.GetPostgresClient().Model(user).Where("email = ?", userForm.Email).Select()
 			if err != pg.ErrNoRows {
-				HandleTemplate(w, "register", LoginPageData{
-					Error: "Email already exists",
-				})
+				if isAPI {
+					w.WriteHeader(500)
+					fmt.Fprintf(w, "Email already exists")
+				} else {
+					HandleTemplate(w, "register", LoginPageData{
+						Error: "Email already exists",
+					})
+				}
 			} else {
 				hashedPassword, err := bcrypt.GenerateFromPassword([]byte(userForm.Password), 10)
 				if err != nil {
-					HandleTemplate(w, "register", LoginPageData{
-						Error: err.Error(),
-					})
+					if isAPI {
+						w.WriteHeader(500)
+						fmt.Fprintf(w, err.Error())
+					} else {
+						HandleTemplate(w, "register", LoginPageData{
+							Error: err.Error(),
+						})
+					}
 				} else {
 					user = new(models.User)
 					user.Email = userForm.Email
 					user.Password = string(hashedPassword)
 					_, err := databases.GetPostgresClient().Model(user).Insert(user)
 					if err != nil {
-						HandleTemplate(w, "register", LoginPageData{
-							Error: err.Error(),
-						})
+						if isAPI {
+							w.WriteHeader(500)
+							fmt.Fprintf(w, err.Error())
+						} else {
+							HandleTemplate(w, "register", LoginPageData{
+								Error: err.Error(),
+							})
+						}
 					} else {
 						SetJwtToken(w, user)
 						http.Redirect(w, r, "/app/", 302)
@@ -91,6 +117,11 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 		if r.Method == "GET" {
 			HandleTemplate(w, "login", LoginPageData{})
 		} else if r.Method == "POST" {
+			isAPITXT := r.URL.Query().Get("api")
+			isAPI := false
+			if isAPITXT == "true" {
+				isAPI = true
+			}
 			r.ParseForm()
 			userForm := &UserForm{}
 			userForm.Email = r.FormValue("email")
@@ -98,15 +129,25 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 			user := new(models.User)
 			err := databases.GetPostgresClient().Model(user).Where("email = ?", userForm.Email).Select()
 			if err == pg.ErrNoRows {
-				HandleTemplate(w, "login", LoginPageData{
-					Error: "Username or password is invalid",
-				})
-			} else {
-				err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(userForm.Password))
-				if err != nil {
+				if isAPI {
+					w.WriteHeader(500)
+					fmt.Fprintf(w, "Username or password is invalid")
+				} else {
 					HandleTemplate(w, "login", LoginPageData{
 						Error: "Username or password is invalid",
 					})
+				}
+			} else {
+				err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(userForm.Password))
+				if err != nil {
+					if isAPI {
+						w.WriteHeader(500)
+						fmt.Fprintf(w, "Username or password is invalid")
+					} else {
+						HandleTemplate(w, "login", LoginPageData{
+							Error: "Username or password is invalid",
+						})
+					}
 				} else {
 					SetJwtToken(w, user)
 					http.Redirect(w, r, "/app/", 302)
