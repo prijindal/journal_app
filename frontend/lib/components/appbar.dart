@@ -2,19 +2,22 @@ import 'package:flutter/material.dart';
 import 'package:journal_app/api/api.dart';
 
 class JournalAppBar extends StatelessWidget implements PreferredSizeWidget {
-  JournalAppBar() : preferredSize = Size.fromHeight(kToolbarHeight);
+  @required
+  final String title;
+  JournalAppBar({this.title = "Journals"})
+      : preferredSize = Size.fromHeight(kToolbarHeight);
 
   @override
   final Size preferredSize;
 
-  _logout(BuildContext context) async {
-    await HttpApi.getInstance().logout();
-    Navigator.of(context).pushReplacementNamed("/login");
+  _refresh() async {
+    HttpApi.getInstance().getUser();
+    HttpApi.getInstance().getJournal();
   }
 
   @override
   Widget build(BuildContext context) => AppBar(
-        title: Text("Journals"),
+        title: Text(this.title),
         leading: Navigator.of(context).canPop()
             ? IconButton(
                 icon: Icon(Icons.close),
@@ -22,17 +25,18 @@ class JournalAppBar extends StatelessWidget implements PreferredSizeWidget {
                   Navigator.of(context).pop();
                 },
               )
-            : IconButton(
-                icon: Icon(Icons.menu),
-                onPressed: () {},
-              ),
+            : Scaffold.of(context).hasDrawer
+                ? IconButton(
+                    icon: Icon(Icons.menu),
+                    onPressed: () {
+                      Scaffold.of(context).openDrawer();
+                    },
+                  )
+                : null,
         actions: <Widget>[
           IconButton(
-            onPressed: () => _logout(context),
-            icon: new RotationTransition(
-              turns: new AlwaysStoppedAnimation(180 / 360),
-              child: Icon(Icons.exit_to_app),
-            ),
+            onPressed: _refresh,
+            icon: Icon(Icons.refresh),
           )
         ],
       );

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:journal_app/components/appbar.dart';
+import 'package:journal_app/components/appdrawer.dart';
 import 'package:journal_app/screens/editjournal.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
@@ -13,21 +14,20 @@ class JournalsScreen extends StatefulWidget {
 class _JournalsScreenState extends State<JournalsScreen> {
   final GlobalKey<RefreshIndicatorState> _refreshIndicatorKey =
       new GlobalKey<RefreshIndicatorState>();
-  JournalResponse _journalResponse;
   @override
   void initState() {
     super.initState();
     _getJournals();
   }
 
+  JournalResponse get _journalResponse => HttpApi.getInstance().journalResponse;
+
   Future<void> _getJournals() async {
-    final journalResponse = await HttpApi.getInstance().getJournal();
-    if (journalResponse == null) {
+    await HttpApi.getInstance().getJournal();
+    if (_journalResponse == null) {
       Navigator.of(context).pushReplacementNamed("/login");
     } else {
-      setState(() {
-        this._journalResponse = journalResponse;
-      });
+      setState(() {});
     }
   }
 
@@ -40,6 +40,7 @@ class _JournalsScreenState extends State<JournalsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      drawer: JournalAppDrawer(),
       appBar: JournalAppBar(),
       floatingActionButton: FloatingActionButton(
           onPressed: _goToNewJournal, child: Icon(Icons.add)),
@@ -58,8 +59,8 @@ class _JournalsScreenState extends State<JournalsScreen> {
                     itemCount: _journalResponse.journals.length,
                     itemBuilder: (context, index) => _JournalTile(
                       _journalResponse.journals[index],
-                      onDelete: _getJournals,
-                      onEdit: _getJournals,
+                      onDelete: () => setState(() {}),
+                      onEdit: () => setState(() {}),
                     ),
                   ),
       ),
@@ -81,21 +82,47 @@ class _JournalTile extends StatelessWidget {
     return timeago.format(date);
   }
 
-  _deleteJournal() async {
-    await HttpApi.getInstance().deleteJournal(journal.id);
-    onDelete();
+  _deleteJournal(BuildContext context) async {
+    final shouldDelete = await showDialog<bool>(
+      context: context,
+      builder: (BuildContext context) => AlertDialog(
+        title: Text("Delete Journal Entry ${journal.id}?"),
+        content: const Text("Are you sure you want to delete?"),
+        actions: <Widget>[
+          FlatButton(
+            child: Text("No"),
+            onPressed: () => Navigator.of(context).pop(false),
+          ),
+          FlatButton(
+            child: Text("Yes"),
+            onPressed: () => Navigator.of(context).pop(true),
+          ),
+        ],
+      ),
+    );
+    if (shouldDelete) {
+      await HttpApi.getInstance().deleteJournal(journal.id);
+      onDelete();
+    }
   }
 
   _editJournal(BuildContext context) async {
-    EditJournalScreenArguments args = EditJournalScreenArguments(journal.id);
-    await Navigator.of(context).pushNamed('/edit', arguments: args);
+    // EditJournalScreenArguments args = EditJournalScreenArguments(journal.id);
+    // await Navigator.of(context).pushNamed('/edit', arguments: args);
+    await Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => EditJournalScreen(
+          journal: journal,
+        ),
+      ),
+    );
     onEdit();
   }
 
   @override
   Widget build(BuildContext context) => ListTile(
         title: Text(
-          journal.content,
+          journal.content.replaceAll("\n", " "),
           overflow: TextOverflow.ellipsis,
           maxLines: 2,
         ),
@@ -109,7 +136,7 @@ class _JournalTile extends StatelessWidget {
             ),
             IconButton(
               icon: Icon(Icons.delete),
-              onPressed: _deleteJournal,
+              onPressed: () => _deleteJournal(context),
             ),
           ],
         ),

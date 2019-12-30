@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:journal_app/api/api.dart';
+import 'package:journal_app/helpers/flutter_persistor.dart';
 
 class LoadingScreen extends StatefulWidget {
   _LoadingScreenState createState() => _LoadingScreenState();
@@ -14,6 +15,7 @@ class _LoadingScreenState extends State<LoadingScreen> {
 
   _checkUser() async {
     final _instance = HttpApi.getInstance();
+    await FlutterPersistor.getInstance().initSharedPreferences();
     final user = await _instance.getUser();
     if (user == null) {
       _instance.logout();

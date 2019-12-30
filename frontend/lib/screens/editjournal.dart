@@ -3,6 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:journal_app/components/appbar.dart';
 
 import 'package:journal_app/api/api.dart';
+import 'package:journal_app/components/appdrawer.dart';
+import 'package:journal_app/components/textarea.dart';
+import 'package:journal_app/protobufs/journal.pbserver.dart';
 
 class EditJournalScreenArguments {
   final Int64 id;
@@ -11,6 +14,8 @@ class EditJournalScreenArguments {
 }
 
 class EditJournalScreen extends StatefulWidget {
+  final Journal journal;
+  EditJournalScreen({this.journal});
   _EditJournalScreenState createState() => _EditJournalScreenState();
 }
 
@@ -24,7 +29,7 @@ class _EditJournalScreenState extends State<EditJournalScreen> {
       if (Navigator.of(context).canPop()) {
         Navigator.of(context).pop();
       } else {
-        Navigator.of(context).popAndPushNamed("/journal");
+        Navigator.of(context).pushReplacementNamed("/journal");
       }
     }
   }
@@ -36,18 +41,31 @@ class _EditJournalScreenState extends State<EditJournalScreen> {
   }
 
   Int64 _getId() {
-    final EditJournalScreenArguments args =
-        ModalRoute.of(context).settings.arguments;
-    return args.id;
+    if (widget.journal == null) {
+      final EditJournalScreenArguments args =
+          ModalRoute.of(context).settings.arguments;
+      return args.id;
+    } else {
+      return widget.journal.id;
+    }
   }
 
   void _getContent() async {
-    final journalResponse = await HttpApi.getInstance().getJournal();
-    final journal = journalResponse.journals
-        .singleWhere((journal) => journal.id == _getId());
-    if (journal != null) {
+    if (widget.journal == null) {
+      await HttpApi.getInstance().getJournal();
+      final journal = HttpApi.getInstance()
+          .journalResponse
+          .journals
+          .singleWhere((journal) => journal.id == _getId());
+      if (journal != null) {
+        setState(() {
+          _contentController = TextEditingController(text: journal.content);
+        });
+      }
+    } else {
       setState(() {
-        _contentController.text = journal.content;
+        _contentController =
+            TextEditingController(text: widget.journal.content);
       });
     }
   }
@@ -55,25 +73,18 @@ class _EditJournalScreenState extends State<EditJournalScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: JournalAppBar(),
+      drawer: JournalAppDrawer(),
+      appBar: JournalAppBar(
+        title: "Edit Journal",
+      ),
       floatingActionButton: FloatingActionButton(
         onPressed: _saveJournal,
         child: Icon(Icons.save),
       ),
-      body: Center(
-        child: Container(
-          padding: EdgeInsets.symmetric(vertical: 10.0, horizontal: 10.0),
-          constraints: BoxConstraints(
-            maxWidth: 500.0,
-          ),
-          child: TextFormField(
-            autofocus: true,
-            controller: _contentController,
-            minLines: 10,
-            maxLines: 20,
-          ),
-        ),
+      body: JournalTextArea(
+        controller: _contentController,
       ),
+      resizeToAvoidBottomPadding: true,
     );
   }
 }

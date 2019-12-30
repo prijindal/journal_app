@@ -4,13 +4,15 @@ import 'package:http/http.dart' as http;
 import 'package:journal_app/protobufs/journal.pbserver.dart';
 import 'package:journal_app/protobufs/user.pb.dart';
 
-const String HOST = 'http://localhost:4001';
-// const String HOST = 'https://journal.easycode.club';
+// const String HOST = 'http://localhost:4001';
+const String HOST = 'https://journal.easycode.club';
 const String COOKIE_KEY = "COOKIE";
 
 class HttpApi {
   String _cookie;
   static HttpApi _instance;
+  User _user;
+  JournalResponse _journalResponse;
 
   static HttpApi getInstance() {
     if (_instance == null) {
@@ -18,6 +20,9 @@ class HttpApi {
     }
     return _instance;
   }
+
+  User get user => _user;
+  JournalResponse get journalResponse => _journalResponse;
 
   FlutterPersistor get _persistance {
     return FlutterPersistor.getInstance();
@@ -61,33 +66,46 @@ class HttpApi {
       _persistance.clearString(COOKIE_KEY);
       return null;
     } else {
-      return User.fromBuffer(response.bodyBytes);
+      _user = User.fromBuffer(response.bodyBytes);
+      return _user;
     }
   }
 
   Future<JournalResponse> getJournal() async {
     var url = '$HOST/journal';
     var response = await http.get(url, headers: this.headers);
-    return JournalResponse.fromBuffer(response.bodyBytes);
+    _journalResponse = JournalResponse.fromBuffer(response.bodyBytes);
+    return _journalResponse;
   }
 
   Future<Journal> newJournal(String content) async {
     var url = '$HOST/journal';
     var response =
         await http.post(url, headers: this.headers, body: {'content': content});
-    return Journal.fromBuffer(response.bodyBytes);
+    final Journal journal = Journal.fromBuffer(response.bodyBytes);
+    _journalResponse.journals.insert(0, journal);
+    _journalResponse.total++;
+    return journal;
   }
 
   Future<Journal> saveJournal(Int64 id, String content) async {
     var url = '$HOST/journal';
     var response = await http.put(url,
         headers: this.headers, body: {'id': id.toString(), 'content': content});
-    return Journal.fromBuffer(response.bodyBytes);
+    final Journal journal = Journal.fromBuffer(response.bodyBytes);
+    final index =
+        _journalResponse.journals.indexWhere((j) => j.id == journal.id);
+    _journalResponse.journals.elementAt(index).content = journal.content;
+    _journalResponse.journals.elementAt(index).updatedAt = journal.updatedAt;
+    return journal;
   }
 
   Future<Journal> deleteJournal(Int64 id) async {
     var url = '$HOST/journal?id=$id';
     var response = await http.delete(url, headers: this.headers);
-    return Journal.fromBuffer(response.bodyBytes);
+    final Journal journal = Journal.fromBuffer(response.bodyBytes);
+    _journalResponse.journals.removeWhere((j) => j.id == journal.id);
+    _journalResponse.total--;
+    return journal;
   }
 }

@@ -12,9 +12,11 @@ class _LoginScreenState extends State<LoginScreen> {
   String _error;
 
   _login() async {
-    var err = await HttpApi.getInstance()
-        .login(_emailController.text, _passwordController.text);
+    final _instance = HttpApi.getInstance();
+    var err =
+        await _instance.login(_emailController.text, _passwordController.text);
     if (err == null) {
+      _instance.getUser();
       Navigator.of(context).pushReplacementNamed("/journal");
     } else {
       setState(() {

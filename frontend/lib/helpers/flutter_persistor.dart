@@ -6,10 +6,6 @@ class FlutterPersistor {
   SharedPreferences _sharedPreferences;
   static FlutterPersistor _instance;
 
-  FlutterPersistor() {
-    _initSharedPreferences();
-  }
-
   static FlutterPersistor getInstance() {
     if (_instance == null) {
       _instance = FlutterPersistor();
@@ -17,7 +13,7 @@ class FlutterPersistor {
     return _instance;
   }
 
-  Future<void> _initSharedPreferences() async {
+  Future<void> initSharedPreferences() async {
     if (Platform.isAndroid || Platform.isIOS) {
       _sharedPreferences = await SharedPreferences.getInstance();
     }
