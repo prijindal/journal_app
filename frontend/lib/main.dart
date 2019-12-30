@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
-import 'package:journal_app/screens/editjournal.dart';
-import 'package:journal_app/screens/journals.dart';
 import 'dart:io';
 
+import 'package:journal_app/screens/editjournal.dart';
+import 'package:journal_app/screens/journals.dart';
 import 'package:journal_app/screens/loading.dart';
 import 'package:journal_app/screens/login.dart';
 import 'package:journal_app/screens/newjournal.dart';
+import 'package:journal_app/screens/settings.dart';
 
 /// If the current platform is a desktop platform that isn't yet supported by
 /// TargetPlatform, override the default platform to one that is.
@@ -38,6 +39,7 @@ class MyApp extends StatelessWidget {
         "/journal": (context) => JournalsScreen(),
         "/new": (context) => NewJournalScreen(),
         "/edit": (context) => EditJournalScreen(),
+        "/settings": (context) => SettingsScreen(),
       },
       // home: LoadingScreen(),
     );

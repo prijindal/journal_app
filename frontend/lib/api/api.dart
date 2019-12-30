@@ -78,20 +78,28 @@ class HttpApi {
     return _journalResponse;
   }
 
-  Future<Journal> newJournal(String content) async {
+  Future<Journal> newJournal(String content,
+      {Journal_JournalSaveType saveType}) async {
     var url = '$HOST/journal';
-    var response =
-        await http.post(url, headers: this.headers, body: {'content': content});
+    var params = {'content': content};
+    if (saveType != null) {
+      params['save_type'] = saveType.toString();
+    }
+    var response = await http.post(url, headers: this.headers, body: params);
     final Journal journal = Journal.fromBuffer(response.bodyBytes);
     _journalResponse.journals.insert(0, journal);
     _journalResponse.total++;
     return journal;
   }
 
-  Future<Journal> saveJournal(Int64 id, String content) async {
+  Future<Journal> saveJournal(Int64 id, String content,
+      {Journal_JournalSaveType saveType}) async {
     var url = '$HOST/journal';
-    var response = await http.put(url,
-        headers: this.headers, body: {'id': id.toString(), 'content': content});
+    var params = {'id': id.toString(), 'content': content};
+    if (saveType != null) {
+      params['save_type'] = saveType.toString();
+    }
+    var response = await http.put(url, headers: this.headers, body: params);
     final Journal journal = Journal.fromBuffer(response.bodyBytes);
     final index =
         _journalResponse.journals.indexWhere((j) => j.id == journal.id);

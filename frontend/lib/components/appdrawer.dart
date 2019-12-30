@@ -50,6 +50,16 @@ class _JournalAppDrawerState extends State<JournalAppDrawer> {
                   },
           ),
           ListTile(
+            title: Text("Settings"),
+            leading: Icon(Icons.settings),
+            onTap: _currentRoute == "/settings"
+                ? null
+                : () {
+                    Navigator.of(context)
+                        .pushNamedAndRemoveUntil("/settings", (route) => false);
+                  },
+          ),
+          ListTile(
             title: Text("Logout"),
             leading: Icon(Icons.exit_to_app),
             onTap: () {

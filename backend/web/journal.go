@@ -58,9 +58,17 @@ func JournalHandler(w http.ResponseWriter, r *http.Request) {
 				fmt.Fprintf(w, err.Error())
 				return
 			}
+			saveTypeText := r.FormValue("save_type")
+			var saveType protobufs.Journal_JournalSaveType
+			if saveTypeText == "ENCRYPTED" {
+				saveType = protobufs.Journal_ENCRYPTED
+			} else {
+				saveType = protobufs.Journal_PLAINTEXT
+			}
 			journal := new(models.Journal)
 			journal.UserID = user.ID
 			journal.Content = content
+			journal.SaveType = saveType.String()
 			_, err := databases.GetPostgresClient().Model(journal).Insert(journal)
 			if err != nil {
 				w.WriteHeader(500)
@@ -96,6 +104,13 @@ func JournalHandler(w http.ResponseWriter, r *http.Request) {
 				fmt.Fprintf(w, err.Error())
 				return
 			}
+			saveTypeText := r.FormValue("save_type")
+			var saveType protobufs.Journal_JournalSaveType
+			if saveTypeText == "ENCRYPTED" {
+				saveType = protobufs.Journal_ENCRYPTED
+			} else {
+				saveType = protobufs.Journal_PLAINTEXT
+			}
 			var journal models.Journal
 			err = databases.GetPostgresClient().Model(&journal).Where("id = ?", id).Select()
 			if err != nil {
@@ -105,6 +120,7 @@ func JournalHandler(w http.ResponseWriter, r *http.Request) {
 			}
 			journal.ID = id
 			journal.Content = content
+			journal.SaveType = saveType.String()
 			_, err = databases.GetPostgresClient().Model(&journal).Where("id = ?", id).Update()
 			if err != nil {
 				w.WriteHeader(500)

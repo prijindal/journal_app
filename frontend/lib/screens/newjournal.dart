@@ -4,6 +4,8 @@ import 'package:journal_app/components/appbar.dart';
 import 'package:journal_app/api/api.dart';
 import 'package:journal_app/components/appdrawer.dart';
 import 'package:journal_app/components/textarea.dart';
+import 'package:journal_app/helpers/encrypt.dart';
+import 'package:journal_app/protobufs/journal.pbserver.dart';
 
 class NewJournalScreen extends StatefulWidget {
   _NewJournalScreenState createState() => _NewJournalScreenState();
@@ -13,8 +15,13 @@ class _NewJournalScreenState extends State<NewJournalScreen> {
   TextEditingController _contentController = TextEditingController();
 
   _saveJournal() async {
+    var saveType = getSaveType();
+    var content = _contentController.text;
+    if (saveType == Journal_JournalSaveType.ENCRYPTED) {
+      content = getEncryptor().encrypt(content).base64;
+    }
     final newjournal =
-        await HttpApi.getInstance().newJournal(_contentController.text);
+        await HttpApi.getInstance().newJournal(content, saveType: saveType);
     if (newjournal != null) {
       if (Navigator.of(context).canPop()) {
         Navigator.of(context).pop();

@@ -1,6 +1,9 @@
+import 'package:encrypt/encrypt.dart';
 import 'package:flutter/material.dart';
 import 'package:journal_app/components/appbar.dart';
 import 'package:journal_app/components/appdrawer.dart';
+import 'package:journal_app/helpers/encrypt.dart';
+import 'package:journal_app/helpers/flutter_persistor.dart';
 import 'package:journal_app/screens/editjournal.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
@@ -119,10 +122,21 @@ class _JournalTile extends StatelessWidget {
     onEdit();
   }
 
+  String _getContent() {
+    var content;
+    if (journal.saveType != Journal_JournalSaveType.ENCRYPTED) {
+      content = journal.content;
+    } else {
+      var encryptedContent = Encrypted.fromBase64(journal.content);
+      content = getEncryptor().decrypt(encryptedContent);
+    }
+    return content.replaceAll("\n", " ");
+  }
+
   @override
   Widget build(BuildContext context) => ListTile(
         title: Text(
-          journal.content.replaceAll("\n", " "),
+          _getContent(),
           overflow: TextOverflow.ellipsis,
           maxLines: 2,
         ),
