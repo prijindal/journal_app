@@ -6,6 +6,8 @@ import * as moment from 'moment';
 import { protobufs } from '../../protobufs';
 import { ConfirmDialogModel, ConfirmDialogComponent } from '../confirm-dialog/confirm-dialog.component';
 import {JournalService} from '../journal.service';
+import { EncryptionService } from '../encryption.service';
+import { PromptDialogModel, PromptDialogComponent } from '../prompt-dialog/prompt-dialog.component';
 
 @Component({
   selector: 'app-journal-list',
@@ -17,6 +19,7 @@ export class JournalListComponent implements OnInit {
 
   constructor(
     private journalService: JournalService,
+    private encryptionService: EncryptionService,
     private dialog: MatDialog,
     private snackBar: MatSnackBar
   ) { }
@@ -88,6 +91,35 @@ export class JournalListComponent implements OnInit {
         this.deleteJournalSelected();
       }
     });
+  }
+
+  isEncryptionKeyNotFound(journal: protobufs.Journal) {
+    if (journal.saveType === protobufs.Journal.JournalSaveType.ENCRYPTED) {
+      return this.encryptionService.isEncryptionKeyNotFound();
+    }
+    return false;
+  }
+
+  enterEncryptionKey() {
+    const dialogData = new PromptDialogModel(`Enter Encryption Key`);
+    const dialogRef = this.dialog.open(PromptDialogComponent, {
+      maxWidth: '400px',
+      data: dialogData
+    });
+
+    dialogRef.afterClosed().subscribe((dialogResult: string) => {
+      if (dialogResult) {
+        this.encryptionService.setEncryptionKey(dialogResult);
+      }
+    });
+  }
+
+  getContent(journal: protobufs.Journal) {
+    if (journal.saveType !== protobufs.Journal.JournalSaveType.ENCRYPTED) {
+      return journal.content;
+    } else {
+      return this.encryptionService.decrypt(journal.content);
+    }
   }
 
   deleteJournalSelected() {

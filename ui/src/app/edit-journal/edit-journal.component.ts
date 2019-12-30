@@ -3,6 +3,8 @@ import { ActivatedRoute, ParamMap } from '@angular/router';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {JournalService} from '../journal.service';
 import {BreakpointObserver, Breakpoints} from '@angular/cdk/layout';
+import { protobufs } from 'src/protobufs';
+import { EncryptionService } from '../encryption.service';
 
 @Component({
   selector: 'app-edit-journal',
@@ -16,6 +18,7 @@ export class EditJournalComponent implements OnInit {
   constructor(
     private route: ActivatedRoute,
     private journalService: JournalService,
+    private encryptionService: EncryptionService,
     private snackBar: MatSnackBar,
     breakpointObserver: BreakpointObserver,
   ) {
@@ -41,10 +44,23 @@ export class EditJournalComponent implements OnInit {
     });
   }
 
+  getJournal() {
+    const journals = this.journalService.journalResponse.journals.filter((a) => a.id === this.journalId);
+    if (journals.length > 0) {
+      return journals[0];
+    } else {
+      return null;
+    }
+  }
+
   getJournalContent() {
     const journals = this.journalService.journalResponse.journals.filter((a) => a.id === this.journalId);
     if (journals.length > 0) {
-      this.content = journals[0].content;
+      if (journals[0].saveType == protobufs.Journal.JournalSaveType.ENCRYPTED) {
+        this.content = this.encryptionService.decrypt(journals[0].content);
+      } else {
+        this.content = journals[0].content;
+      }
     } else {
       this.snackBar.open(`Journal Entry ${this.journalId} not found`, 'Retry', {
         duration: 2000
@@ -56,7 +72,10 @@ export class EditJournalComponent implements OnInit {
   }
 
   editSubmitJournal(newContent: string) {
-    this.journalService.editJournal(this.journalId, newContent)
+    if (this.getJournal().saveType == protobufs.Journal.JournalSaveType.ENCRYPTED) {
+      newContent = this.encryptionService.encrypt(newContent);
+    }
+    this.journalService.editJournal(this.journalId, newContent, this.getJournal().saveType)
     .then((data) => {
       this.journalId = null;
       this.snackBar.open(`Succesfully edited journal ${data.id}`, 'Undo', {

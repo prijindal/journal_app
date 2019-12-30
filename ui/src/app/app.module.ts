@@ -23,6 +23,7 @@ import { ConfirmDialogComponent } from './confirm-dialog/confirm-dialog.componen
 import { EditJournalComponent } from './edit-journal/edit-journal.component';
 import { JournalListComponent } from './journal-list/journal-list.component';
 import { JournalTextareaComponent } from './journal-textarea/journal-textarea.component';
+import { PromptDialogComponent } from './prompt-dialog/prompt-dialog.component';
 
 @NgModule({
   declarations: [
@@ -34,6 +35,7 @@ import { JournalTextareaComponent } from './journal-textarea/journal-textarea.co
     EditJournalComponent,
     JournalListComponent,
     JournalTextareaComponent,
+    PromptDialogComponent,
   ],
   imports: [
     BrowserModule,
@@ -51,7 +53,10 @@ import { JournalTextareaComponent } from './journal-textarea/journal-textarea.co
     MatMenuModule,
     MatSidenavModule
   ],
-  entryComponents: [ConfirmDialogComponent],
+  entryComponents: [
+    ConfirmDialogComponent,
+    PromptDialogComponent
+  ],
   providers: [],
   bootstrap: [AppComponent]
 })

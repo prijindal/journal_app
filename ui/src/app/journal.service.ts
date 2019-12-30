@@ -39,10 +39,17 @@ export class JournalService {
     });
   }
 
-  editJournal(id: number | Long, content: string) {
+  editJournal(id: number | Long, content: string, saveType: protobufs.Journal.JournalSaveType = protobufs.Journal.JournalSaveType.PLAINTEXT) {
     const form = new FormData();
     form.append('id', id.toString());
     form.append('content', content);
+    if (saveType != null) {
+      if (saveType == protobufs.Journal.JournalSaveType.PLAINTEXT) {
+        form.append('save_type', 'PLAINTEXT');
+      } else if (saveType == protobufs.Journal.JournalSaveType.ENCRYPTED) {
+        form.append('save_type', 'ENCRYPTED');
+      }
+    }
     return this.http.put('/journal', form, {responseType: 'arraybuffer'})
     .toPromise()
     .then(data => protobufs.Journal.decode(new Uint8Array(data)))
