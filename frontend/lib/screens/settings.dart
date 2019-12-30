@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:journal_app/api/api.dart';
 import 'package:journal_app/components/appbar.dart';
 import 'package:journal_app/components/appdrawer.dart';
+import 'package:journal_app/components/enterkey.dart';
 import 'package:journal_app/helpers/encrypt.dart';
 import 'package:journal_app/helpers/flutter_persistor.dart';
 import 'package:journal_app/protobufs/journal.pb.dart';
@@ -55,33 +56,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
     if (confirm) {
       if (newType == Journal_JournalSaveType.ENCRYPTED) {
-        final TextEditingController _encyptionKeyController =
-            TextEditingController();
-        final String encryptionKey = await showDialog<String>(
-          context: context,
-          builder: (context) => SimpleDialog(
-            title: Text("Enter encyption key"),
-            children: <Widget>[
-              TextFormField(
-                controller: _encyptionKeyController,
-                maxLength: 32,
-              ),
-              Row(
-                children: <Widget>[
-                  FlatButton(
-                    child: Text("Cancel"),
-                    onPressed: () => Navigator.of(context).pop(null),
-                  ),
-                  RaisedButton(
-                    child: Text("Save"),
-                    onPressed: () =>
-                        Navigator.of(context).pop(_encyptionKeyController.text),
-                  ),
-                ],
-              )
-            ],
-          ),
-        );
+        final String encryptionKey = await enterKeyModal(context);
         if (encryptionKey == null) {
           return;
         } else {

@@ -4,8 +4,8 @@ import 'package:http/http.dart' as http;
 import 'package:journal_app/protobufs/journal.pbserver.dart';
 import 'package:journal_app/protobufs/user.pb.dart';
 
-// const String HOST = 'http://localhost:4001';
-const String HOST = 'https://journal.easycode.club';
+const String HOST = 'http://localhost:4001';
+// const String HOST = 'https://journal.easycode.club';
 const String COOKIE_KEY = "COOKIE";
 
 class HttpApi {

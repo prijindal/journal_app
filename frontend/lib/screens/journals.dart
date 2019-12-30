@@ -2,6 +2,7 @@ import 'package:encrypt/encrypt.dart';
 import 'package:flutter/material.dart';
 import 'package:journal_app/components/appbar.dart';
 import 'package:journal_app/components/appdrawer.dart';
+import 'package:journal_app/components/enterkey.dart';
 import 'package:journal_app/helpers/encrypt.dart';
 import 'package:journal_app/helpers/flutter_persistor.dart';
 import 'package:journal_app/screens/editjournal.dart';
@@ -133,13 +134,42 @@ class _JournalTile extends StatelessWidget {
     return content.replaceAll("\n", " ");
   }
 
+  bool _isEncryptionKeyNotFound() {
+    if (journal.saveType == Journal_JournalSaveType.ENCRYPTED) {
+      var encryptionKey =
+          FlutterPersistor.getInstance().loadString(ENCRYPTION_KEY);
+      if (encryptionKey == null || encryptionKey.isEmpty) {
+        return true;
+      }
+      return false;
+    }
+    return false;
+  }
+
+  void _enterEncryptionKey(BuildContext context) async {
+    final String encryptionKey = await enterKeyModal(context);
+    if (encryptionKey == null) {
+      return;
+    } else {
+      FlutterPersistor.getInstance().setString(ENCRYPTION_KEY, encryptionKey);
+      FlutterPersistor.getInstance()
+          .setString(SAVE_TYPE, journal.saveType.toString());
+    }
+  }
+
   @override
   Widget build(BuildContext context) => ListTile(
+        leading: _isEncryptionKeyNotFound() ? Icon(Icons.vpn_key) : null,
         title: Text(
-          _getContent(),
+          _isEncryptionKeyNotFound()
+              ? "Key not found. Tap to enter"
+              : _getContent(),
           overflow: TextOverflow.ellipsis,
           maxLines: 2,
         ),
+        onTap: _isEncryptionKeyNotFound()
+            ? () => _enterEncryptionKey(context)
+            : null,
         subtitle: Text(_fromNow()),
         trailing: Row(
           mainAxisSize: MainAxisSize.min,
