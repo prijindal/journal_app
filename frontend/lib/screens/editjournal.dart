@@ -1,17 +1,12 @@
-import 'package:fixnum/fixnum.dart';
 import 'package:flutter/material.dart';
-import 'package:journal_app/components/appbar.dart';
+import 'package:encrypt/encrypt.dart';
 
+import 'package:journal_app/components/appbar.dart';
 import 'package:journal_app/api/api.dart';
 import 'package:journal_app/components/appdrawer.dart';
 import 'package:journal_app/components/textarea.dart';
+import 'package:journal_app/helpers/encrypt.dart';
 import 'package:journal_app/protobufs/journal.pbserver.dart';
-
-class EditJournalScreenArguments {
-  final Int64 id;
-
-  EditJournalScreenArguments(this.id);
-}
 
 class EditJournalScreen extends StatefulWidget {
   final Journal journal;
@@ -23,8 +18,13 @@ class _EditJournalScreenState extends State<EditJournalScreen> {
   TextEditingController _contentController = TextEditingController();
 
   _saveJournal() async {
-    final savedJournal = await HttpApi.getInstance()
-        .saveJournal(_getId(), _contentController.text);
+    var content = _contentController.text;
+    if (widget.journal.saveType == Journal_JournalSaveType.ENCRYPTED) {
+      content = getEncryptor().encrypt(content).base64;
+    }
+    final savedJournal = await HttpApi.getInstance().saveJournal(
+        widget.journal.id, content,
+        saveType: widget.journal.saveType);
     if (savedJournal != null) {
       if (Navigator.of(context).canPop()) {
         Navigator.of(context).pop();
@@ -40,34 +40,14 @@ class _EditJournalScreenState extends State<EditJournalScreen> {
     _getContent();
   }
 
-  Int64 _getId() {
-    if (widget.journal == null) {
-      final EditJournalScreenArguments args =
-          ModalRoute.of(context).settings.arguments;
-      return args.id;
-    } else {
-      return widget.journal.id;
-    }
-  }
-
   void _getContent() async {
-    if (widget.journal == null) {
-      await HttpApi.getInstance().getJournal();
-      final journal = HttpApi.getInstance()
-          .journalResponse
-          .journals
-          .singleWhere((journal) => journal.id == _getId());
-      if (journal != null) {
-        setState(() {
-          _contentController = TextEditingController(text: journal.content);
-        });
-      }
-    } else {
-      setState(() {
-        _contentController =
-            TextEditingController(text: widget.journal.content);
-      });
+    var content = widget.journal.content;
+    if (widget.journal.saveType == Journal_JournalSaveType.ENCRYPTED) {
+      content = getEncryptor().decrypt(Encrypted.fromBase64(content));
     }
+    setState(() {
+      _contentController = TextEditingController(text: content);
+    });
   }
 
   @override
