@@ -10,8 +10,8 @@ class FlutterPersistor {
     _initSharedPreferences();
   }
 
-  static getInstance() {
-    if(_instance == null) {
+  static FlutterPersistor getInstance() {
+    if (_instance == null) {
       _instance = FlutterPersistor();
     }
     return _instance;
