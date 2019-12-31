@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show PlatformException;
+import 'package:pedantic/pedantic.dart';
 import 'package:uni_links/uni_links.dart';
 
 import 'package:journal_app/api/api.dart';
@@ -36,10 +37,10 @@ class _LoadingScreenState extends State<LoadingScreen> {
     await FlutterPersistor.getInstance().initSharedPreferences();
     final user = await _instance.getUser();
     if (user == null) {
-      _instance.logout();
-      Navigator.of(context).pushReplacementNamed("/login");
+      unawaited(_instance.logout());
+      unawaited(Navigator.of(context).pushReplacementNamed("/login"));
     } else {
-      Navigator.of(context).pushReplacementNamed("/journal");
+      unawaited(Navigator.of(context).pushReplacementNamed("/journal"));
     }
   }
 

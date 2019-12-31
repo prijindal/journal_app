@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:journal_app/api/api.dart';
+import 'package:pedantic/pedantic.dart';
 
 class LoginScreen extends StatefulWidget {
   @override
@@ -16,8 +17,8 @@ class _LoginScreenState extends State<LoginScreen> {
     var err =
         await _instance.login(_emailController.text, _passwordController.text);
     if (err == null) {
-      _instance.getUser();
-      Navigator.of(context).pushReplacementNamed("/journal");
+      unawaited(_instance.getUser());
+      unawaited(Navigator.of(context).pushReplacementNamed("/journal"));
     } else {
       setState(() {
         _error = err;

@@ -60,7 +60,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         if (encryptionKey == null) {
           return;
         } else {
-          FlutterPersistor.getInstance()
+          await FlutterPersistor.getInstance()
               .setString(ENCRYPTION_KEY, encryptionKey);
           encryptJournals();
         }
@@ -71,7 +71,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       setState(() {
         _saveType = newType;
       });
-      FlutterPersistor.getInstance()
+      await FlutterPersistor.getInstance()
           .setString(SAVE_TYPE, newType.value.toString());
     }
   }

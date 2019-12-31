@@ -56,7 +56,7 @@ export class EditJournalComponent implements OnInit {
   getJournalContent() {
     const journals = this.journalService.journalResponse.journals.filter((a) => a.id === this.journalId);
     if (journals.length > 0) {
-      if (journals[0].saveType == protobufs.Journal.JournalSaveType.ENCRYPTED) {
+      if (journals[0].saveType === protobufs.Journal.JournalSaveType.ENCRYPTED) {
         this.content = this.encryptionService.decrypt(journals[0].content);
       } else {
         this.content = journals[0].content;
@@ -72,7 +72,7 @@ export class EditJournalComponent implements OnInit {
   }
 
   editSubmitJournal(newContent: string) {
-    if (this.getJournal().saveType == protobufs.Journal.JournalSaveType.ENCRYPTED) {
+    if (this.getJournal().saveType === protobufs.Journal.JournalSaveType.ENCRYPTED) {
       newContent = this.encryptionService.encrypt(newContent);
     }
     this.journalService.editJournal(this.journalId, newContent, this.getJournal().saveType)

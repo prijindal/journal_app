@@ -22,6 +22,7 @@ dependencies:
   encrypt: any
   fixnum: any
   http: any
+  pedantic: any
   protobuf: any
   shared_preferences: any
   timeago: any

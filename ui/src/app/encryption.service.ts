@@ -29,8 +29,8 @@ export class EncryptionService {
     const raw = atob(base64);
     let HEX = '';
     for ( let i = 0; i < raw.length; i++ ) {
-      let _hex = raw.charCodeAt(i).toString(16);
-      HEX += (_hex.length == 2 ? _hex : '0' + _hex);
+      const hexV = raw.charCodeAt(i).toString(16);
+      HEX += (hexV.length === 2 ? hexV : '0' + hexV);
     }
     return HEX.toUpperCase();
   }

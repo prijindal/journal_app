@@ -39,14 +39,18 @@ export class JournalService {
     });
   }
 
-  editJournal(id: number | Long, content: string, saveType: protobufs.Journal.JournalSaveType = protobufs.Journal.JournalSaveType.PLAINTEXT) {
+  editJournal(
+    id: number | Long,
+    content: string,
+    saveType: protobufs.Journal.JournalSaveType = protobufs.Journal.JournalSaveType.PLAINTEXT
+  ) {
     const form = new FormData();
     form.append('id', id.toString());
     form.append('content', content);
     if (saveType != null) {
-      if (saveType == protobufs.Journal.JournalSaveType.PLAINTEXT) {
+      if (saveType === protobufs.Journal.JournalSaveType.PLAINTEXT) {
         form.append('save_type', 'PLAINTEXT');
-      } else if (saveType == protobufs.Journal.JournalSaveType.ENCRYPTED) {
+      } else if (saveType === protobufs.Journal.JournalSaveType.ENCRYPTED) {
         form.append('save_type', 'ENCRYPTED');
       }
     }

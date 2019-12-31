@@ -29,7 +29,7 @@ class HttpApi {
   }
 
   Map<String, String> get headers {
-    Map<String, String> headers = new Map<String, String>();
+    Map<String, String> headers = Map<String, String>();
     if (this._cookie == null) {
       this._cookie = _persistance.loadString(COOKIE_KEY);
     }
@@ -45,7 +45,7 @@ class HttpApi {
     if (response.headers.containsKey('set-cookie')) {
       this._cookie = response.headers['set-cookie'];
       if (_persistance != null) {
-        _persistance.setString(COOKIE_KEY, this._cookie);
+        await _persistance.setString(COOKIE_KEY, this._cookie);
       }
       return null;
     } else {
@@ -54,7 +54,7 @@ class HttpApi {
   }
 
   Future<void> logout() async {
-    _persistance.clearString(COOKIE_KEY);
+    await _persistance.clearString(COOKIE_KEY);
     var url = '$HOST/logout';
     await http.get(url, headers: this.headers);
   }
@@ -63,7 +63,7 @@ class HttpApi {
     var url = '$HOST/user';
     var response = await http.get(url, headers: this.headers);
     if (response.statusCode != 200) {
-      _persistance.clearString(COOKIE_KEY);
+      await _persistance.clearString(COOKIE_KEY);
       return null;
     } else {
       _user = User.fromBuffer(response.bodyBytes);

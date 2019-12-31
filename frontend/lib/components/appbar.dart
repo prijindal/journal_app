@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:journal_app/api/api.dart';
+import 'package:pedantic/pedantic.dart';
 
 class JournalAppBar extends StatelessWidget implements PreferredSizeWidget {
   @required
@@ -11,8 +12,8 @@ class JournalAppBar extends StatelessWidget implements PreferredSizeWidget {
   final Size preferredSize;
 
   _refresh() async {
-    HttpApi.getInstance().getUser();
-    HttpApi.getInstance().getJournal();
+    unawaited(HttpApi.getInstance().getUser());
+    unawaited(HttpApi.getInstance().getJournal());
   }
 
   @override

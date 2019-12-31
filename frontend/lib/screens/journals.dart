@@ -6,6 +6,7 @@ import 'package:journal_app/components/enterkey.dart';
 import 'package:journal_app/helpers/encrypt.dart';
 import 'package:journal_app/helpers/flutter_persistor.dart';
 import 'package:journal_app/screens/editjournal.dart';
+import 'package:pedantic/pedantic.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
 import 'package:journal_app/api/api.dart';
@@ -17,7 +18,7 @@ class JournalsScreen extends StatefulWidget {
 
 class _JournalsScreenState extends State<JournalsScreen> {
   final GlobalKey<RefreshIndicatorState> _refreshIndicatorKey =
-      new GlobalKey<RefreshIndicatorState>();
+      GlobalKey<RefreshIndicatorState>();
   @override
   void initState() {
     super.initState();
@@ -29,7 +30,7 @@ class _JournalsScreenState extends State<JournalsScreen> {
   Future<void> _getJournals() async {
     await HttpApi.getInstance().getJournal();
     if (_journalResponse == null) {
-      Navigator.of(context).pushReplacementNamed("/login");
+      unawaited(Navigator.of(context).pushReplacementNamed("/login"));
     } else {
       setState(() {});
     }
@@ -81,8 +82,8 @@ class _JournalTile extends StatelessWidget {
   _JournalTile(this.journal, {this.onDelete, this.onEdit});
 
   String _fromNow() {
-    final date = new DateTime.fromMillisecondsSinceEpoch(
-        journal.createdAt.toInt() * 1000);
+    final date =
+        DateTime.fromMillisecondsSinceEpoch(journal.createdAt.toInt() * 1000);
     return timeago.format(date);
   }
 
@@ -124,7 +125,7 @@ class _JournalTile extends StatelessWidget {
   }
 
   String _getContent() {
-    var content;
+    String content;
     if (journal.saveType != Journal_JournalSaveType.ENCRYPTED) {
       content = journal.content;
     } else {
@@ -151,8 +152,9 @@ class _JournalTile extends StatelessWidget {
     if (encryptionKey == null) {
       return;
     } else {
-      FlutterPersistor.getInstance().setString(ENCRYPTION_KEY, encryptionKey);
-      FlutterPersistor.getInstance()
+      await FlutterPersistor.getInstance()
+          .setString(ENCRYPTION_KEY, encryptionKey);
+      await FlutterPersistor.getInstance()
           .setString(SAVE_TYPE, journal.saveType.toString());
     }
   }

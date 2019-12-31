@@ -6,6 +6,7 @@ import 'package:journal_app/components/appdrawer.dart';
 import 'package:journal_app/components/textarea.dart';
 import 'package:journal_app/helpers/encrypt.dart';
 import 'package:journal_app/protobufs/journal.pbserver.dart';
+import 'package:pedantic/pedantic.dart';
 
 class NewJournalScreen extends StatefulWidget {
   _NewJournalScreenState createState() => _NewJournalScreenState();
@@ -26,7 +27,7 @@ class _NewJournalScreenState extends State<NewJournalScreen> {
       if (Navigator.of(context).canPop()) {
         Navigator.of(context).pop();
       } else {
-        Navigator.of(context).pushReplacementNamed("/journal");
+        unawaited(Navigator.of(context).pushReplacementNamed("/journal"));
       }
     }
   }
