@@ -56,17 +56,19 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
     if (confirm) {
       if (newType == Journal_JournalSaveType.ENCRYPTED) {
-        final String encryptionKey = await enterKeyModal(context);
+        final encryptionKeyModal = await enterKeyModal(context);
+        final encryptionKey = encryptionKeyModal.encryptionKey;
+        final shouldSave = encryptionKeyModal.shouldSave;
         if (encryptionKey == null) {
           return;
         } else {
-          await FlutterPersistor.getInstance()
-              .setString(ENCRYPTION_KEY, encryptionKey);
-          encryptJournals();
+          EncryptionService.getInstance()
+              .setEncryptionKey(encryptionKey, shouldSave);
+          EncryptionService.getInstance().encryptJournals();
         }
       } else if (newType == Journal_JournalSaveType.PLAINTEXT &&
           _saveType == Journal_JournalSaveType.ENCRYPTED) {
-        decryptJournals();
+        EncryptionService.getInstance().decryptJournals();
       }
       setState(() {
         _saveType = newType;

@@ -19,7 +19,7 @@ class _NewJournalScreenState extends State<NewJournalScreen> {
     var saveType = getSaveType();
     var content = _contentController.text;
     if (saveType == Journal_JournalSaveType.ENCRYPTED) {
-      content = getEncryptor().encrypt(content).base64;
+      content = EncryptionService.getInstance().encrypt(content);
     }
     final newjournal =
         await HttpApi.getInstance().newJournal(content, saveType: saveType);

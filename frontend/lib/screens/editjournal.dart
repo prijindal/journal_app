@@ -21,7 +21,7 @@ class _EditJournalScreenState extends State<EditJournalScreen> {
   _saveJournal() async {
     var content = _contentController.text;
     if (widget.journal.saveType == Journal_JournalSaveType.ENCRYPTED) {
-      content = getEncryptor().encrypt(content).base64;
+      content = EncryptionService.getInstance().encrypt(content);
     }
     final savedJournal = await HttpApi.getInstance().saveJournal(
         widget.journal.id, content,
@@ -44,7 +44,7 @@ class _EditJournalScreenState extends State<EditJournalScreen> {
   void _getContent() async {
     var content = widget.journal.content;
     if (widget.journal.saveType == Journal_JournalSaveType.ENCRYPTED) {
-      content = getEncryptor().decrypt(Encrypted.fromBase64(content));
+      content = EncryptionService.getInstance().decrypt(content);
     }
     setState(() {
       _contentController = TextEditingController(text: content);

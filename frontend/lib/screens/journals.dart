@@ -129,16 +129,14 @@ class _JournalTile extends StatelessWidget {
     if (journal.saveType != Journal_JournalSaveType.ENCRYPTED) {
       content = journal.content;
     } else {
-      var encryptedContent = Encrypted.fromBase64(journal.content);
-      content = getEncryptor().decrypt(encryptedContent);
+      content = EncryptionService.getInstance().decrypt(journal.content);
     }
     return content.replaceAll("\n", " ");
   }
 
   bool _isEncryptionKeyNotFound() {
     if (journal.saveType == Journal_JournalSaveType.ENCRYPTED) {
-      var encryptionKey =
-          FlutterPersistor.getInstance().loadString(ENCRYPTION_KEY);
+      var encryptionKey = EncryptionService.getInstance().encryptionKey;
       if (encryptionKey == null || encryptionKey.isEmpty) {
         return true;
       }
@@ -148,14 +146,17 @@ class _JournalTile extends StatelessWidget {
   }
 
   void _enterEncryptionKey(BuildContext context) async {
-    final String encryptionKey = await enterKeyModal(context);
+    final encryptionKeyModal = await enterKeyModal(context);
+    final encryptionKey = encryptionKeyModal.encryptionKey;
+    final shouldSave = encryptionKeyModal.shouldSave;
     if (encryptionKey == null) {
       return;
     } else {
-      await FlutterPersistor.getInstance()
-          .setString(ENCRYPTION_KEY, encryptionKey);
+      EncryptionService.getInstance()
+          .setEncryptionKey(encryptionKey, shouldSave);
       await FlutterPersistor.getInstance()
           .setString(SAVE_TYPE, journal.saveType.toString());
+      onEdit();
     }
   }
 
