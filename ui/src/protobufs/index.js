@@ -18,6 +18,479 @@ $root.protobufs = (function() {
      */
     var protobufs = {};
 
+    protobufs.HttpApiQueue = (function() {
+
+        /**
+         * Properties of a HttpApiQueue.
+         * @memberof protobufs
+         * @interface IHttpApiQueue
+         * @property {Array.<protobufs.IHttpApiQueueItem>|null} [queue] HttpApiQueue queue
+         */
+
+        /**
+         * Constructs a new HttpApiQueue.
+         * @memberof protobufs
+         * @classdesc Represents a HttpApiQueue.
+         * @implements IHttpApiQueue
+         * @constructor
+         * @param {protobufs.IHttpApiQueue=} [properties] Properties to set
+         */
+        function HttpApiQueue(properties) {
+            this.queue = [];
+            if (properties)
+                for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                    if (properties[keys[i]] != null)
+                        this[keys[i]] = properties[keys[i]];
+        }
+
+        /**
+         * HttpApiQueue queue.
+         * @member {Array.<protobufs.IHttpApiQueueItem>} queue
+         * @memberof protobufs.HttpApiQueue
+         * @instance
+         */
+        HttpApiQueue.prototype.queue = $util.emptyArray;
+
+        /**
+         * Creates a new HttpApiQueue instance using the specified properties.
+         * @function create
+         * @memberof protobufs.HttpApiQueue
+         * @static
+         * @param {protobufs.IHttpApiQueue=} [properties] Properties to set
+         * @returns {protobufs.HttpApiQueue} HttpApiQueue instance
+         */
+        HttpApiQueue.create = function create(properties) {
+            return new HttpApiQueue(properties);
+        };
+
+        /**
+         * Encodes the specified HttpApiQueue message. Does not implicitly {@link protobufs.HttpApiQueue.verify|verify} messages.
+         * @function encode
+         * @memberof protobufs.HttpApiQueue
+         * @static
+         * @param {protobufs.IHttpApiQueue} message HttpApiQueue message or plain object to encode
+         * @param {$protobuf.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.Writer} Writer
+         */
+        HttpApiQueue.encode = function encode(message, writer) {
+            if (!writer)
+                writer = $Writer.create();
+            if (message.queue != null && message.queue.length)
+                for (var i = 0; i < message.queue.length; ++i)
+                    $root.protobufs.HttpApiQueueItem.encode(message.queue[i], writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
+            return writer;
+        };
+
+        /**
+         * Encodes the specified HttpApiQueue message, length delimited. Does not implicitly {@link protobufs.HttpApiQueue.verify|verify} messages.
+         * @function encodeDelimited
+         * @memberof protobufs.HttpApiQueue
+         * @static
+         * @param {protobufs.IHttpApiQueue} message HttpApiQueue message or plain object to encode
+         * @param {$protobuf.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.Writer} Writer
+         */
+        HttpApiQueue.encodeDelimited = function encodeDelimited(message, writer) {
+            return this.encode(message, writer).ldelim();
+        };
+
+        /**
+         * Decodes a HttpApiQueue message from the specified reader or buffer.
+         * @function decode
+         * @memberof protobufs.HttpApiQueue
+         * @static
+         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @param {number} [length] Message length if known beforehand
+         * @returns {protobufs.HttpApiQueue} HttpApiQueue
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        HttpApiQueue.decode = function decode(reader, length) {
+            if (!(reader instanceof $Reader))
+                reader = $Reader.create(reader);
+            var end = length === undefined ? reader.len : reader.pos + length, message = new $root.protobufs.HttpApiQueue();
+            while (reader.pos < end) {
+                var tag = reader.uint32();
+                switch (tag >>> 3) {
+                case 1:
+                    if (!(message.queue && message.queue.length))
+                        message.queue = [];
+                    message.queue.push($root.protobufs.HttpApiQueueItem.decode(reader, reader.uint32()));
+                    break;
+                default:
+                    reader.skipType(tag & 7);
+                    break;
+                }
+            }
+            return message;
+        };
+
+        /**
+         * Decodes a HttpApiQueue message from the specified reader or buffer, length delimited.
+         * @function decodeDelimited
+         * @memberof protobufs.HttpApiQueue
+         * @static
+         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @returns {protobufs.HttpApiQueue} HttpApiQueue
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        HttpApiQueue.decodeDelimited = function decodeDelimited(reader) {
+            if (!(reader instanceof $Reader))
+                reader = new $Reader(reader);
+            return this.decode(reader, reader.uint32());
+        };
+
+        /**
+         * Verifies a HttpApiQueue message.
+         * @function verify
+         * @memberof protobufs.HttpApiQueue
+         * @static
+         * @param {Object.<string,*>} message Plain object to verify
+         * @returns {string|null} `null` if valid, otherwise the reason why it is not
+         */
+        HttpApiQueue.verify = function verify(message) {
+            if (typeof message !== "object" || message === null)
+                return "object expected";
+            if (message.queue != null && message.hasOwnProperty("queue")) {
+                if (!Array.isArray(message.queue))
+                    return "queue: array expected";
+                for (var i = 0; i < message.queue.length; ++i) {
+                    var error = $root.protobufs.HttpApiQueueItem.verify(message.queue[i]);
+                    if (error)
+                        return "queue." + error;
+                }
+            }
+            return null;
+        };
+
+        /**
+         * Creates a HttpApiQueue message from a plain object. Also converts values to their respective internal types.
+         * @function fromObject
+         * @memberof protobufs.HttpApiQueue
+         * @static
+         * @param {Object.<string,*>} object Plain object
+         * @returns {protobufs.HttpApiQueue} HttpApiQueue
+         */
+        HttpApiQueue.fromObject = function fromObject(object) {
+            if (object instanceof $root.protobufs.HttpApiQueue)
+                return object;
+            var message = new $root.protobufs.HttpApiQueue();
+            if (object.queue) {
+                if (!Array.isArray(object.queue))
+                    throw TypeError(".protobufs.HttpApiQueue.queue: array expected");
+                message.queue = [];
+                for (var i = 0; i < object.queue.length; ++i) {
+                    if (typeof object.queue[i] !== "object")
+                        throw TypeError(".protobufs.HttpApiQueue.queue: object expected");
+                    message.queue[i] = $root.protobufs.HttpApiQueueItem.fromObject(object.queue[i]);
+                }
+            }
+            return message;
+        };
+
+        /**
+         * Creates a plain object from a HttpApiQueue message. Also converts values to other types if specified.
+         * @function toObject
+         * @memberof protobufs.HttpApiQueue
+         * @static
+         * @param {protobufs.HttpApiQueue} message HttpApiQueue
+         * @param {$protobuf.IConversionOptions} [options] Conversion options
+         * @returns {Object.<string,*>} Plain object
+         */
+        HttpApiQueue.toObject = function toObject(message, options) {
+            if (!options)
+                options = {};
+            var object = {};
+            if (options.arrays || options.defaults)
+                object.queue = [];
+            if (message.queue && message.queue.length) {
+                object.queue = [];
+                for (var j = 0; j < message.queue.length; ++j)
+                    object.queue[j] = $root.protobufs.HttpApiQueueItem.toObject(message.queue[j], options);
+            }
+            return object;
+        };
+
+        /**
+         * Converts this HttpApiQueue to JSON.
+         * @function toJSON
+         * @memberof protobufs.HttpApiQueue
+         * @instance
+         * @returns {Object.<string,*>} JSON object
+         */
+        HttpApiQueue.prototype.toJSON = function toJSON() {
+            return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
+        };
+
+        return HttpApiQueue;
+    })();
+
+    protobufs.HttpApiQueueItem = (function() {
+
+        /**
+         * Properties of a HttpApiQueueItem.
+         * @memberof protobufs
+         * @interface IHttpApiQueueItem
+         * @property {protobufs.HttpApiQueueItem.HttpApiQueueItemType|null} [type] HttpApiQueueItem type
+         * @property {Object.<string,string>|null} [params] HttpApiQueueItem params
+         */
+
+        /**
+         * Constructs a new HttpApiQueueItem.
+         * @memberof protobufs
+         * @classdesc Represents a HttpApiQueueItem.
+         * @implements IHttpApiQueueItem
+         * @constructor
+         * @param {protobufs.IHttpApiQueueItem=} [properties] Properties to set
+         */
+        function HttpApiQueueItem(properties) {
+            this.params = {};
+            if (properties)
+                for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                    if (properties[keys[i]] != null)
+                        this[keys[i]] = properties[keys[i]];
+        }
+
+        /**
+         * HttpApiQueueItem type.
+         * @member {protobufs.HttpApiQueueItem.HttpApiQueueItemType} type
+         * @memberof protobufs.HttpApiQueueItem
+         * @instance
+         */
+        HttpApiQueueItem.prototype.type = 0;
+
+        /**
+         * HttpApiQueueItem params.
+         * @member {Object.<string,string>} params
+         * @memberof protobufs.HttpApiQueueItem
+         * @instance
+         */
+        HttpApiQueueItem.prototype.params = $util.emptyObject;
+
+        /**
+         * Creates a new HttpApiQueueItem instance using the specified properties.
+         * @function create
+         * @memberof protobufs.HttpApiQueueItem
+         * @static
+         * @param {protobufs.IHttpApiQueueItem=} [properties] Properties to set
+         * @returns {protobufs.HttpApiQueueItem} HttpApiQueueItem instance
+         */
+        HttpApiQueueItem.create = function create(properties) {
+            return new HttpApiQueueItem(properties);
+        };
+
+        /**
+         * Encodes the specified HttpApiQueueItem message. Does not implicitly {@link protobufs.HttpApiQueueItem.verify|verify} messages.
+         * @function encode
+         * @memberof protobufs.HttpApiQueueItem
+         * @static
+         * @param {protobufs.IHttpApiQueueItem} message HttpApiQueueItem message or plain object to encode
+         * @param {$protobuf.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.Writer} Writer
+         */
+        HttpApiQueueItem.encode = function encode(message, writer) {
+            if (!writer)
+                writer = $Writer.create();
+            if (message.type != null && message.hasOwnProperty("type"))
+                writer.uint32(/* id 1, wireType 0 =*/8).int32(message.type);
+            if (message.params != null && message.hasOwnProperty("params"))
+                for (var keys = Object.keys(message.params), i = 0; i < keys.length; ++i)
+                    writer.uint32(/* id 2, wireType 2 =*/18).fork().uint32(/* id 1, wireType 2 =*/10).string(keys[i]).uint32(/* id 2, wireType 2 =*/18).string(message.params[keys[i]]).ldelim();
+            return writer;
+        };
+
+        /**
+         * Encodes the specified HttpApiQueueItem message, length delimited. Does not implicitly {@link protobufs.HttpApiQueueItem.verify|verify} messages.
+         * @function encodeDelimited
+         * @memberof protobufs.HttpApiQueueItem
+         * @static
+         * @param {protobufs.IHttpApiQueueItem} message HttpApiQueueItem message or plain object to encode
+         * @param {$protobuf.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.Writer} Writer
+         */
+        HttpApiQueueItem.encodeDelimited = function encodeDelimited(message, writer) {
+            return this.encode(message, writer).ldelim();
+        };
+
+        /**
+         * Decodes a HttpApiQueueItem message from the specified reader or buffer.
+         * @function decode
+         * @memberof protobufs.HttpApiQueueItem
+         * @static
+         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @param {number} [length] Message length if known beforehand
+         * @returns {protobufs.HttpApiQueueItem} HttpApiQueueItem
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        HttpApiQueueItem.decode = function decode(reader, length) {
+            if (!(reader instanceof $Reader))
+                reader = $Reader.create(reader);
+            var end = length === undefined ? reader.len : reader.pos + length, message = new $root.protobufs.HttpApiQueueItem(), key;
+            while (reader.pos < end) {
+                var tag = reader.uint32();
+                switch (tag >>> 3) {
+                case 1:
+                    message.type = reader.int32();
+                    break;
+                case 2:
+                    reader.skip().pos++;
+                    if (message.params === $util.emptyObject)
+                        message.params = {};
+                    key = reader.string();
+                    reader.pos++;
+                    message.params[key] = reader.string();
+                    break;
+                default:
+                    reader.skipType(tag & 7);
+                    break;
+                }
+            }
+            return message;
+        };
+
+        /**
+         * Decodes a HttpApiQueueItem message from the specified reader or buffer, length delimited.
+         * @function decodeDelimited
+         * @memberof protobufs.HttpApiQueueItem
+         * @static
+         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @returns {protobufs.HttpApiQueueItem} HttpApiQueueItem
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        HttpApiQueueItem.decodeDelimited = function decodeDelimited(reader) {
+            if (!(reader instanceof $Reader))
+                reader = new $Reader(reader);
+            return this.decode(reader, reader.uint32());
+        };
+
+        /**
+         * Verifies a HttpApiQueueItem message.
+         * @function verify
+         * @memberof protobufs.HttpApiQueueItem
+         * @static
+         * @param {Object.<string,*>} message Plain object to verify
+         * @returns {string|null} `null` if valid, otherwise the reason why it is not
+         */
+        HttpApiQueueItem.verify = function verify(message) {
+            if (typeof message !== "object" || message === null)
+                return "object expected";
+            if (message.type != null && message.hasOwnProperty("type"))
+                switch (message.type) {
+                default:
+                    return "type: enum value expected";
+                case 0:
+                case 1:
+                case 2:
+                    break;
+                }
+            if (message.params != null && message.hasOwnProperty("params")) {
+                if (!$util.isObject(message.params))
+                    return "params: object expected";
+                var key = Object.keys(message.params);
+                for (var i = 0; i < key.length; ++i)
+                    if (!$util.isString(message.params[key[i]]))
+                        return "params: string{k:string} expected";
+            }
+            return null;
+        };
+
+        /**
+         * Creates a HttpApiQueueItem message from a plain object. Also converts values to their respective internal types.
+         * @function fromObject
+         * @memberof protobufs.HttpApiQueueItem
+         * @static
+         * @param {Object.<string,*>} object Plain object
+         * @returns {protobufs.HttpApiQueueItem} HttpApiQueueItem
+         */
+        HttpApiQueueItem.fromObject = function fromObject(object) {
+            if (object instanceof $root.protobufs.HttpApiQueueItem)
+                return object;
+            var message = new $root.protobufs.HttpApiQueueItem();
+            switch (object.type) {
+            case "NEW_JOURNAL":
+            case 0:
+                message.type = 0;
+                break;
+            case "SAVE_JOURNAL":
+            case 1:
+                message.type = 1;
+                break;
+            case "DELETE_JOURNAL":
+            case 2:
+                message.type = 2;
+                break;
+            }
+            if (object.params) {
+                if (typeof object.params !== "object")
+                    throw TypeError(".protobufs.HttpApiQueueItem.params: object expected");
+                message.params = {};
+                for (var keys = Object.keys(object.params), i = 0; i < keys.length; ++i)
+                    message.params[keys[i]] = String(object.params[keys[i]]);
+            }
+            return message;
+        };
+
+        /**
+         * Creates a plain object from a HttpApiQueueItem message. Also converts values to other types if specified.
+         * @function toObject
+         * @memberof protobufs.HttpApiQueueItem
+         * @static
+         * @param {protobufs.HttpApiQueueItem} message HttpApiQueueItem
+         * @param {$protobuf.IConversionOptions} [options] Conversion options
+         * @returns {Object.<string,*>} Plain object
+         */
+        HttpApiQueueItem.toObject = function toObject(message, options) {
+            if (!options)
+                options = {};
+            var object = {};
+            if (options.objects || options.defaults)
+                object.params = {};
+            if (options.defaults)
+                object.type = options.enums === String ? "NEW_JOURNAL" : 0;
+            if (message.type != null && message.hasOwnProperty("type"))
+                object.type = options.enums === String ? $root.protobufs.HttpApiQueueItem.HttpApiQueueItemType[message.type] : message.type;
+            var keys2;
+            if (message.params && (keys2 = Object.keys(message.params)).length) {
+                object.params = {};
+                for (var j = 0; j < keys2.length; ++j)
+                    object.params[keys2[j]] = message.params[keys2[j]];
+            }
+            return object;
+        };
+
+        /**
+         * Converts this HttpApiQueueItem to JSON.
+         * @function toJSON
+         * @memberof protobufs.HttpApiQueueItem
+         * @instance
+         * @returns {Object.<string,*>} JSON object
+         */
+        HttpApiQueueItem.prototype.toJSON = function toJSON() {
+            return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
+        };
+
+        /**
+         * HttpApiQueueItemType enum.
+         * @name protobufs.HttpApiQueueItem.HttpApiQueueItemType
+         * @enum {string}
+         * @property {number} NEW_JOURNAL=0 NEW_JOURNAL value
+         * @property {number} SAVE_JOURNAL=1 SAVE_JOURNAL value
+         * @property {number} DELETE_JOURNAL=2 DELETE_JOURNAL value
+         */
+        HttpApiQueueItem.HttpApiQueueItemType = (function() {
+            var valuesById = {}, values = Object.create(valuesById);
+            values[valuesById[0] = "NEW_JOURNAL"] = 0;
+            values[valuesById[1] = "SAVE_JOURNAL"] = 1;
+            values[valuesById[2] = "DELETE_JOURNAL"] = 2;
+            return values;
+        })();
+
+        return HttpApiQueueItem;
+    })();
+
     protobufs.Journal = (function() {
 
         /**

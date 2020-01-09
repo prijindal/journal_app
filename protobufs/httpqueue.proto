@@ -1,0 +1,16 @@
+syntax = "proto3";
+package protobufs;
+
+message HttpApiQueue {
+    repeated HttpApiQueueItem queue = 1;
+}
+
+message HttpApiQueueItem {
+    enum HttpApiQueueItemType {
+        NEW_JOURNAL = 0;
+        SAVE_JOURNAL = 1;
+        DELETE_JOURNAL = 2;
+    }
+    HttpApiQueueItemType type = 1;
+    map<string,string> params = 2;
+}

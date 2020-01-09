@@ -3,6 +3,202 @@ import * as $protobuf from "protobufjs";
 /** Namespace protobufs. */
 export namespace protobufs {
 
+    /** Properties of a HttpApiQueue. */
+    interface IHttpApiQueue {
+
+        /** HttpApiQueue queue */
+        queue?: (protobufs.IHttpApiQueueItem[]|null);
+    }
+
+    /** Represents a HttpApiQueue. */
+    class HttpApiQueue implements IHttpApiQueue {
+
+        /**
+         * Constructs a new HttpApiQueue.
+         * @param [properties] Properties to set
+         */
+        constructor(properties?: protobufs.IHttpApiQueue);
+
+        /** HttpApiQueue queue. */
+        public queue: protobufs.IHttpApiQueueItem[];
+
+        /**
+         * Creates a new HttpApiQueue instance using the specified properties.
+         * @param [properties] Properties to set
+         * @returns HttpApiQueue instance
+         */
+        public static create(properties?: protobufs.IHttpApiQueue): protobufs.HttpApiQueue;
+
+        /**
+         * Encodes the specified HttpApiQueue message. Does not implicitly {@link protobufs.HttpApiQueue.verify|verify} messages.
+         * @param message HttpApiQueue message or plain object to encode
+         * @param [writer] Writer to encode to
+         * @returns Writer
+         */
+        public static encode(message: protobufs.IHttpApiQueue, writer?: $protobuf.Writer): $protobuf.Writer;
+
+        /**
+         * Encodes the specified HttpApiQueue message, length delimited. Does not implicitly {@link protobufs.HttpApiQueue.verify|verify} messages.
+         * @param message HttpApiQueue message or plain object to encode
+         * @param [writer] Writer to encode to
+         * @returns Writer
+         */
+        public static encodeDelimited(message: protobufs.IHttpApiQueue, writer?: $protobuf.Writer): $protobuf.Writer;
+
+        /**
+         * Decodes a HttpApiQueue message from the specified reader or buffer.
+         * @param reader Reader or buffer to decode from
+         * @param [length] Message length if known beforehand
+         * @returns HttpApiQueue
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): protobufs.HttpApiQueue;
+
+        /**
+         * Decodes a HttpApiQueue message from the specified reader or buffer, length delimited.
+         * @param reader Reader or buffer to decode from
+         * @returns HttpApiQueue
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): protobufs.HttpApiQueue;
+
+        /**
+         * Verifies a HttpApiQueue message.
+         * @param message Plain object to verify
+         * @returns `null` if valid, otherwise the reason why it is not
+         */
+        public static verify(message: { [k: string]: any }): (string|null);
+
+        /**
+         * Creates a HttpApiQueue message from a plain object. Also converts values to their respective internal types.
+         * @param object Plain object
+         * @returns HttpApiQueue
+         */
+        public static fromObject(object: { [k: string]: any }): protobufs.HttpApiQueue;
+
+        /**
+         * Creates a plain object from a HttpApiQueue message. Also converts values to other types if specified.
+         * @param message HttpApiQueue
+         * @param [options] Conversion options
+         * @returns Plain object
+         */
+        public static toObject(message: protobufs.HttpApiQueue, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+        /**
+         * Converts this HttpApiQueue to JSON.
+         * @returns JSON object
+         */
+        public toJSON(): { [k: string]: any };
+    }
+
+    /** Properties of a HttpApiQueueItem. */
+    interface IHttpApiQueueItem {
+
+        /** HttpApiQueueItem type */
+        type?: (protobufs.HttpApiQueueItem.HttpApiQueueItemType|null);
+
+        /** HttpApiQueueItem params */
+        params?: ({ [k: string]: string }|null);
+    }
+
+    /** Represents a HttpApiQueueItem. */
+    class HttpApiQueueItem implements IHttpApiQueueItem {
+
+        /**
+         * Constructs a new HttpApiQueueItem.
+         * @param [properties] Properties to set
+         */
+        constructor(properties?: protobufs.IHttpApiQueueItem);
+
+        /** HttpApiQueueItem type. */
+        public type: protobufs.HttpApiQueueItem.HttpApiQueueItemType;
+
+        /** HttpApiQueueItem params. */
+        public params: { [k: string]: string };
+
+        /**
+         * Creates a new HttpApiQueueItem instance using the specified properties.
+         * @param [properties] Properties to set
+         * @returns HttpApiQueueItem instance
+         */
+        public static create(properties?: protobufs.IHttpApiQueueItem): protobufs.HttpApiQueueItem;
+
+        /**
+         * Encodes the specified HttpApiQueueItem message. Does not implicitly {@link protobufs.HttpApiQueueItem.verify|verify} messages.
+         * @param message HttpApiQueueItem message or plain object to encode
+         * @param [writer] Writer to encode to
+         * @returns Writer
+         */
+        public static encode(message: protobufs.IHttpApiQueueItem, writer?: $protobuf.Writer): $protobuf.Writer;
+
+        /**
+         * Encodes the specified HttpApiQueueItem message, length delimited. Does not implicitly {@link protobufs.HttpApiQueueItem.verify|verify} messages.
+         * @param message HttpApiQueueItem message or plain object to encode
+         * @param [writer] Writer to encode to
+         * @returns Writer
+         */
+        public static encodeDelimited(message: protobufs.IHttpApiQueueItem, writer?: $protobuf.Writer): $protobuf.Writer;
+
+        /**
+         * Decodes a HttpApiQueueItem message from the specified reader or buffer.
+         * @param reader Reader or buffer to decode from
+         * @param [length] Message length if known beforehand
+         * @returns HttpApiQueueItem
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): protobufs.HttpApiQueueItem;
+
+        /**
+         * Decodes a HttpApiQueueItem message from the specified reader or buffer, length delimited.
+         * @param reader Reader or buffer to decode from
+         * @returns HttpApiQueueItem
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): protobufs.HttpApiQueueItem;
+
+        /**
+         * Verifies a HttpApiQueueItem message.
+         * @param message Plain object to verify
+         * @returns `null` if valid, otherwise the reason why it is not
+         */
+        public static verify(message: { [k: string]: any }): (string|null);
+
+        /**
+         * Creates a HttpApiQueueItem message from a plain object. Also converts values to their respective internal types.
+         * @param object Plain object
+         * @returns HttpApiQueueItem
+         */
+        public static fromObject(object: { [k: string]: any }): protobufs.HttpApiQueueItem;
+
+        /**
+         * Creates a plain object from a HttpApiQueueItem message. Also converts values to other types if specified.
+         * @param message HttpApiQueueItem
+         * @param [options] Conversion options
+         * @returns Plain object
+         */
+        public static toObject(message: protobufs.HttpApiQueueItem, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+        /**
+         * Converts this HttpApiQueueItem to JSON.
+         * @returns JSON object
+         */
+        public toJSON(): { [k: string]: any };
+    }
+
+    namespace HttpApiQueueItem {
+
+        /** HttpApiQueueItemType enum. */
+        enum HttpApiQueueItemType {
+            NEW_JOURNAL = 0,
+            SAVE_JOURNAL = 1,
+            DELETE_JOURNAL = 2
+        }
+    }
+
     /** Properties of a Journal. */
     interface IJournal {
 
