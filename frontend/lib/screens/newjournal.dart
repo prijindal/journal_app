@@ -6,7 +6,8 @@ import 'package:journal_app/components/appdrawer.dart';
 import 'package:journal_app/components/enterkey.dart';
 import 'package:journal_app/components/textarea.dart';
 import 'package:journal_app/helpers/encrypt.dart';
-import 'package:journal_app/protobufs/journal.pbserver.dart';
+import 'package:journal_app/helpers/flutter_persistor.dart';
+import 'package:journal_app/protobufs/journal.pb.dart';
 import 'package:pedantic/pedantic.dart';
 
 class NewJournalScreen extends StatefulWidget {
@@ -22,6 +23,8 @@ class _NewJournalScreenState extends State<NewJournalScreen> {
     if (saveType == Journal_JournalSaveType.ENCRYPTED) {
       if (EncryptionService.getInstance().encryptionKey == null) {
         await enterKeyModalAndSave(context);
+        FlutterPersistor.getInstance()
+            .setString(SAVE_TYPE, saveType.value.toString());
       }
       content = EncryptionService.getInstance().encrypt(content);
     }

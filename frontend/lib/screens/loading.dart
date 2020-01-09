@@ -34,13 +34,12 @@ class _LoadingScreenState extends State<LoadingScreen> {
 
   _checkUser() async {
     final _instance = HttpApi.getInstance();
-    await FlutterPersistor.getInstance().initSharedPreferences();
-    final user = await _instance.getUser();
-    if (user == null) {
-      unawaited(_instance.logout());
-      unawaited(Navigator.of(context).pushReplacementNamed("/login"));
-    } else {
+    await FlutterPersistor.getInstance().initFlutterPersistor();
+    await _instance.initHttpApi();
+    if (_instance.cookieExists) {
       unawaited(Navigator.of(context).pushReplacementNamed("/journal"));
+    } else {
+      unawaited(Navigator.of(context).pushReplacementNamed("/login"));
     }
   }
 

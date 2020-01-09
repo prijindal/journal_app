@@ -19,6 +19,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  connectivity: any
   encrypt: any
   fixnum: any
   http: any

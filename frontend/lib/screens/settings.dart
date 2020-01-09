@@ -69,6 +69,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     if (confirm) {
       if (newType == Journal_JournalSaveType.ENCRYPTED) {
         await enterKeyModalAndSave(context);
+        EncryptionService.getInstance().encryptJournals();
       } else if (newType == Journal_JournalSaveType.PLAINTEXT &&
           _saveType == Journal_JournalSaveType.ENCRYPTED) {
         if (EncryptionService.getInstance().encryptionKey == null) {

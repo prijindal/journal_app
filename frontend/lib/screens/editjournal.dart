@@ -6,7 +6,7 @@ import 'package:journal_app/api/api.dart';
 import 'package:journal_app/components/appdrawer.dart';
 import 'package:journal_app/components/textarea.dart';
 import 'package:journal_app/helpers/encrypt.dart';
-import 'package:journal_app/protobufs/journal.pbserver.dart';
+import 'package:journal_app/protobufs/journal.pb.dart';
 import 'package:pedantic/pedantic.dart';
 
 class EditJournalScreen extends StatefulWidget {

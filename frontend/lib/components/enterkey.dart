@@ -17,7 +17,6 @@ Future<bool> enterKeyModalAndSave(BuildContext context) async {
     return false;
   } else {
     EncryptionService.getInstance().setEncryptionKey(encryptionKey, shouldSave);
-    EncryptionService.getInstance().encryptJournals();
     return true;
   }
 }

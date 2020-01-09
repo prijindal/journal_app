@@ -1,4 +1,3 @@
-import 'package:encrypt/encrypt.dart';
 import 'package:flutter/material.dart';
 import 'package:journal_app/components/appbar.dart';
 import 'package:journal_app/components/appdrawer.dart';
@@ -10,7 +9,7 @@ import 'package:pedantic/pedantic.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
 import 'package:journal_app/api/api.dart';
-import 'package:journal_app/protobufs/journal.pbserver.dart';
+import 'package:journal_app/protobufs/journal.pb.dart';
 
 class JournalsScreen extends StatefulWidget {
   _JournalsScreenState createState() => _JournalsScreenState();
@@ -28,7 +27,18 @@ class _JournalsScreenState extends State<JournalsScreen> {
   JournalResponse get _journalResponse => HttpApi.getInstance().journalResponse;
 
   Future<void> _getJournals() async {
-    await HttpApi.getInstance().getJournal();
+    var _instance = HttpApi.getInstance();
+    var _isConnected = await _instance.isConnected();
+    if (!_isConnected) {
+      return;
+    }
+    try {
+      await _instance.getJournal();
+    } catch (e) {
+      await _instance.logout();
+      await Navigator.of(context).pushReplacementNamed("/login");
+      return;
+    }
     if (_journalResponse == null) {
       unawaited(Navigator.of(context).pushReplacementNamed("/login"));
     } else {
@@ -124,7 +134,7 @@ class _JournalTile extends StatelessWidget {
     onEdit();
   }
 
-  String _getContent(BuildContext context) {
+  String _getContent() {
     String content;
     if (journal.saveType != Journal_JournalSaveType.ENCRYPTED) {
       content = journal.content;
@@ -152,6 +162,8 @@ class _JournalTile extends StatelessWidget {
 
   void _enterEncryptionKey(BuildContext context) async {
     final isSuccessful = await enterKeyModalAndSave(context);
+    await FlutterPersistor.getInstance()
+        .setString(SAVE_TYPE, journal.saveType.value.toString());
     if (isSuccessful) {
       onEdit();
     }
@@ -163,7 +175,7 @@ class _JournalTile extends StatelessWidget {
         title: Text(
           _isEncryptionKeyNotFound()
               ? "Key not found. Tap to enter"
-              : _getContent(context),
+              : _getContent(),
           overflow: TextOverflow.ellipsis,
           maxLines: 2,
         ),

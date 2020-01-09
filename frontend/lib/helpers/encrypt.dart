@@ -3,7 +3,7 @@ import 'package:crypto/crypto.dart';
 import 'package:encrypt/encrypt.dart';
 import 'package:journal_app/api/api.dart';
 import 'package:journal_app/helpers/flutter_persistor.dart';
-import 'package:journal_app/protobufs/journal.pbserver.dart';
+import 'package:journal_app/protobufs/journal.pb.dart';
 
 const String ENCRYPTION_KEY = "ENCRYPTION_KEY";
 const String SAVE_TYPE = "SAVE_TYPE";

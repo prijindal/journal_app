@@ -17,7 +17,10 @@ class _LoginScreenState extends State<LoginScreen> {
     var err =
         await _instance.login(_emailController.text, _passwordController.text);
     if (err == null) {
-      unawaited(_instance.getUser());
+      var _isConnected = await HttpApi.getInstance().isConnected();
+      if (_isConnected) {
+        unawaited(_instance.getUser());
+      }
       unawaited(Navigator.of(context).pushReplacementNamed("/journal"));
     } else {
       setState(() {

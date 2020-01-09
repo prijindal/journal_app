@@ -12,6 +12,10 @@ class JournalAppBar extends StatelessWidget implements PreferredSizeWidget {
   final Size preferredSize;
 
   _refresh() async {
+    var _isConnected = await HttpApi.getInstance().isConnected();
+    if (!_isConnected) {
+      return;
+    }
     unawaited(HttpApi.getInstance().getUser());
     unawaited(HttpApi.getInstance().getJournal());
   }
