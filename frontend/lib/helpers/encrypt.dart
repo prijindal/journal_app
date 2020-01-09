@@ -1,3 +1,5 @@
+import 'dart:convert';
+import 'package:crypto/crypto.dart';
 import 'package:encrypt/encrypt.dart';
 import 'package:journal_app/api/api.dart';
 import 'package:journal_app/helpers/flutter_persistor.dart';
@@ -25,11 +27,14 @@ class EncryptionService {
       this._encryptionKey =
           FlutterPersistor.getInstance().loadString(ENCRYPTION_KEY);
     }
+    if (this._encryptionKey == null || this._encryptionKey.isEmpty) {
+      return null;
+    }
     return this._encryptionKey;
   }
 
   setEncryptionKey(String encryptionKey, bool shouldSave) {
-    this._encryptionKey = encryptionKey;
+    this._encryptionKey = md5.convert(utf8.encode(encryptionKey)).toString();
     _cacheDecrypted = {};
     _cacheEncrypted = {};
     if (shouldSave) {
@@ -38,17 +43,16 @@ class EncryptionService {
     }
   }
 
+  deleteEncryptionKey() {
+    this._encryptionKey = null;
+    FlutterPersistor.getInstance().clearString(ENCRYPTION_KEY);
+  }
+
   Encrypter getEncryptor() {
     if (encryptionKey == null) {
       return null;
     }
-    var modifiedKey = encryptionKey;
-    if (encryptionKey.length < 32) {
-      for (var i = encryptionKey.length; i < 32; i += 1) {
-        modifiedKey += ".";
-      }
-    }
-    final key = Key.fromUtf8(modifiedKey);
+    final key = Key.fromUtf8(encryptionKey);
     final encrypter = Encrypter(AES(key, mode: AESMode.ecb));
     return encrypter;
   }
@@ -71,9 +75,13 @@ class EncryptionService {
     if (encryptor == null) {
       return "";
     }
-    final decryptedText = encryptor.decrypt(encryptedContent);
-    _cacheDecrypted[encryptedText] = decryptedText;
-    return decryptedText;
+    try {
+      final decryptedText = encryptor.decrypt(encryptedContent);
+      _cacheDecrypted[encryptedText] = decryptedText;
+      return decryptedText;
+    } catch (error) {
+      rethrow;
+    }
   }
 
   encryptJournals() async {

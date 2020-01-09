@@ -124,12 +124,17 @@ class _JournalTile extends StatelessWidget {
     onEdit();
   }
 
-  String _getContent() {
+  String _getContent(BuildContext context) {
     String content;
     if (journal.saveType != Journal_JournalSaveType.ENCRYPTED) {
       content = journal.content;
     } else {
-      content = EncryptionService.getInstance().decrypt(journal.content);
+      try {
+        content = EncryptionService.getInstance().decrypt(journal.content);
+      } catch (e) {
+        EncryptionService.getInstance().deleteEncryptionKey();
+        return 'Wrong Encryption key.Tap to enter again';
+      }
     }
     return content.replaceAll("\n", " ");
   }
@@ -146,16 +151,8 @@ class _JournalTile extends StatelessWidget {
   }
 
   void _enterEncryptionKey(BuildContext context) async {
-    final encryptionKeyModal = await enterKeyModal(context);
-    final encryptionKey = encryptionKeyModal.encryptionKey;
-    final shouldSave = encryptionKeyModal.shouldSave;
-    if (encryptionKey == null) {
-      return;
-    } else {
-      EncryptionService.getInstance()
-          .setEncryptionKey(encryptionKey, shouldSave);
-      await FlutterPersistor.getInstance()
-          .setString(SAVE_TYPE, journal.saveType.toString());
+    final isSuccessful = await enterKeyModalAndSave(context);
+    if (isSuccessful) {
       onEdit();
     }
   }
@@ -166,7 +163,7 @@ class _JournalTile extends StatelessWidget {
         title: Text(
           _isEncryptionKeyNotFound()
               ? "Key not found. Tap to enter"
-              : _getContent(),
+              : _getContent(context),
           overflow: TextOverflow.ellipsis,
           maxLines: 2,
         ),

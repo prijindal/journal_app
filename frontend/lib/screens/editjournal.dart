@@ -56,7 +56,7 @@ class _EditJournalScreenState extends State<EditJournalScreen> {
     return Scaffold(
       drawer: JournalAppDrawer(),
       appBar: JournalAppBar(
-        title: "Edit Journal",
+        title: Text("Edit Journal"),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: _saveJournal,

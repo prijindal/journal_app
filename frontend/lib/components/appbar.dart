@@ -4,8 +4,8 @@ import 'package:pedantic/pedantic.dart';
 
 class JournalAppBar extends StatelessWidget implements PreferredSizeWidget {
   @required
-  final String title;
-  JournalAppBar({this.title = "Journals"})
+  final Widget title;
+  JournalAppBar({this.title = const Text("Journals")})
       : preferredSize = Size.fromHeight(kToolbarHeight);
 
   @override
@@ -18,7 +18,7 @@ class JournalAppBar extends StatelessWidget implements PreferredSizeWidget {
 
   @override
   Widget build(BuildContext context) => AppBar(
-        title: Text(this.title),
+        title: this.title,
         leading: Navigator.of(context).canPop()
             ? IconButton(
                 icon: Icon(Icons.close),

@@ -3,6 +3,7 @@ import 'package:journal_app/components/appbar.dart';
 
 import 'package:journal_app/api/api.dart';
 import 'package:journal_app/components/appdrawer.dart';
+import 'package:journal_app/components/enterkey.dart';
 import 'package:journal_app/components/textarea.dart';
 import 'package:journal_app/helpers/encrypt.dart';
 import 'package:journal_app/protobufs/journal.pbserver.dart';
@@ -19,6 +20,9 @@ class _NewJournalScreenState extends State<NewJournalScreen> {
     var saveType = getSaveType();
     var content = _contentController.text;
     if (saveType == Journal_JournalSaveType.ENCRYPTED) {
+      if (EncryptionService.getInstance().encryptionKey == null) {
+        await enterKeyModalAndSave(context);
+      }
       content = EncryptionService.getInstance().encrypt(content);
     }
     final newjournal =
@@ -37,7 +41,7 @@ class _NewJournalScreenState extends State<NewJournalScreen> {
     return Scaffold(
       drawer: JournalAppDrawer(),
       appBar: JournalAppBar(
-        title: "New Journal",
+        title: Text("New Journal"),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: _saveJournal,

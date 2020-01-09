@@ -13,10 +13,22 @@ class SettingsScreen extends StatefulWidget {
 
 class _SettingsScreenState extends State<SettingsScreen> {
   Journal_JournalSaveType _saveType;
+  bool _shouldSave;
   @override
   void initState() {
     super.initState();
     _getType();
+    _getShouldSave();
+  }
+
+  _getShouldSave() {
+    var _encryptionKey =
+        FlutterPersistor.getInstance().loadString(ENCRYPTION_KEY);
+    if (_encryptionKey == null) {
+      _shouldSave = false;
+    } else {
+      _shouldSave = true;
+    }
   }
 
   _getType() {
@@ -56,20 +68,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
     if (confirm) {
       if (newType == Journal_JournalSaveType.ENCRYPTED) {
-        final encryptionKeyModal = await enterKeyModal(context);
-        final encryptionKey = encryptionKeyModal.encryptionKey;
-        final shouldSave = encryptionKeyModal.shouldSave;
-        if (encryptionKey == null) {
-          return;
-        } else {
-          EncryptionService.getInstance()
-              .setEncryptionKey(encryptionKey, shouldSave);
-          EncryptionService.getInstance().encryptJournals();
-        }
+        await enterKeyModalAndSave(context);
       } else if (newType == Journal_JournalSaveType.PLAINTEXT &&
           _saveType == Journal_JournalSaveType.ENCRYPTED) {
+        if (EncryptionService.getInstance().encryptionKey == null) {
+          await enterKeyModalAndSave(context);
+        }
         EncryptionService.getInstance().decryptJournals();
       }
+      _getShouldSave();
       setState(() {
         _saveType = newType;
       });
@@ -78,25 +85,44 @@ class _SettingsScreenState extends State<SettingsScreen> {
     }
   }
 
+  void _toggleShouldSave(bool newValue) {
+    setState(() {
+      _shouldSave = newValue;
+    });
+    if (_shouldSave == true) {
+      FlutterPersistor.getInstance().setString(
+          ENCRYPTION_KEY, EncryptionService.getInstance().encryptionKey);
+    } else {
+      FlutterPersistor.getInstance().clearString(ENCRYPTION_KEY);
+    }
+  }
+
   @override
   Widget build(BuildContext context) => Scaffold(
         appBar: JournalAppBar(
-          title: "Settings",
+          title: Text("Settings"),
         ),
         drawer: JournalAppDrawer(),
         body: ListView(
           children: <Widget>[
-            DropdownButton<Journal_JournalSaveType>(
-              value: _saveType,
-              onChanged: _onChanged,
-              items: Journal_JournalSaveType.values
-                  .map<DropdownMenuItem<Journal_JournalSaveType>>(
-                    (value) => DropdownMenuItem<Journal_JournalSaveType>(
-                      value: value,
-                      child: Text(value.toString()),
-                    ),
-                  )
-                  .toList(),
+            ListTile(
+              title: DropdownButton<Journal_JournalSaveType>(
+                value: _saveType,
+                onChanged: _onChanged,
+                items: Journal_JournalSaveType.values
+                    .map<DropdownMenuItem<Journal_JournalSaveType>>(
+                      (value) => DropdownMenuItem<Journal_JournalSaveType>(
+                        value: value,
+                        child: Text(value.toString()),
+                      ),
+                    )
+                    .toList(),
+              ),
+            ),
+            SwitchListTile(
+              title: Text("Save Encryption Key"),
+              value: _shouldSave,
+              onChanged: _toggleShouldSave,
             ),
             ListTile(
               title: Text("Logout"),
