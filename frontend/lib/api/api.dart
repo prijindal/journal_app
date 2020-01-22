@@ -126,6 +126,26 @@ class HttpApi {
     }
   }
 
+  // Returns error if any, or null if succesfull
+  Future<String> register(
+      String email, String password, String confirm_password) async {
+    var url = '$HOST/register?api=true';
+    var response = await http.post(url, body: {
+      'email': email,
+      'password': password,
+      'confirm_password': confirm_password
+    });
+    if (response.headers.containsKey('set-cookie')) {
+      this._cookie = response.headers['set-cookie'];
+      if (_persistance != null) {
+        await _persistance.setString(COOKIE_KEY, this._cookie);
+      }
+      return null;
+    } else {
+      return response.body;
+    }
+  }
+
   Future<void> logout() async {
     await _persistance.clearString(COOKIE_KEY);
     this._cookie = null;
