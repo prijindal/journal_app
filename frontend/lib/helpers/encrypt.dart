@@ -65,15 +65,15 @@ class EncryptionService {
     final encryptedText = getEncryptor().encrypt(decryptedText, iv: iv).base64;
     final transitmessage = iv.base64 + encryptedText;
     _cacheDecrypted[decryptedText] = transitmessage;
-    return encryptedText;
+    return transitmessage;
   }
 
   String decrypt(String transitmessage) {
+    if (_cacheDecrypted.containsKey(transitmessage)) {
+      return _cacheDecrypted[transitmessage];
+    }
     final iv = IV.fromBase64(transitmessage.substring(0, 24));
     final encryptedText = transitmessage.substring(24);
-    if (_cacheDecrypted.containsKey(encryptedText)) {
-      return _cacheDecrypted[encryptedText];
-    }
     final encryptedContent = Encrypted.fromBase64(encryptedText);
     final encryptor = getEncryptor();
     if (encryptor == null) {
