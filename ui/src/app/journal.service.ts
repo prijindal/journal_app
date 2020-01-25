@@ -9,18 +9,22 @@ export class JournalService {
   public journalResponse: protobufs.JournalResponse;
   constructor(private http: HttpClient) { }
 
-  getJournals() {
+  getJournals(): Promise<protobufs.JournalResponse> {
     return this.http.get('/journal', {responseType: 'arraybuffer'})
     .toPromise()
     .then(data => protobufs.JournalResponse.decode(new Uint8Array(data)))
     .then((data) => {
       this.journalResponse = data;
+      return data;
     });
   }
 
-  addJournal(content: string) {
+  addJournal(content: string, saveType?: protobufs.Journal.JournalSaveType) {
     const form = new FormData();
     form.append('content', content);
+    if (saveType != null) {
+      form.append('save_type', protobufs.Journal.JournalSaveType[saveType]);
+    }
     return this.http.post('/journal', form, {responseType: 'arraybuffer'})
     .toPromise()
     .then(data => protobufs.Journal.decode(new Uint8Array(data)))

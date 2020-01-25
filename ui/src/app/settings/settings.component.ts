@@ -1,4 +1,11 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import {MatDialog} from '@angular/material/dialog';
+
+import { ConfirmDialogModel, ConfirmDialogComponent } from '../confirm-dialog/confirm-dialog.component';
+import { enterKeyModalAndSave } from '../encryption-key-modal/encryption-key-modal.component';
+import {SavetypeService} from '../savetype.service';
+import {EncryptionService} from '../encryption.service';
+import {protobufs} from '../../protobufs';
 
 @Component({
   selector: 'app-settings',
@@ -6,10 +13,60 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./settings.component.scss']
 })
 export class SettingsComponent implements OnInit {
-
-  constructor() { }
+  public saveType: protobufs.Journal.JournalSaveType;
+  public possibleSaveTypes = [protobufs.Journal.JournalSaveType.PLAINTEXT, protobufs.Journal.JournalSaveType.ENCRYPTED];
+  constructor(
+    private savetypeService: SavetypeService,
+    private encryptionService: EncryptionService,
+    private dialog: MatDialog,
+    private changeDetectorRef: ChangeDetectorRef,
+  ) {  }
 
   ngOnInit() {
+    this.saveType = this.savetypeService.getSaveType();
   }
 
+  saveTypeToString(type: protobufs.Journal.JournalSaveType): String {
+    if (type === protobufs.Journal.JournalSaveType.ENCRYPTED) {
+      return 'ENCRYPTED';
+    } else {
+      return 'PLAINTEXT';
+    }
+  }
+
+  async onChange(event) {
+    const originalType: protobufs.Journal.JournalSaveType = this.saveType;
+    const type: protobufs.Journal.JournalSaveType = event.value;
+    let content = '';
+    if (type === protobufs.Journal.JournalSaveType.PLAINTEXT) {
+      content = 'This is the default and data will be stored in the cloud in plaintext';
+    } else if (type === protobufs.Journal.JournalSaveType.ENCRYPTED) {
+      content = 'Data will be stored in encrypted format, if you forget the key, you lose your data';
+    }
+    const dialogData = new ConfirmDialogModel(content, 'Are you sure?');
+    const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+      maxWidth: '400px',
+      data: dialogData
+    });
+
+    const dialogResult: boolean = await dialogRef.afterClosed().toPromise();
+    if (dialogResult) {
+      this.saveType = type;
+      this.savetypeService.setSaveType(this.saveType);
+    } else {
+      if (originalType === protobufs.Journal.JournalSaveType.ENCRYPTED) {
+        this.saveType = protobufs.Journal.JournalSaveType.PLAINTEXT;
+      } else if (originalType === protobufs.Journal.JournalSaveType.PLAINTEXT)  {
+        this.saveType = protobufs.Journal.JournalSaveType.ENCRYPTED;
+      }
+    }
+    if (this.saveType === protobufs.Journal.JournalSaveType.ENCRYPTED) {
+      const didGetKey = await enterKeyModalAndSave(this.dialog, this.encryptionService);
+      if (!didGetKey) {
+        this.saveType = protobufs.Journal.JournalSaveType.PLAINTEXT;
+      } else {
+        this.encryptionService.encryptJournals();
+      }
+    }
+  }
 }

@@ -15,6 +15,9 @@ import {MatSnackBarModule} from '@angular/material/snack-bar';
 import {MatCheckboxModule} from '@angular/material/checkbox';
 import {MatMenuModule} from '@angular/material/menu';
 import {MatSidenavModule} from '@angular/material/sidenav';
+import {MatFormFieldModule} from '@angular/material/form-field';
+import {MatSelectModule} from '@angular/material/select';
+import {MatSlideToggleModule} from '@angular/material/slide-toggle';
 
 import { HomeComponent } from './home/home.component';
 import { SettingsComponent } from './settings/settings.component';
@@ -24,6 +27,7 @@ import { EditJournalComponent } from './edit-journal/edit-journal.component';
 import { JournalListComponent } from './journal-list/journal-list.component';
 import { JournalTextareaComponent } from './journal-textarea/journal-textarea.component';
 import { PromptDialogComponent } from './prompt-dialog/prompt-dialog.component';
+import { EncryptionKeyModalComponent } from './encryption-key-modal/encryption-key-modal.component';
 
 @NgModule({
   declarations: [
@@ -36,6 +40,7 @@ import { PromptDialogComponent } from './prompt-dialog/prompt-dialog.component';
     JournalListComponent,
     JournalTextareaComponent,
     PromptDialogComponent,
+    EncryptionKeyModalComponent
   ],
   imports: [
     BrowserModule,
@@ -51,11 +56,15 @@ import { PromptDialogComponent } from './prompt-dialog/prompt-dialog.component';
     MatSnackBarModule,
     MatCheckboxModule,
     MatMenuModule,
-    MatSidenavModule
+    MatSidenavModule,
+    MatFormFieldModule,
+    MatSelectModule,
+    MatSlideToggleModule
   ],
   entryComponents: [
     ConfirmDialogComponent,
-    PromptDialogComponent
+    PromptDialogComponent,
+    EncryptionKeyModalComponent
   ],
   providers: [],
   bootstrap: [AppComponent]

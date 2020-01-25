@@ -1,12 +1,15 @@
 import { Injectable } from '@angular/core';
-import {utils, ModeOfOperation} from 'aes-js';
+import {MD5, AES, mode, enc, pad } from 'crypto-js';
+
+import {JournalService} from './journal.service';
+import { protobufs } from 'src/protobufs';
 
 @Injectable({
   providedIn: 'root'
 })
 export class EncryptionService {
   private encryptionKey;
-  constructor() { }
+  constructor(private journalService: JournalService) { }
 
   isEncryptionKeyNotFound() {
     if (this.encryptionKey == null || this.encryptionKey.length === 0) {
@@ -16,13 +19,7 @@ export class EncryptionService {
   }
 
   getEncryptionKey() {
-    let modifiedKey = this.encryptionKey;
-    if (this.encryptionKey.length < 32) {
-      for (let i = this.encryptionKey.length; i < 32; i += 1) {
-        modifiedKey += '.';
-      }
-    }
-    return modifiedKey;
+    return this.encryptionKey;
   }
 
   base64toHEX(base64: string) {
@@ -47,28 +44,37 @@ export class EncryptionService {
   }
 
   setEncryptionKey(encryptionKey: string) {
-    this.encryptionKey = encryptionKey;
+    this.encryptionKey = MD5(encryptionKey).toString();
   }
 
-  encrypt(decryptedText: string) {
+  encrypt(decryptedText: string): string {
     const encryptionKey = this.getEncryptionKey();
-    const encryptionKeyBytes = utils.utf8.toBytes(encryptionKey);
-    const decryptedBytes = utils.utf8.toBytes(decryptedText);
-    const aesEcb = new ModeOfOperation.ecb(encryptionKeyBytes);
-    const encryptedBytes = aesEcb.encrypt(decryptedBytes);
-    const encryptedHex = utils.hex.fromBytes(encryptedBytes);
-    const encryptedText = this.HEXtobase64(encryptedHex);
+    if (encryptionKey == null) {
+      return '';
+    }
+    const encrypted = AES.encrypt(decryptedText, this.getEncryptionKey(), {iv: null, mode: mode.ECB, padding: pad.Pkcs7}).toString();
+    const encryptedText = btoa(encrypted);
     return encryptedText;
+    return encrypted;
   }
 
-  decrypt(encrypted: string) {
+  decrypt(encrypted: string): string {
     const encryptionKey = this.getEncryptionKey();
-    const encryptionKeyBytes = utils.utf8.toBytes(encryptionKey);
-    const encryptedHex = this.base64toHEX(encrypted);
-    const encryptedBytes = utils.hex.toBytes(encryptedHex);
-    const aesEcb = new ModeOfOperation.ecb(encryptionKeyBytes);
-    const decryptedBytes = aesEcb.decrypt(encryptedBytes);
-    const decryptedText = utils.utf8.fromBytes(decryptedBytes);
+    console.log(encryptionKey);
+    if (encryptionKey == null) {
+      return '';
+    }
+    const decryptedText = AES.decrypt(atob(encrypted), encryptionKey, {iv: null, mode: mode.ECB, padding: pad.Pkcs7}).toString(enc.Utf8);
     return decryptedText;
+  }
+
+  async encryptJournals() {
+    const journalsResponse = await this.journalService.getJournals();
+    journalsResponse.journals.forEach((journal) => {
+      if (journal.saveType !== protobufs.Journal.JournalSaveType.ENCRYPTED) {
+        const encrypted = this.encrypt(journal.content);
+        this.journalService.editJournal(journal.id, encrypted, protobufs.Journal.JournalSaveType.ENCRYPTED);
+      }
+    });
   }
 }
