@@ -26,7 +26,6 @@ import { ConfirmDialogComponent } from './confirm-dialog/confirm-dialog.componen
 import { EditJournalComponent } from './edit-journal/edit-journal.component';
 import { JournalListComponent } from './journal-list/journal-list.component';
 import { JournalTextareaComponent } from './journal-textarea/journal-textarea.component';
-import { PromptDialogComponent } from './prompt-dialog/prompt-dialog.component';
 import { EncryptionKeyModalComponent } from './encryption-key-modal/encryption-key-modal.component';
 
 @NgModule({
@@ -39,7 +38,6 @@ import { EncryptionKeyModalComponent } from './encryption-key-modal/encryption-k
     EditJournalComponent,
     JournalListComponent,
     JournalTextareaComponent,
-    PromptDialogComponent,
     EncryptionKeyModalComponent
   ],
   imports: [
@@ -63,7 +61,6 @@ import { EncryptionKeyModalComponent } from './encryption-key-modal/encryption-k
   ],
   entryComponents: [
     ConfirmDialogComponent,
-    PromptDialogComponent,
     EncryptionKeyModalComponent
   ],
   providers: [],

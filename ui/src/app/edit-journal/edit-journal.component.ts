@@ -5,6 +5,8 @@ import {JournalService} from '../journal.service';
 import {BreakpointObserver, Breakpoints} from '@angular/cdk/layout';
 import { protobufs } from 'src/protobufs';
 import { EncryptionService } from '../encryption.service';
+import { enterKeyModalAndSave } from '../encryption-key-modal/encryption-key-modal.component';
+import { MatDialog } from '@angular/material';
 
 @Component({
   selector: 'app-edit-journal',
@@ -20,6 +22,7 @@ export class EditJournalComponent implements OnInit {
     private journalService: JournalService,
     private encryptionService: EncryptionService,
     private snackBar: MatSnackBar,
+    private dialog: MatDialog,
     breakpointObserver: BreakpointObserver,
   ) {
     const layoutChanges = breakpointObserver.observe([
@@ -53,14 +56,18 @@ export class EditJournalComponent implements OnInit {
     }
   }
 
-  getJournalContent() {
+  async getJournalContent() {
     const journals = this.journalService.journalResponse.journals.filter((a) => a.id === this.journalId);
     if (journals.length > 0) {
       if (journals[0].saveType === protobufs.Journal.JournalSaveType.ENCRYPTED) {
+        if (this.encryptionService.getEncryptionKey() == null) {
+          await enterKeyModalAndSave(this.dialog, this.encryptionService);
+        }
         this.content = this.encryptionService.decrypt(journals[0].content);
       } else {
         this.content = journals[0].content;
       }
+      console.log(this.content);
     } else {
       this.snackBar.open(`Journal Entry ${this.journalId} not found`, 'Retry', {
         duration: 2000
@@ -71,8 +78,11 @@ export class EditJournalComponent implements OnInit {
     }
   }
 
-  editSubmitJournal(newContent: string) {
+  async editSubmitJournal(newContent: string) {
     if (this.getJournal().saveType === protobufs.Journal.JournalSaveType.ENCRYPTED) {
+      if (this.encryptionService.getEncryptionKey() == null) {
+        await enterKeyModalAndSave(this.dialog, this.encryptionService);
+      }
       newContent = this.encryptionService.encrypt(newContent);
     }
     this.journalService.editJournal(this.journalId, newContent, this.getJournal().saveType)
