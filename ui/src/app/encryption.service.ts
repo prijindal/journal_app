@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import {MD5, AES, mode, enc, pad, LibWordArray, WordArray } from 'crypto-js';
+import {MD5, AES, mode, enc, pad, lib } from 'crypto-js';
 
 import {JournalService} from './journal.service';
 import { protobufs } from 'src/protobufs';
@@ -31,15 +31,20 @@ export class EncryptionService {
     if (encryptionKey == null) {
       return '';
     }
+    const iv = lib.WordArray.random(128 / 8);
     const encrypted = AES.encrypt(
       enc.Utf8.parse(decryptedText),
       enc.Utf8.parse(encryptionKey),
-      {iv: null, mode: mode.ECB, padding: pad.Pkcs7})
+      {iv, mode: mode.CBC, padding: pad.Pkcs7})
     ;
-    return enc.Base64.stringify(encrypted.ciphertext);
+    const encryptedText = enc.Base64.stringify(encrypted.ciphertext);
+    const transitmessage = enc.Base64.stringify(iv) + encryptedText;
+    return transitmessage;
   }
 
-  decrypt(encrypted: string): string {
+  decrypt(transitmessage: string): string {
+    const iv = enc.Base64.parse(transitmessage.substr(0, 24));
+    const encrypted = transitmessage.substring(24);
     const encryptionKey = this.getEncryptionKey();
     if (encryptionKey == null) {
       return '';
@@ -47,7 +52,7 @@ export class EncryptionService {
     const decryptedText = AES.decrypt(
       encrypted,
       enc.Utf8.parse(encryptionKey),
-      {iv: null, mode: mode.ECB, padding: pad.Pkcs7}
+      {iv, mode: mode.CBC, padding: pad.Pkcs7}
     ).toString();
     return enc.Utf8.stringify(enc.Hex.parse(decryptedText));
   }

@@ -53,7 +53,7 @@ class EncryptionService {
       return null;
     }
     final key = Key.fromUtf8(encryptionKey);
-    final encrypter = Encrypter(AES(key, mode: AESMode.ecb));
+    final encrypter = Encrypter(AES(key, mode: AESMode.cbc));
     return encrypter;
   }
 
@@ -61,12 +61,16 @@ class EncryptionService {
     if (_cacheEncrypted.containsKey(decryptedText)) {
       return _cacheDecrypted[decryptedText];
     }
-    final encryptedText = getEncryptor().encrypt(decryptedText).base64;
-    _cacheDecrypted[decryptedText] = encryptedText;
+    final iv = IV.fromLength(16);
+    final encryptedText = getEncryptor().encrypt(decryptedText, iv: iv).base64;
+    final transitmessage = iv.base64 + encryptedText;
+    _cacheDecrypted[decryptedText] = transitmessage;
     return encryptedText;
   }
 
-  String decrypt(String encryptedText) {
+  String decrypt(String transitmessage) {
+    final iv = IV.fromBase64(transitmessage.substring(0, 24));
+    final encryptedText = transitmessage.substring(24);
     if (_cacheDecrypted.containsKey(encryptedText)) {
       return _cacheDecrypted[encryptedText];
     }
@@ -76,7 +80,7 @@ class EncryptionService {
       return "";
     }
     try {
-      final decryptedText = encryptor.decrypt(encryptedContent);
+      final decryptedText = encryptor.decrypt(encryptedContent, iv: iv);
       _cacheDecrypted[encryptedText] = decryptedText;
       return decryptedText;
     } catch (error) {
