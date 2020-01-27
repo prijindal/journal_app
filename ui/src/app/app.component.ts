@@ -9,8 +9,8 @@ import { SidebarService } from './sidebar.service';
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent implements AfterViewInit {
-  public isHandset: boolean;
-  @ViewChild('sidenav', {static: false}) public myNav: MatSidenav;
+  public isHandset: boolean | undefined;
+  @ViewChild('sidenav', {static: false}) public myNav: MatSidenav | undefined;
   constructor(
     public sidebarService: SidebarService,
     breakpointObserver: BreakpointObserver,
@@ -24,7 +24,7 @@ export class AppComponent implements AfterViewInit {
     });
   }
 
-  ngAfterViewInit() {
+  ngAfterViewInit(): void {
     this.sidebarService.myNav = this.myNav;
   }
 }

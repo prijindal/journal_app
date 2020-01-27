@@ -5,11 +5,9 @@ import {protobufs} from '../protobufs';
   providedIn: 'root'
 })
 export class MockUserService {
-  public user: protobufs.User;
+  public user: protobufs.User | undefined;
 
-  getUser(): Promise<protobufs.User> {
-    return new Promise<protobufs.User>((resolve) => {
-      resolve(new protobufs.User());
-    });
+  async getUser(): Promise<protobufs.User> {
+    return new protobufs.User();
   }
 }

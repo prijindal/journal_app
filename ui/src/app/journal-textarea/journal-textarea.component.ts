@@ -7,10 +7,10 @@ import {BreakpointObserver, Breakpoints} from '@angular/cdk/layout';
   styleUrls: ['./journal-textarea.component.scss']
 })
 export class JournalTextareaComponent {
-  public isHandset: boolean;
-  public btnColor = 'primary';
-  @Input() public content = '';
-  @Output() public save = new EventEmitter<string>();
+  public isHandset: boolean | undefined;
+  public btnColor: string = 'primary';
+  @Input() public content: string = '';
+  @Output() public save: EventEmitter<string> = new EventEmitter<string>();
   constructor(
     breakpointObserver: BreakpointObserver,
   ) {
@@ -23,7 +23,7 @@ export class JournalTextareaComponent {
     });
   }
 
-  onSubmit(e) {
+  onSubmit(e: any): void {
     e.preventDefault();
     this.save.emit(this.content);
   }

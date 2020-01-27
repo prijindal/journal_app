@@ -5,11 +5,11 @@ import {protobufs} from '../protobufs';
   providedIn: 'root'
 })
 export class MockJournalService {
-  public journalResponse: protobufs.JournalResponse;
+  public journalResponse: protobufs.JournalResponse | undefined;
 
-  getJournals(): Promise<protobufs.JournalResponse> {
-    return new Promise<protobufs.JournalResponse>((resolve) => {
-      resolve(new protobufs.JournalResponse());
+  async getJournals(): Promise<protobufs.JournalResponse> {
+    return new protobufs.JournalResponse({
+      journals: []
     });
   }
 }

@@ -8,21 +8,21 @@ import { protobufs } from 'src/protobufs';
   providedIn: 'root'
 })
 export class EncryptionService {
-  private encryptionKey;
+  private encryptionKey: string | undefined;
   constructor(private journalService: JournalService) { }
 
-  isEncryptionKeyNotFound() {
+  get isEncryptionKeyNotFound(): boolean {
     if (this.encryptionKey == null || this.encryptionKey.length === 0) {
       return true;
     }
     return false;
   }
 
-  getEncryptionKey() {
+  private getEncryptionKey(): string | undefined {
     return this.encryptionKey;
   }
 
-  setEncryptionKey(encryptionKey: string) {
+  setEncryptionKey(encryptionKey: string): void {
     this.encryptionKey = MD5(encryptionKey).toString();
   }
 
@@ -57,10 +57,10 @@ export class EncryptionService {
     return enc.Utf8.stringify(enc.Hex.parse(decryptedText));
   }
 
-  async encryptJournals() {
+  async encryptJournals(): Promise<void> {
     const journalsResponse = await this.journalService.getJournals();
     journalsResponse.journals.forEach((journal) => {
-      if (journal.saveType !== protobufs.Journal.JournalSaveType.ENCRYPTED) {
+      if (journal.saveType !== protobufs.Journal.JournalSaveType.ENCRYPTED && journal.content && journal.id) {
         const encrypted = this.encrypt(journal.content);
         this.journalService.editJournal(journal.id, encrypted, protobufs.Journal.JournalSaveType.ENCRYPTED);
       }

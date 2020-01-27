@@ -20,8 +20,8 @@ enum TextAreaMode {
   styleUrls: ['./home.component.scss']
 })
 export class HomeComponent implements OnInit {
-  public isHandset: boolean;
-  public content = '';
+  public isHandset: boolean | undefined;
+  public content: string = '';
   constructor(
     private snackBar: MatSnackBar,
     private journalService: JournalService,
@@ -40,14 +40,14 @@ export class HomeComponent implements OnInit {
     });
   }
 
-  ngOnInit() {
+  ngOnInit(): void {
     this.journalService.getJournals();
   }
 
-  async addJournal(newContent: string) {
+  async addJournal(newContent: string): Promise<void> {
     const saveType = this.savetypeService.getSaveType();
     if (saveType === protobufs.Journal.JournalSaveType.ENCRYPTED) {
-      if (this.encryptionService.getEncryptionKey() == null) {
+      if (this.encryptionService.isEncryptionKeyNotFound) {
         await enterKeyModalAndSave(this.dialog, this.encryptionService);
       }
       newContent = this.encryptionService.encrypt(newContent);

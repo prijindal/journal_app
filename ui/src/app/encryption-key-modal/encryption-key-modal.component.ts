@@ -32,14 +32,14 @@ export async function enterKeyModalAndSave(dialog: MatDialog, encryptionService:
   styleUrls: ['./encryption-key-modal.component.scss']
 })
 export class EncryptionKeyModalComponent implements OnInit {
-  encryptionKey: string;
-  shouldSave: boolean;
+  encryptionKey: string = '';
+  shouldSave: boolean = false;
 
   constructor(
-    public dialogRef: MatDialogRef<EncryptionKeyModalComponent, {encryptionKey: string, shouldSave: boolean}>,
+    public dialogRef: MatDialogRef<EncryptionKeyModalComponent, EncryptionKeyModalReturn | null>,
   ) {}
 
-  ngOnInit() {
+  ngOnInit(): void {
   }
 
   onPrompt(): void {
@@ -52,3 +52,5 @@ export class EncryptionKeyModalComponent implements OnInit {
     this.dialogRef.close(null);
   }
 }
+
+export interface EncryptionKeyModalReturn {encryptionKey: string; shouldSave: boolean; }

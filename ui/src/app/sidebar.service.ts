@@ -5,14 +5,14 @@ import { MatSidenav } from '@angular/material';
   providedIn: 'root'
 })
 export class SidebarService {
-  private myNavSidebar: MatSidenav;
+  private myNavSidebar: MatSidenav | undefined;
   constructor() { }
 
-  get myNav() {
+  get myNav(): MatSidenav | undefined {
     return this.myNavSidebar;
   }
 
-  set myNav(myNav: MatSidenav) {
+  set myNav(myNav: MatSidenav | undefined) {
     this.myNavSidebar = myNav;
   }
 }

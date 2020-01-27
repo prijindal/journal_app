@@ -6,7 +6,7 @@ import {protobufs} from '../protobufs';
   providedIn: 'root'
 })
 export class UserService {
-  public user: protobufs.User;
+  public user: protobufs.User | undefined;
 
   constructor(private http: HttpClient) { }
 

@@ -6,7 +6,7 @@ import {protobufs} from '../protobufs';
   providedIn: 'root'
 })
 export class JournalService {
-  public journalResponse: protobufs.JournalResponse;
+  public journalResponse: protobufs.JournalResponse | undefined;
   constructor(private http: HttpClient) { }
 
   getJournals(): Promise<protobufs.JournalResponse> {
@@ -19,7 +19,7 @@ export class JournalService {
     });
   }
 
-  addJournal(content: string, saveType?: protobufs.Journal.JournalSaveType) {
+  addJournal(content: string, saveType?: protobufs.Journal.JournalSaveType): Promise<protobufs.Journal> {
     const form = new FormData();
     form.append('content', content);
     if (saveType != null) {
@@ -29,27 +29,34 @@ export class JournalService {
     .toPromise()
     .then(data => protobufs.Journal.decode(new Uint8Array(data)))
     .then((data) => {
-      this.journalResponse.journals.unshift(data);
+      if (this.journalResponse != null) {
+        this.journalResponse.journals.unshift(data);
+      }
       return data;
     });
   }
 
-  deleteJournal(id: number | Long) {
+  deleteJournal(id: number | Long): Promise<protobufs.Journal> {
     return this.http.delete('/journal', {params: {id: id.toString()}, responseType: 'arraybuffer'})
     .toPromise()
     .then(data => protobufs.Journal.decode(new Uint8Array(data)))
     .then((data) => {
-      this.journalResponse.journals = this.journalResponse.journals.filter((a) => a.id !== id);
+      if (this.journalResponse != null) {
+        this.journalResponse.journals = this.journalResponse.journals.filter((a) => a.id !== id);
+      }
+      return data;
     });
   }
 
   editJournal(
-    id: number | Long,
+    id: number | Long | null,
     content: string,
-    saveType: protobufs.Journal.JournalSaveType = protobufs.Journal.JournalSaveType.PLAINTEXT
-  ) {
+    saveType: protobufs.Journal.JournalSaveType | null | undefined = protobufs.Journal.JournalSaveType.PLAINTEXT
+  ): Promise<protobufs.Journal> {
     const form = new FormData();
-    form.append('id', id.toString());
+    if (id != null) {
+      form.append('id', id.toString());
+    }
     form.append('content', content);
     if (saveType != null) {
       if (saveType === protobufs.Journal.JournalSaveType.PLAINTEXT) {
@@ -62,13 +69,15 @@ export class JournalService {
     .toPromise()
     .then(data => protobufs.Journal.decode(new Uint8Array(data)))
     .then((data) => {
-      this.journalResponse.journals = this.journalResponse.journals.map((a) => {
-        if (a.id === data.id) {
-          return data;
-        } else {
-          return a;
-        }
-      });
+      if (this.journalResponse != null) {
+        this.journalResponse.journals = this.journalResponse.journals.map((a) => {
+          if (a.id === data.id) {
+            return data;
+          } else {
+            return a;
+          }
+        });
+      }
       return data;
     });
   }

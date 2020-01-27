@@ -19,7 +19,7 @@ export class ConfirmDialogComponent implements OnInit {
     this.message = data.message;
   }
 
-  ngOnInit() {
+  ngOnInit(): void {
   }
 
   onConfirm(): void {

@@ -14,9 +14,9 @@ import { MatDialog } from '@angular/material';
   styleUrls: ['./edit-journal.component.scss']
 })
 export class EditJournalComponent implements OnInit {
-  private journalId: number;
-  public content = '';
-  public isHandset: boolean;
+  private journalId: number | Long | null = null;
+  public content: string = '';
+  public isHandset: boolean | undefined;
   constructor(
     private route: ActivatedRoute,
     private journalService: JournalService,
@@ -34,63 +34,75 @@ export class EditJournalComponent implements OnInit {
     });
   }
 
-  ngOnInit() {
+  ngOnInit(): void {
     this.route.paramMap.subscribe((params: ParamMap) => {
-      this.journalId = parseInt(params.get('id'), 10);
-      if (this.journalService.journalResponse == null) {
-        this.journalService.getJournals().then(() => {
+      const id = params.get('id');
+      if (id != null) {
+        this.journalId = parseInt(id, 10);
+        if (this.journalService.journalResponse == null) {
+          this.journalService.getJournals().then(() => {
+            this.getJournalContent();
+          });
+        } else {
           this.getJournalContent();
-        });
-      } else {
-        this.getJournalContent();
+        }
       }
     });
   }
 
-  getJournal() {
-    const journals = this.journalService.journalResponse.journals.filter((a) => a.id === this.journalId);
-    if (journals.length > 0) {
-      return journals[0];
-    } else {
-      return null;
+  getJournal(): protobufs.IJournal | undefined {
+    if (this.journalService.journalResponse != null) {
+      const journals = this.journalService.journalResponse.journals.filter((a) => a.id === this.journalId);
+      if (journals.length > 0) {
+        return journals[0];
+      } else {
+        return;
+      }
     }
   }
 
-  async getJournalContent() {
-    const journals = this.journalService.journalResponse.journals.filter((a) => a.id === this.journalId);
-    if (journals.length > 0) {
-      if (journals[0].saveType === protobufs.Journal.JournalSaveType.ENCRYPTED) {
-        if (this.encryptionService.getEncryptionKey() == null) {
+  async getJournalContent(): Promise<void> {
+    if (this.journalService.journalResponse != null) {
+      const journals = this.journalService.journalResponse.journals.filter((a) => a.id === this.journalId);
+      if (journals.length > 0) {
+        const journal = journals[0];
+        if (journal.content != null) {
+          if (journal.saveType === protobufs.Journal.JournalSaveType.ENCRYPTED) {
+            if (this.encryptionService.isEncryptionKeyNotFound) {
+              await enterKeyModalAndSave(this.dialog, this.encryptionService);
+            }
+            this.content = this.encryptionService.decrypt(journal.content);
+          } else {
+            this.content = journal.content;
+          }
+        }
+      } else {
+        this.snackBar.open(`Journal Entry ${this.journalId} not found`, 'Retry', {
+          duration: 2000
+        })
+        .onAction().subscribe(() => {
+          window.location.reload();
+        });
+      }
+    }
+  }
+
+  async editSubmitJournal(newContent: string): Promise<void> {
+    const journal = this.getJournal();
+    if (journal != null) {
+      if (journal.saveType === protobufs.Journal.JournalSaveType.ENCRYPTED) {
+        if (this.encryptionService.isEncryptionKeyNotFound) {
           await enterKeyModalAndSave(this.dialog, this.encryptionService);
         }
-        this.content = this.encryptionService.decrypt(journals[0].content);
-      } else {
-        this.content = journals[0].content;
+        newContent = this.encryptionService.encrypt(newContent);
       }
-      console.log(this.content);
-    } else {
-      this.snackBar.open(`Journal Entry ${this.journalId} not found`, 'Retry', {
-        duration: 2000
-      })
-      .onAction().subscribe(() => {
-        window.location.reload();
+      this.journalService.editJournal(this.journalId, newContent, journal.saveType)
+      .then((data) => {
+        this.journalId = null;
+        this.snackBar.open(`Succesfully edited journal ${data.id}`, 'Undo', {
+          duration: 2000
+        });
       });
     }
-  }
-
-  async editSubmitJournal(newContent: string) {
-    if (this.getJournal().saveType === protobufs.Journal.JournalSaveType.ENCRYPTED) {
-      if (this.encryptionService.getEncryptionKey() == null) {
-        await enterKeyModalAndSave(this.dialog, this.encryptionService);
-      }
-      newContent = this.encryptionService.encrypt(newContent);
-    }
-    this.journalService.editJournal(this.journalId, newContent, this.getJournal().saveType)
-    .then((data) => {
-      this.journalId = null;
-      this.snackBar.open(`Succesfully edited journal ${data.id}`, 'Undo', {
-        duration: 2000
-      });
-    });
   }
 }

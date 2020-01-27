@@ -24,22 +24,23 @@ export class JournalListComponent implements OnInit {
     private snackBar: MatSnackBar
   ) { }
 
-  ngOnInit() {
+  ngOnInit(): void {
     this.journalService.getJournals();
   }
 
-  get journalResponse() {
+  get journalResponse(): protobufs.JournalResponse | undefined {
     return this.journalService.journalResponse;
   }
-  selectedJournalLength() {
+
+  selectedJournalLength(): number {
     return Object.values(this.selectedJournals).filter(a => a === true).length;
   }
 
-  fromNow(date) {
+  fromNow(date: number): string {
     return moment.unix(date).fromNow();
   }
 
-  deleteJournalConfirm(journal: protobufs.Journal) {
+  deleteJournalConfirm(journal: protobufs.Journal): void {
     const dialogData = new ConfirmDialogModel(`Delete Journal ${journal.id}`, 'Are you sure you want to delete?');
     const dialogRef = this.dialog.open(ConfirmDialogComponent, {
       maxWidth: '400px',
@@ -53,7 +54,7 @@ export class JournalListComponent implements OnInit {
     });
   }
 
-  deleteJournal(journal: protobufs.Journal) {
+  deleteJournal(journal: protobufs.Journal): Promise<void> {
     return this.journalService.deleteJournal(journal.id)
     .then(() => {
       this.snackBar.open(`Deleted journal entry ${journal.id}`, 'Undo', {
@@ -74,12 +75,12 @@ export class JournalListComponent implements OnInit {
     });
   }
 
-  undoDeleteJournal(journal: protobufs.Journal) {
+  undoDeleteJournal(journal: protobufs.Journal): void {
     // TODO: Better undo delete
     this.journalService.addJournal(journal.content);
   }
 
-  deleteJournalSelectedConfirm() {
+  deleteJournalSelectedConfirm(): void {
     const dialogData = new ConfirmDialogModel(`Delete ${this.selectedJournalLength()} Journal Entries`, 'Are you sure you want to delete?');
     const dialogRef = this.dialog.open(ConfirmDialogComponent, {
       maxWidth: '400px',
@@ -93,18 +94,18 @@ export class JournalListComponent implements OnInit {
     });
   }
 
-  isEncryptionKeyNotFound(journal: protobufs.Journal) {
+  isEncryptionKeyNotFound(journal: protobufs.Journal): boolean {
     if (journal.saveType === protobufs.Journal.JournalSaveType.ENCRYPTED) {
-      return this.encryptionService.isEncryptionKeyNotFound();
+      return this.encryptionService.isEncryptionKeyNotFound;
     }
     return false;
   }
 
-  enterEncryptionKey() {
+  enterEncryptionKey(): void {
     enterKeyModalAndSave(this.dialog, this.encryptionService);
   }
 
-  getContent(journal: protobufs.Journal) {
+  getContent(journal: protobufs.Journal): string {
     if (journal.saveType !== protobufs.Journal.JournalSaveType.ENCRYPTED) {
       return journal.content;
     } else {
@@ -112,13 +113,13 @@ export class JournalListComponent implements OnInit {
     }
   }
 
-  deleteJournalSelected() {
-    Object.keys(this.selectedJournals).forEach((key) => {
+  deleteJournalSelected(): void {
+    for (const key in this.selectedJournals) {
       if (this.selectedJournals[key]) {
         const id = parseInt(key, 10);
         this.journalService.deleteJournal(id);
       }
-    });
+    }
     this.selectedJournals = {};
   }
 }
