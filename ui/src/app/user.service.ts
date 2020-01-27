@@ -10,12 +10,13 @@ export class UserService {
 
   constructor(private http: HttpClient) { }
 
-  getUser() {
+  getUser(): Promise<protobufs.User> {
     return this.http.get('/user', {responseType: 'arraybuffer'})
     .toPromise()
     .then(data => protobufs.User.decode(new Uint8Array(data)))
     .then((user) => {
       this.user = user;
+      return user;
     });
   }
 }

@@ -1,6 +1,7 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { JournalTextareaComponent } from './journal-textarea.component';
+import { AppMaterialModule } from '../app-material/app-material.module';
 
 describe('JournalTextareaComponent', () => {
   let component: JournalTextareaComponent;
@@ -8,7 +9,8 @@ describe('JournalTextareaComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ JournalTextareaComponent ]
+      declarations: [ JournalTextareaComponent ],
+      imports: [AppMaterialModule]
     })
     .compileComponents();
   }));

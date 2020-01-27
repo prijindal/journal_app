@@ -1,16 +1,16 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { ConfirmDialogComponent } from './confirm-dialog.component';
+import { EncryptionKeyModalComponent } from './encryption-key-modal.component';
 import { AppMaterialModule } from '../app-material/app-material.module';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 
-describe('ConfirmDialogComponent', () => {
-  let component: ConfirmDialogComponent;
-  let fixture: ComponentFixture<ConfirmDialogComponent>;
+describe('EncryptionKeyModalComponent', () => {
+  let component: EncryptionKeyModalComponent;
+  let fixture: ComponentFixture<EncryptionKeyModalComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ ConfirmDialogComponent ],
+      declarations: [ EncryptionKeyModalComponent ],
       imports: [AppMaterialModule],
       providers: [
         { provide: MatDialogRef, useValue: {} },
@@ -21,7 +21,7 @@ describe('ConfirmDialogComponent', () => {
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(ConfirmDialogComponent);
+    fixture = TestBed.createComponent(EncryptionKeyModalComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
