@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:encrypt/encrypt.dart';
 
 import 'package:journal_app/components/appbar.dart';
 import 'package:journal_app/api/api.dart';

@@ -7,6 +7,7 @@ import 'package:journal_app/helpers/flutter_persistor.dart';
 import 'package:journal_app/protobufs/journal.pb.dart';
 import 'package:journal_app/protobufs/user.pb.dart';
 import 'package:journal_app/protobufs/httpqueue.pb.dart';
+import 'package:pedantic/pedantic.dart';
 
 const JOURNALS_KEY = "JOURNALS_KEY";
 const HTTP_API_QUEUE_KEY = "HTTP_API_QUEUE_KEY";
@@ -152,7 +153,9 @@ class HttpApi {
     var url = '$HOST/logout';
     try {
       await http.get(url, headers: this.headers);
-    } catch (e) {}
+    } catch (e) {
+      print(e);
+    }
   }
 
   Future<User> getUser() async {
@@ -174,8 +177,8 @@ class HttpApi {
       throw Error();
     }
     _journalResponse = JournalResponse.fromBuffer(response.bodyBytes);
-    FlutterPersistor.getInstance()
-        .setBuffer(JOURNALS_KEY, _journalResponse.writeToBuffer());
+    unawaited(FlutterPersistor.getInstance()
+        .setBuffer(JOURNALS_KEY, _journalResponse.writeToBuffer()));
     return _journalResponse;
   }
 

@@ -8,19 +8,19 @@ echo -e "import * as Long from \"long\"; \n$(cat ../ui/src/protobufs/index.d.ts)
 cd ..
 
 cd backend
-golint ./
+golint ./ &&
 mkdir -p coverage
-go test -coverprofile=coverage/coverage.out
+go test -coverprofile=coverage/coverage.out &&
 go tool cover -html=coverage/coverage.out -o coverage/coverage.html
 cd ..
 
 cd ui
-ng lint
-ng test --browsers ChromeHeadless --watch=false --code-coverage
+ng lint &&
+ng test --browsers ChromeHeadless --watch=false --code-coverage &&
 cd ..
 
 cd frontend
-flutter analyze
-flutter test --coverage
+flutter analyze &&
+flutter test --coverage &&
 genhtml coverage/lcov.info -o coverage/html
 cd ..

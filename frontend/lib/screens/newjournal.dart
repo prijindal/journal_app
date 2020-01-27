@@ -23,8 +23,8 @@ class _NewJournalScreenState extends State<NewJournalScreen> {
     if (saveType == Journal_JournalSaveType.ENCRYPTED) {
       if (EncryptionService.getInstance().encryptionKey == null) {
         await enterKeyModalAndSave(context);
-        FlutterPersistor.getInstance()
-            .setString(SAVE_TYPE, saveType.value.toString());
+        unawaited(FlutterPersistor.getInstance()
+            .setString(SAVE_TYPE, saveType.value.toString()));
       }
       content = EncryptionService.getInstance().encrypt(content);
     }
