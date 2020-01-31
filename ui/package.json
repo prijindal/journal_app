@@ -28,6 +28,7 @@
     "protobufjs": "^6.8.8",
     "rxjs": "~6.4.0",
     "tslib": "^1.10.0",
+    "uuid": "^3.4.0",
     "zone.js": "~0.9.1"
   },
   "devDependencies": {
@@ -40,6 +41,7 @@
     "@types/jasmine": "~3.5.1",
     "@types/jasminewd2": "~2.0.8",
     "@types/node": "~8.9.4",
+    "@types/uuid": "^3.4.7",
     "codelyzer": "^5.2.1",
     "jasmine-core": "~3.5.0",
     "jasmine-spec-reporter": "~4.2.1",

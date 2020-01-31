@@ -8,6 +8,7 @@ import 'package:journal_app/protobufs/journal.pb.dart';
 import 'package:journal_app/protobufs/user.pb.dart';
 import 'package:journal_app/protobufs/httpqueue.pb.dart';
 import 'package:pedantic/pedantic.dart';
+import 'package:uuid/uuid.dart';
 
 const JOURNALS_KEY = "JOURNALS_KEY";
 const HTTP_API_QUEUE_KEY = "HTTP_API_QUEUE_KEY";
@@ -183,9 +184,15 @@ class HttpApi {
   }
 
   Future<Journal> newJournal(String content,
-      {Journal_JournalSaveType saveType}) async {
+      {Journal_JournalSaveType saveType, String uuid}) async {
     var url = '$HOST/journal';
-    var params = {'content': content};
+    if (uuid == null) {
+      uuid = Uuid().v4();
+    }
+    var params = {
+      'content': content,
+      'uuid': uuid,
+    };
     if (saveType != null) {
       params['save_type'] = saveType.toString();
     }

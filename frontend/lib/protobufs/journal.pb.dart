@@ -22,6 +22,7 @@ class Journal extends $pb.GeneratedMessage {
     ..aOS(4, 'content')
     ..aInt64(5, 'createdAt')
     ..aInt64(6, 'updatedAt')
+    ..aOS(7, 'uuid')
     ..hasRequiredFields = false
   ;
 
@@ -93,6 +94,15 @@ class Journal extends $pb.GeneratedMessage {
   $core.bool hasUpdatedAt() => $_has(5);
   @$pb.TagNumber(6)
   void clearUpdatedAt() => clearField(6);
+
+  @$pb.TagNumber(7)
+  $core.String get uuid => $_getSZ(6);
+  @$pb.TagNumber(7)
+  set uuid($core.String v) { $_setString(6, v); }
+  @$pb.TagNumber(7)
+  $core.bool hasUuid() => $_has(6);
+  @$pb.TagNumber(7)
+  void clearUuid() => clearField(7);
 }
 
 class JournalResponse extends $pb.GeneratedMessage {

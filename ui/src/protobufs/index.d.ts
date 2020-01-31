@@ -219,6 +219,9 @@ export namespace protobufs {
 
         /** Journal updatedAt */
         updatedAt?: (number|Long|null);
+
+        /** Journal uuid */
+        uuid?: (string|null);
     }
 
     /** Represents a Journal. */
@@ -247,6 +250,9 @@ export namespace protobufs {
 
         /** Journal updatedAt. */
         public updatedAt: (number|Long);
+
+        /** Journal uuid. */
+        public uuid: string;
 
         /**
          * Creates a new Journal instance using the specified properties.

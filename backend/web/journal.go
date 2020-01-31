@@ -41,6 +41,7 @@ func JournalHandler(w http.ResponseWriter, r *http.Request) {
 					Content:   journal.Content,
 					CreatedAt: journal.CreatedAt.Unix(),
 					UpdatedAt: journal.UpdatedAt.Unix(),
+					Uuid: journal.UUID,
 				}
 				journalResponse.Journals = append(journalResponse.Journals, journalData)
 			}
@@ -65,10 +66,12 @@ func JournalHandler(w http.ResponseWriter, r *http.Request) {
 			} else {
 				saveType = protobufs.Journal_PLAINTEXT
 			}
+			uuid := r.FormValue("uuid")
 			journal := new(models.Journal)
 			journal.UserID = user.ID
 			journal.Content = content
 			journal.SaveType = saveType.String()
+			journal.UUID = uuid;
 			_, err := databases.GetPostgresClient().Model(journal).Insert(journal)
 			if err != nil {
 				w.WriteHeader(500)
@@ -82,6 +85,7 @@ func JournalHandler(w http.ResponseWriter, r *http.Request) {
 				Content:   journal.Content,
 				CreatedAt: journal.CreatedAt.Unix(),
 				UpdatedAt: journal.UpdatedAt.Unix(),
+				Uuid: journal.UUID,
 			}
 			res, err := proto.Marshal(journalData)
 			if err != nil {
@@ -140,6 +144,7 @@ func JournalHandler(w http.ResponseWriter, r *http.Request) {
 				Content:   journal.Content,
 				CreatedAt: journal.CreatedAt.Unix(),
 				UpdatedAt: journal.UpdatedAt.Unix(),
+				Uuid: journal.UUID,
 			}
 			res, err := proto.Marshal(journalData)
 			if err != nil {

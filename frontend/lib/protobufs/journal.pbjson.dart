@@ -14,6 +14,7 @@ const Journal$json = const {
     const {'1': 'content', '3': 4, '4': 1, '5': 9, '10': 'content'},
     const {'1': 'created_at', '3': 5, '4': 1, '5': 3, '10': 'createdAt'},
     const {'1': 'updated_at', '3': 6, '4': 1, '5': 3, '10': 'updatedAt'},
+    const {'1': 'uuid', '3': 7, '4': 1, '5': 9, '10': 'uuid'},
   ],
   '4': const [Journal_JournalSaveType$json],
 };

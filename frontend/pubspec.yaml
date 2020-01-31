@@ -23,6 +23,11 @@ dependencies:
   encrypt: any
   fixnum: any
   http: any
+  uuid: any
+  moor: any
+  moor_ffi: any
+  path_provider: any
+  path: any
   pedantic: any
   protobuf: any
   shared_preferences: any
@@ -34,6 +39,8 @@ dependencies:
   cupertino_icons: ^0.1.2
 
 dev_dependencies:
+  moor_generator: any
+  build_runner: any
   flutter_test:
     sdk: flutter
 

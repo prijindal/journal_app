@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import {protobufs} from '../protobufs';
+import * as uuidv4 from 'uuid/v4';
 
 @Injectable({
   providedIn: 'root'
@@ -19,9 +20,13 @@ export class JournalService {
     });
   }
 
-  addJournal(content: string, saveType?: protobufs.Journal.JournalSaveType): Promise<protobufs.Journal> {
+  addJournal(content: string, saveType?: protobufs.Journal.JournalSaveType, uuid?: string): Promise<protobufs.Journal> {
     const form = new FormData();
+    if (uuid == null) {
+      uuid = uuidv4();
+    }
     form.append('content', content);
+    form.append('uuid', uuid);
     if (saveType != null) {
       form.append('save_type', protobufs.Journal.JournalSaveType[saveType]);
     }

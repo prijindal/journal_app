@@ -503,6 +503,7 @@ $root.protobufs = (function() {
          * @property {string|null} [content] Journal content
          * @property {number|Long|null} [createdAt] Journal createdAt
          * @property {number|Long|null} [updatedAt] Journal updatedAt
+         * @property {string|null} [uuid] Journal uuid
          */
 
         /**
@@ -569,6 +570,14 @@ $root.protobufs = (function() {
         Journal.prototype.updatedAt = $util.Long ? $util.Long.fromBits(0,0,false) : 0;
 
         /**
+         * Journal uuid.
+         * @member {string} uuid
+         * @memberof protobufs.Journal
+         * @instance
+         */
+        Journal.prototype.uuid = "";
+
+        /**
          * Creates a new Journal instance using the specified properties.
          * @function create
          * @memberof protobufs.Journal
@@ -604,6 +613,8 @@ $root.protobufs = (function() {
                 writer.uint32(/* id 5, wireType 0 =*/40).int64(message.createdAt);
             if (message.updatedAt != null && message.hasOwnProperty("updatedAt"))
                 writer.uint32(/* id 6, wireType 0 =*/48).int64(message.updatedAt);
+            if (message.uuid != null && message.hasOwnProperty("uuid"))
+                writer.uint32(/* id 7, wireType 2 =*/58).string(message.uuid);
             return writer;
         };
 
@@ -655,6 +666,9 @@ $root.protobufs = (function() {
                     break;
                 case 6:
                     message.updatedAt = reader.int64();
+                    break;
+                case 7:
+                    message.uuid = reader.string();
                     break;
                 default:
                     reader.skipType(tag & 7);
@@ -715,6 +729,9 @@ $root.protobufs = (function() {
             if (message.updatedAt != null && message.hasOwnProperty("updatedAt"))
                 if (!$util.isInteger(message.updatedAt) && !(message.updatedAt && $util.isInteger(message.updatedAt.low) && $util.isInteger(message.updatedAt.high)))
                     return "updatedAt: integer|Long expected";
+            if (message.uuid != null && message.hasOwnProperty("uuid"))
+                if (!$util.isString(message.uuid))
+                    return "uuid: string expected";
             return null;
         };
 
@@ -782,6 +799,8 @@ $root.protobufs = (function() {
                     message.updatedAt = object.updatedAt;
                 else if (typeof object.updatedAt === "object")
                     message.updatedAt = new $util.LongBits(object.updatedAt.low >>> 0, object.updatedAt.high >>> 0).toNumber();
+            if (object.uuid != null)
+                message.uuid = String(object.uuid);
             return message;
         };
 
@@ -821,6 +840,7 @@ $root.protobufs = (function() {
                     object.updatedAt = options.longs === String ? long.toString() : options.longs === Number ? long.toNumber() : long;
                 } else
                     object.updatedAt = options.longs === String ? "0" : 0;
+                object.uuid = "";
             }
             if (message.id != null && message.hasOwnProperty("id"))
                 if (typeof message.id === "number")
@@ -846,6 +866,8 @@ $root.protobufs = (function() {
                     object.updatedAt = options.longs === String ? String(message.updatedAt) : message.updatedAt;
                 else
                     object.updatedAt = options.longs === String ? $util.Long.prototype.toString.call(message.updatedAt) : options.longs === Number ? new $util.LongBits(message.updatedAt.low >>> 0, message.updatedAt.high >>> 0).toNumber() : message.updatedAt;
+            if (message.uuid != null && message.hasOwnProperty("uuid"))
+                object.uuid = message.uuid;
             return object;
         };
 
