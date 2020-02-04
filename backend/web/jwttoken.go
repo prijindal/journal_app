@@ -111,10 +111,19 @@ func RefreshToken(w http.ResponseWriter, r *http.Request, accessToken *models.Ac
 
 	// Set the new token as the users `token` cookie
 	http.SetCookie(w, &http.Cookie{
-		Name:    "token",
+		Name:     "token",
+		Path:     "/",
+		Value:    tokenString,
+		Expires:  expirationTime,
+		Secure:   true,
+		HttpOnly: true,
+	})
+	http.SetCookie(w, &http.Cookie{
+		Name:    "XSRF-TOKEN",
 		Path:    "/",
 		Value:   tokenString,
 		Expires: expirationTime,
+		Secure:  true,
 	})
 	return nil
 }
@@ -152,10 +161,19 @@ func SetJwtToken(w http.ResponseWriter, user *models.User) {
 	// Finally, we set the client cookie for "token" as the JWT we just generated
 	// we also set an expiry time which is the same as the token itself
 	http.SetCookie(w, &http.Cookie{
-		Name:    "token",
+		Name:     "token",
+		Path:     "/",
+		Value:    tokenString,
+		Expires:  expirationTime,
+		Secure:   true,
+		HttpOnly: true,
+	})
+	http.SetCookie(w, &http.Cookie{
+		Name:    "XSRF-TOKEN",
 		Path:    "/",
 		Value:   tokenString,
 		Expires: expirationTime,
+		Secure:  true,
 	})
 }
 
@@ -168,5 +186,13 @@ func UnSetJwtToken(w http.ResponseWriter, accessToken *models.AccessToken) {
 		Path:    "/",
 		Value:   "",
 		Expires: time.Unix(0, 0),
+		Secure:  true,
+	})
+	http.SetCookie(w, &http.Cookie{
+		Name:    "XSRF-TOKEN",
+		Path:    "/",
+		Value:   "",
+		Expires: time.Unix(0, 0),
+		Secure:  true,
 	})
 }

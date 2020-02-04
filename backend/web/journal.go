@@ -41,7 +41,7 @@ func JournalHandler(w http.ResponseWriter, r *http.Request) {
 					Content:   journal.Content,
 					CreatedAt: journal.CreatedAt.Unix(),
 					UpdatedAt: journal.UpdatedAt.Unix(),
-					Uuid: journal.UUID,
+					Uuid:      journal.UUID,
 				}
 				journalResponse.Journals = append(journalResponse.Journals, journalData)
 			}
@@ -53,6 +53,10 @@ func JournalHandler(w http.ResponseWriter, r *http.Request) {
 			}
 			w.Write(res)
 		} else if r.Method == "POST" {
+			xsrfToken := r.Header.Get("X-XSRF-TOKEN")
+			if VerifyXSRFToken(xsrfToken) == false {
+				return
+			}
 			content := r.FormValue("content")
 			if content == "" {
 				w.WriteHeader(500)
@@ -71,7 +75,7 @@ func JournalHandler(w http.ResponseWriter, r *http.Request) {
 			journal.UserID = user.ID
 			journal.Content = content
 			journal.SaveType = saveType.String()
-			journal.UUID = uuid;
+			journal.UUID = uuid
 			_, err := databases.GetPostgresClient().Model(journal).Insert(journal)
 			if err != nil {
 				w.WriteHeader(500)
@@ -85,7 +89,7 @@ func JournalHandler(w http.ResponseWriter, r *http.Request) {
 				Content:   journal.Content,
 				CreatedAt: journal.CreatedAt.Unix(),
 				UpdatedAt: journal.UpdatedAt.Unix(),
-				Uuid: journal.UUID,
+				Uuid:      journal.UUID,
 			}
 			res, err := proto.Marshal(journalData)
 			if err != nil {
@@ -95,6 +99,10 @@ func JournalHandler(w http.ResponseWriter, r *http.Request) {
 			}
 			w.Write(res)
 		} else if r.Method == "PUT" {
+			xsrfToken := r.Header.Get("X-XSRF-TOKEN")
+			if VerifyXSRFToken(xsrfToken) == false {
+				return
+			}
 			idTxt := r.FormValue("id")
 			id, err := strconv.Atoi(idTxt)
 			if err != nil {
@@ -144,7 +152,7 @@ func JournalHandler(w http.ResponseWriter, r *http.Request) {
 				Content:   journal.Content,
 				CreatedAt: journal.CreatedAt.Unix(),
 				UpdatedAt: journal.UpdatedAt.Unix(),
-				Uuid: journal.UUID,
+				Uuid:      journal.UUID,
 			}
 			res, err := proto.Marshal(journalData)
 			if err != nil {

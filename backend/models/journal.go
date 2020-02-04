@@ -3,7 +3,7 @@ package models
 /*Journal ..*/
 type Journal struct {
 	ID       int
-	UUID     string
+	UUID     string `pg:",unique"`
 	UserID   int
 	SaveType string `pg:"type:journal_save_type,default:'PLAINTEXT'"`
 	Content  string
