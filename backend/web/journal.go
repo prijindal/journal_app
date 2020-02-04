@@ -16,6 +16,7 @@ func JournalHandler(w http.ResponseWriter, r *http.Request) {
 	user, _, err := ParseJwtToken(r)
 	if err != nil {
 		w.WriteHeader(403)
+		fmt.Fprintf(w, err.Error())
 	} else {
 		if r.Method == "GET" {
 			var size = 20
@@ -162,6 +163,10 @@ func JournalHandler(w http.ResponseWriter, r *http.Request) {
 			}
 			w.Write(res)
 		} else if r.Method == "DELETE" {
+			xsrfToken := r.Header.Get("X-XSRF-TOKEN")
+			if VerifyXSRFToken(xsrfToken) == false {
+				return
+			}
 			idTxt := r.URL.Query().Get("id")
 			id, err := strconv.Atoi(idTxt)
 			if err != nil {

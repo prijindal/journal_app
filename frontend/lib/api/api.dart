@@ -84,12 +84,49 @@ class HttpApi {
     return FlutterPersistor.getInstance();
   }
 
+  Map<String, String> _parseSetCookies() {
+    var setCookies = this._cookie.split(',');
+    Map<String, String> cookies = <String, String>{};
+    for (var setCookie in setCookies) {
+      var cookiesSplit = setCookie.split(';');
+
+      for (var rawCookie in cookiesSplit) {
+        if (rawCookie.isNotEmpty) {
+          var keyValue = rawCookie.split('=');
+          if (keyValue != null && keyValue.length == 2) {
+            var key = keyValue[0].trim();
+            var value = keyValue[1];
+
+            // ignore keys that aren't cookies
+            if (key == 'path' || key == 'expires') continue;
+
+            cookies[key] = value;
+          }
+        }
+      }
+    }
+    return cookies;
+  }
+
   Map<String, String> get headers {
     Map<String, String> headers = Map<String, String>();
     if (this._cookie == null) {
       this._cookie = _persistance.loadString(COOKIE_KEY);
     }
-    headers['cookie'] = this._cookie;
+    if (this._cookie != null && this._cookie.isNotEmpty) {
+      Map<String, String> cookies = _parseSetCookies();
+      String cookieText = "";
+      for (var key in cookies.keys) {
+        if (cookieText.isNotEmpty) {
+          cookieText += ";";
+        }
+        cookieText += key + "=" + cookies[key];
+      }
+      headers['cookie'] = cookieText;
+      if (cookies.containsKey("XSRF-TOKEN")) {
+        headers["X-XSRF-TOKEN"] = cookies["XSRF-TOKEN"];
+      }
+    }
     return headers;
   }
 

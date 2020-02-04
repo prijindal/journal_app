@@ -182,11 +182,12 @@ func UnSetJwtToken(w http.ResponseWriter, accessToken *models.AccessToken) {
 	// Set the new token as the users `token` cookie
 	databases.GetPostgresClient().Model(accessToken).WherePK().Delete()
 	http.SetCookie(w, &http.Cookie{
-		Name:    "token",
-		Path:    "/",
-		Value:   "",
-		Expires: time.Unix(0, 0),
-		Secure:  true,
+		Name:     "token",
+		Path:     "/",
+		Value:    "",
+		Expires:  time.Unix(0, 0),
+		Secure:   true,
+		HttpOnly: true,
 	})
 	http.SetCookie(w, &http.Cookie{
 		Name:    "XSRF-TOKEN",
