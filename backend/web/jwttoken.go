@@ -91,13 +91,13 @@ func RefreshToken(w http.ResponseWriter, r *http.Request, accessToken *models.Ac
 	// We ensure that a new token is not issued until enough time has elapsed
 	// In this case, a new token will only be issued if the old token is within
 	// 30 seconds of expiry. Otherwise, return a bad request status
-	if time.Now().Sub(accessToken.UpdatedAt) > 24*time.Hour {
+	if time.Now().Sub(accessToken.UpdatedAt) > 30*24*time.Hour {
 		w.WriteHeader(http.StatusUnauthorized)
 		return jwt.NewValidationError("Expired token", 1)
 	}
 
 	// Now, create a new token for the current use, with a renewed expiration time
-	expirationTime := time.Now().Add(24 * time.Hour)
+	expirationTime := time.Now().Add(30 * 24 * time.Hour)
 	claims.ExpiresAt = expirationTime.Unix()
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	tokenString, err := token.SignedString(jwtKey)
@@ -132,7 +132,7 @@ func RefreshToken(w http.ResponseWriter, r *http.Request, accessToken *models.Ac
 func SetJwtToken(w http.ResponseWriter, user *models.User) {
 	// Declare the expiration time of the token
 	// here, we have kept it as 5 minutes
-	expirationTime := time.Now().Add(24 * time.Hour)
+	expirationTime := time.Now().Add(30 * 24 * time.Hour)
 	accessTokenString := uuid.NewV1().String()
 	accessTokenModel := new(models.AccessToken)
 	accessTokenModel.Token = accessTokenString
