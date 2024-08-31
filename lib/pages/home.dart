@@ -1,10 +1,8 @@
 import 'dart:async';
-import 'dart:io';
 
 import 'package:drift/drift.dart';
-import 'package:flutter/foundation.dart';
-import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 
 import '../models/core.dart';
 import '../models/drift.dart';
@@ -105,9 +103,9 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  _recordJournalEntry() {
+  void _recordJournalEntry() {
     ScaffoldMessenger.of(context)
-        .showSnackBar(SnackBar(content: Text("Not implemented")));
+        .showSnackBar(const SnackBar(content: Text("Not implemented")));
   }
 
   Widget _buildJournalList() {
