@@ -6,6 +6,7 @@ import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 
 import '../models/core.dart';
 import '../models/drift.dart';
+import 'newentry.dart';
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key});
@@ -104,8 +105,9 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   void _recordJournalEntry() {
-    ScaffoldMessenger.of(context)
-        .showSnackBar(const SnackBar(content: Text("Not implemented")));
+    JournalEntryForm.newEntry(
+      context: context,
+    );
   }
 
   Widget _buildJournalList() {
@@ -170,7 +172,13 @@ class JournalEntryContainerTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListTile(
-      title: Text(journalEntry.description),
+      title: Text(journalEntry.creationTime.toString()),
+      onTap: () {
+        JournalEntryForm.editEntry(
+          context: context,
+          journalEntry: journalEntry,
+        );
+      },
     );
   }
 }

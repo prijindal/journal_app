@@ -49,6 +49,7 @@ class MyMaterialApp extends StatelessWidget {
     return MaterialApp(
       routes: {
         "/": (context) => const MyHomePage(),
+        // "/new": (context) => const JournalEntryForm(),
         // "/profile": (context) => const ProfileScreen(),
         // "/login": (context) => const LoginScreen(),
       },
