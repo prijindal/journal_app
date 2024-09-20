@@ -4,7 +4,6 @@ import 'dart:convert';
 import 'package:drift/drift.dart';
 import 'package:fleather/fleather.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 
 import '../models/core.dart';
 import '../models/drift.dart';
@@ -113,44 +112,32 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Widget _buildJournalList() {
-    return AnimationLimiter(
-      child: ListView.builder(
-        padding: const EdgeInsets.fromLTRB(0, 0, 0, 80),
-        itemCount: _journalEntries != null ? _journalEntries!.length : 1,
-        itemBuilder: (BuildContext context, int index) {
-          if (_journalEntries == null) {
-            return const Center(
-              key: Key("JournalListLoading"),
-              child: Text(
-                "Loading...",
-              ),
-            );
-          }
-          if (_journalEntries!.isEmpty) {
-            return const Center(
-              key: Key("JournalListEmpty"),
-              child: Text(
-                "No Journals added",
-              ),
-            );
-          }
-          final journalEntry = _journalEntries![index];
-          return AnimationConfiguration.staggeredList(
-            key: Key("AnimationConfiguration ${journalEntry.id}"),
-            position: index,
-            duration: const Duration(milliseconds: 375),
-            child: SlideAnimation(
-              verticalOffset: 50.0,
-              child: FadeInAnimation(
-                child: JournalEntryContainerTile(
-                  key: Key("${journalEntry.id}-tile"),
-                  journalEntry: journalEntry,
-                ),
-              ),
+    return ListView.builder(
+      padding: const EdgeInsets.fromLTRB(0, 0, 0, 80),
+      itemCount: _journalEntries != null ? _journalEntries!.length : 1,
+      itemBuilder: (BuildContext context, int index) {
+        if (_journalEntries == null) {
+          return const Center(
+            key: Key("JournalListLoading"),
+            child: Text(
+              "Loading...",
             ),
           );
-        },
-      ),
+        }
+        if (_journalEntries!.isEmpty) {
+          return const Center(
+            key: Key("JournalListEmpty"),
+            child: Text(
+              "No Journals added",
+            ),
+          );
+        }
+        final journalEntry = _journalEntries![index];
+        return JournalEntryContainerTile(
+          key: Key("${journalEntry.id}-tile"),
+          journalEntry: journalEntry,
+        );
+      },
     );
   }
 
