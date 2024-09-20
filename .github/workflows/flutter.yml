@@ -57,6 +57,7 @@ jobs:
         env:
           GOOGLE_APPLICATION_CREDENTIALS: google-application-credentials.json
       - run: flutter build appbundle --release
+      - run: flutter build apk --release
       - uses: actions/upload-artifact@v4
         with:
           name: android
