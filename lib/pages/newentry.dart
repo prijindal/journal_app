@@ -13,9 +13,11 @@ class JournalEntryForm extends StatefulWidget {
     required this.title,
     this.creationTime,
     this.description,
+    this.hidden = false,
   });
   final DateTime? creationTime;
   final String? description;
+  final bool hidden;
   final String title;
 
   @override
@@ -48,6 +50,7 @@ class JournalEntryForm extends StatefulWidget {
           title: journalEntry.creationTime.toString(),
           creationTime: journalEntry.creationTime,
           description: journalEntry.description,
+          hidden: journalEntry.hidden,
         );
       },
     );
@@ -70,11 +73,14 @@ class _JournalEntryFormState extends State<JournalEntryForm> {
   late final DateTime _selectedDate =
       widget.creationTime?.toLocal() ?? DateTime.now();
 
+  late var _hidden = widget.hidden;
+
   void _saveEntry() {
     Navigator.of(context).pop<JournalEntryCompanion>(
       JournalEntryCompanion(
         creationTime: drift.Value(_selectedDate),
         description: drift.Value(jsonEncode(_controller.document.toJson())),
+        hidden: drift.Value(_hidden),
       ),
     );
   }
@@ -105,6 +111,25 @@ class _JournalEntryFormState extends State<JournalEntryForm> {
           ),
           FleatherToolbar.basic(
             controller: _controller,
+            leading: [
+              defaultToggleStyleButtonBuilder(
+                context,
+                ParchmentAttribute.code,
+                Icons.visibility,
+                _hidden,
+                () {
+                  setState(() {
+                    _hidden = !_hidden;
+                  });
+                },
+              ),
+              const SizedBox(width: 1),
+              VerticalDivider(
+                indent: 16,
+                endIndent: 16,
+                color: Colors.grey.shade400,
+              )
+            ],
           )
         ],
       ),
