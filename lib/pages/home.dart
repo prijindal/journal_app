@@ -173,26 +173,34 @@ class JournalEntryContainerTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListTile(
-      // title: Text(ParchmentDocument.fromJson(
-      //   jsonDecode(journalEntry.description!) as List<dynamic>,
-      // ).toPlainText()),
-      title: FleatherEditor(
-        readOnly: true,
-        showCursor: false,
-        enableInteractiveSelection: false,
-        controller: FleatherController(
-          document: ParchmentDocument.fromJson(
-            jsonDecode(journalEntry.description) as List<dynamic>,
+    return Container(
+      margin: const EdgeInsets.symmetric(
+        vertical: 12.0,
+        horizontal: 0,
+      ),
+      child: Card(
+        child: ListTile(
+          subtitle: FleatherEditor(
+            readOnly: true,
+            showCursor: false,
+            enableInteractiveSelection: false,
+            controller: FleatherController(
+              document: ParchmentDocument.fromJson(
+                jsonDecode(journalEntry.description) as List<dynamic>,
+              ),
+            ),
           ),
+          title: Text(
+            journalEntry.creationTime.toString(),
+          ),
+          onTap: () {
+            JournalEntryForm.editEntry(
+              context: context,
+              journalEntry: journalEntry,
+            );
+          },
         ),
       ),
-      onTap: () {
-        JournalEntryForm.editEntry(
-          context: context,
-          journalEntry: journalEntry,
-        );
-      },
     );
   }
 }

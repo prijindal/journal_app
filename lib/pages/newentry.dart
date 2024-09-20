@@ -10,11 +10,13 @@ import '../models/drift.dart';
 class JournalEntryForm extends StatefulWidget {
   const JournalEntryForm({
     super.key,
+    required this.title,
     this.creationTime,
     this.description,
   });
   final DateTime? creationTime;
   final String? description;
+  final String title;
 
   @override
   State<JournalEntryForm> createState() => _JournalEntryFormState();
@@ -25,7 +27,7 @@ class JournalEntryForm extends StatefulWidget {
     final entry = await showDialog<JournalEntryCompanion?>(
       context: context,
       builder: (BuildContext context) {
-        return const JournalEntryForm();
+        return const JournalEntryForm(title: "New Entry");
       },
     );
     if (entry != null) {
@@ -43,6 +45,7 @@ class JournalEntryForm extends StatefulWidget {
       context: context,
       builder: (BuildContext context) {
         return JournalEntryForm(
+          title: journalEntry.creationTime.toString(),
           creationTime: journalEntry.creationTime,
           description: journalEntry.description,
         );
@@ -80,7 +83,7 @@ class _JournalEntryFormState extends State<JournalEntryForm> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("New Entry"),
+        title: Text(widget.title),
         actions: [
           IconButton(
             onPressed: _saveEntry,
