@@ -91,7 +91,14 @@ class _JournalEntryFormState extends State<JournalEntryForm> {
       body: Column(
         children: [
           Expanded(
-            child: FleatherEditor(controller: _controller),
+            child: FleatherEditor(
+              controller: _controller,
+              padding: const EdgeInsets.symmetric(
+                vertical: 0,
+                horizontal: 12,
+              ),
+              autofocus: true,
+            ),
           ),
           FleatherToolbar.basic(
             controller: _controller,

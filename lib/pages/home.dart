@@ -1,6 +1,8 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:drift/drift.dart';
+import 'package:fleather/fleather.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 
@@ -172,7 +174,19 @@ class JournalEntryContainerTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListTile(
-      title: Text(journalEntry.creationTime.toString()),
+      // title: Text(ParchmentDocument.fromJson(
+      //   jsonDecode(journalEntry.description!) as List<dynamic>,
+      // ).toPlainText()),
+      title: FleatherEditor(
+        readOnly: true,
+        showCursor: false,
+        enableInteractiveSelection: false,
+        controller: FleatherController(
+          document: ParchmentDocument.fromJson(
+            jsonDecode(journalEntry.description) as List<dynamic>,
+          ),
+        ),
+      ),
       onTap: () {
         JournalEntryForm.editEntry(
           context: context,
