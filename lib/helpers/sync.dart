@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:drift/drift.dart';
+import 'package:firebase_core/firebase_core.dart';
 
 import '../models/core.dart';
 import '../models/drift.dart';
@@ -32,4 +33,17 @@ Future<void> jsonToDb(String jsonEncoded) async {
     );
   });
   AppLogger.instance.d("Loaded data into database");
+}
+
+bool isFirebaseInitialized() {
+  try {
+    return Firebase.apps.isNotEmpty;
+  } catch (e, stack) {
+    AppLogger.instance.e(
+      "Firebase.apps error",
+      error: e,
+      stackTrace: stack,
+    );
+    return false;
+  }
 }
