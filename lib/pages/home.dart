@@ -81,10 +81,10 @@ class _MyHomePageState extends State<MyHomePage> {
           padding: const EdgeInsets.only(right: 20.0),
           child: GestureDetector(
             onTap: () {
-              Navigator.pushNamed(context, "/profile");
+              Navigator.pushNamed(context, "/settings");
             },
             child: const Icon(
-              Icons.person,
+              Icons.settings,
               size: 26.0,
             ),
           ),

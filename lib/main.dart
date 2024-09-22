@@ -6,8 +6,8 @@ import './firebase_options.dart';
 import './helpers/logger.dart';
 import './models/theme.dart';
 import './pages/home.dart';
+import 'pages/settings.dart';
 // import 'pages/login.dart';
-// import 'pages/profile.dart';
 
 void main() async {
   runApp(
@@ -49,8 +49,7 @@ class MyMaterialApp extends StatelessWidget {
     return MaterialApp(
       routes: {
         "/": (context) => const MyHomePage(),
-        // "/new": (context) => const JournalEntryForm(),
-        // "/profile": (context) => const ProfileScreen(),
+        "/settings": (context) => const SettingsScreen(),
         // "/login": (context) => const LoginScreen(),
       },
       initialRoute: "/",
