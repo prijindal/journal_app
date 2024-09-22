@@ -193,14 +193,14 @@ jobs:
       - run: flutter pub get
       - run: flutter analyze
       - run: flutter test
-      - run: npm install -g firebase-tools
-      - run: echo "$FIREBASE_SERVICE_ACCOUNT_JOURNAL_APP_PRIJINDAL" > google-application-credentials.json
-        env:
-          FIREBASE_SERVICE_ACCOUNT_JOURNAL_APP_PRIJINDAL: ${{secrets.FIREBASE_SERVICE_ACCOUNT_JOURNAL_APP_PRIJINDAL}}
-      - run: rm lib/firebase_options.dart
-      - run: flutterfire configure -y --platforms=windows --ios-bundle-id=com.prijindal.journal-app --macos-bundle-id=com.prijindal.journal-app --web-app-id=1:903944243626:web:575096b9f07bed49f9c3d3 --android-package-name=com.prijindal.journal_app --windows-app-id=1:903944243626:web:575096b9f07bed49f9c3d3
-        env:
-          GOOGLE_APPLICATION_CREDENTIALS: google-application-credentials.json
+      # - run: npm install -g firebase-tools
+      # - run: echo "$FIREBASE_SERVICE_ACCOUNT_JOURNAL_APP_PRIJINDAL" > google-application-credentials.json
+      #   env:
+      #     FIREBASE_SERVICE_ACCOUNT_JOURNAL_APP_PRIJINDAL: ${{secrets.FIREBASE_SERVICE_ACCOUNT_JOURNAL_APP_PRIJINDAL}}
+      # - run: rm lib/firebase_options.dart
+      # - run: flutterfire configure -y --platforms=windows --ios-bundle-id=com.prijindal.journal-app --macos-bundle-id=com.prijindal.journal-app --web-app-id=1:903944243626:web:575096b9f07bed49f9c3d3 --android-package-name=com.prijindal.journal_app --windows-app-id=1:903944243626:web:575096b9f07bed49f9c3d3
+      #   env:
+      #     GOOGLE_APPLICATION_CREDENTIALS: google-application-credentials.json
       - run: flutter build windows --release
       - uses: actions/upload-artifact@v4
         with:
