@@ -9,14 +9,30 @@ import '../helpers/google_http_client.dart';
 import '../helpers/logger.dart';
 import '../helpers/sync.dart';
 
-class SettingsScreen extends StatefulWidget {
+class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
 
   @override
-  State<SettingsScreen> createState() => _SettingsScreenState();
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text("Settings"),
+      ),
+      body: ListView(children: [
+        if (isFirebaseInitialized()) const GoogleSignInSyncList(),
+      ]),
+    );
+  }
 }
 
-class _SettingsScreenState extends State<SettingsScreen> {
+class GoogleSignInSyncList extends StatefulWidget {
+  const GoogleSignInSyncList({super.key});
+
+  @override
+  State<GoogleSignInSyncList> createState() => _GoogleSignInSyncListState();
+}
+
+class _GoogleSignInSyncListState extends State<GoogleSignInSyncList> {
   bool _isLoginLoading = true;
   final _googleSignIn = GoogleSignIn(
     scopes: [
@@ -81,35 +97,30 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text("Settings"),
-      ),
-      body: ListView(
-        children: [
+    return Column(
+      children: [
+        const ListTile(
+          title: Text("Sync"),
+          dense: true,
+        ),
+        if (_isLoginLoading)
           const ListTile(
-            title: Text("Sync"),
-            dense: true,
+            title: Text("Checking google sign in ...."),
+            enabled: false,
           ),
-          if (_isLoginLoading)
-            const ListTile(
-              title: Text("Checking google sign in ...."),
-              enabled: false,
-            ),
-          if (!_isLoginLoading && _currentUser == null)
-            ListTile(
-              title: const Text("Login with Google"),
-              onTap: _login,
-            ),
-          if (!_isLoginLoading && _currentUser != null)
-            ListTile(
-              title: Text(_currentUser!.email),
-              enabled: false,
-            ),
-          if (!_isLoginLoading && _currentUser != null)
-            DriveSyncList(driveApi: _driveApi!),
-        ],
-      ),
+        if (!_isLoginLoading && _currentUser == null)
+          ListTile(
+            title: const Text("Login with Google"),
+            onTap: _login,
+          ),
+        if (!_isLoginLoading && _currentUser != null)
+          ListTile(
+            title: Text(_currentUser!.email),
+            enabled: false,
+          ),
+        if (!_isLoginLoading && _currentUser != null)
+          DriveSyncList(driveApi: _driveApi!),
+      ],
     );
   }
 }
