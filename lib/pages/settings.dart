@@ -35,6 +35,7 @@ class GoogleSignInSyncList extends StatefulWidget {
 class _GoogleSignInSyncListState extends State<GoogleSignInSyncList> {
   bool _isLoginLoading = true;
   final _googleSignIn = GoogleSignIn(
+    clientId: googleSignInClientId,
     scopes: [
       DriveApi.driveAppdataScope,
     ],
