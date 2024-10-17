@@ -310,51 +310,70 @@ typedef $$JournalEntryTableUpdateCompanionBuilder = JournalEntryCompanion
 });
 
 class $$JournalEntryTableFilterComposer
-    extends FilterComposer<_$SharedDatabase, $JournalEntryTable> {
-  $$JournalEntryTableFilterComposer(super.$state);
-  ColumnFilters<String> get id => $state.composableBuilder(
-      column: $state.table.id,
-      builder: (column, joinBuilders) =>
-          ColumnFilters(column, joinBuilders: joinBuilders));
+    extends Composer<_$SharedDatabase, $JournalEntryTable> {
+  $$JournalEntryTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+      column: $table.id, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<String> get description => $state.composableBuilder(
-      column: $state.table.description,
-      builder: (column, joinBuilders) =>
-          ColumnFilters(column, joinBuilders: joinBuilders));
+  ColumnFilters<String> get description => $composableBuilder(
+      column: $table.description, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<DateTime> get creationTime => $state.composableBuilder(
-      column: $state.table.creationTime,
-      builder: (column, joinBuilders) =>
-          ColumnFilters(column, joinBuilders: joinBuilders));
+  ColumnFilters<DateTime> get creationTime => $composableBuilder(
+      column: $table.creationTime, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<bool> get hidden => $state.composableBuilder(
-      column: $state.table.hidden,
-      builder: (column, joinBuilders) =>
-          ColumnFilters(column, joinBuilders: joinBuilders));
+  ColumnFilters<bool> get hidden => $composableBuilder(
+      column: $table.hidden, builder: (column) => ColumnFilters(column));
 }
 
 class $$JournalEntryTableOrderingComposer
-    extends OrderingComposer<_$SharedDatabase, $JournalEntryTable> {
-  $$JournalEntryTableOrderingComposer(super.$state);
-  ColumnOrderings<String> get id => $state.composableBuilder(
-      column: $state.table.id,
-      builder: (column, joinBuilders) =>
-          ColumnOrderings(column, joinBuilders: joinBuilders));
+    extends Composer<_$SharedDatabase, $JournalEntryTable> {
+  $$JournalEntryTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+      column: $table.id, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<String> get description => $state.composableBuilder(
-      column: $state.table.description,
-      builder: (column, joinBuilders) =>
-          ColumnOrderings(column, joinBuilders: joinBuilders));
+  ColumnOrderings<String> get description => $composableBuilder(
+      column: $table.description, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<DateTime> get creationTime => $state.composableBuilder(
-      column: $state.table.creationTime,
-      builder: (column, joinBuilders) =>
-          ColumnOrderings(column, joinBuilders: joinBuilders));
+  ColumnOrderings<DateTime> get creationTime => $composableBuilder(
+      column: $table.creationTime,
+      builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<bool> get hidden => $state.composableBuilder(
-      column: $state.table.hidden,
-      builder: (column, joinBuilders) =>
-          ColumnOrderings(column, joinBuilders: joinBuilders));
+  ColumnOrderings<bool> get hidden => $composableBuilder(
+      column: $table.hidden, builder: (column) => ColumnOrderings(column));
+}
+
+class $$JournalEntryTableAnnotationComposer
+    extends Composer<_$SharedDatabase, $JournalEntryTable> {
+  $$JournalEntryTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get description => $composableBuilder(
+      column: $table.description, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get creationTime => $composableBuilder(
+      column: $table.creationTime, builder: (column) => column);
+
+  GeneratedColumn<bool> get hidden =>
+      $composableBuilder(column: $table.hidden, builder: (column) => column);
 }
 
 class $$JournalEntryTableTableManager extends RootTableManager<
@@ -363,6 +382,7 @@ class $$JournalEntryTableTableManager extends RootTableManager<
     JournalEntryData,
     $$JournalEntryTableFilterComposer,
     $$JournalEntryTableOrderingComposer,
+    $$JournalEntryTableAnnotationComposer,
     $$JournalEntryTableCreateCompanionBuilder,
     $$JournalEntryTableUpdateCompanionBuilder,
     (
@@ -375,10 +395,12 @@ class $$JournalEntryTableTableManager extends RootTableManager<
       : super(TableManagerState(
           db: db,
           table: table,
-          filteringComposer:
-              $$JournalEntryTableFilterComposer(ComposerState(db, table)),
-          orderingComposer:
-              $$JournalEntryTableOrderingComposer(ComposerState(db, table)),
+          createFilteringComposer: () =>
+              $$JournalEntryTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$JournalEntryTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$JournalEntryTableAnnotationComposer($db: db, $table: table),
           updateCompanionCallback: ({
             Value<String> id = const Value.absent(),
             Value<String> description = const Value.absent(),
@@ -420,6 +442,7 @@ typedef $$JournalEntryTableProcessedTableManager = ProcessedTableManager<
     JournalEntryData,
     $$JournalEntryTableFilterComposer,
     $$JournalEntryTableOrderingComposer,
+    $$JournalEntryTableAnnotationComposer,
     $$JournalEntryTableCreateCompanionBuilder,
     $$JournalEntryTableUpdateCompanionBuilder,
     (
