@@ -1,5 +1,8 @@
 import 'package:drift/drift.dart';
+import 'package:fleather/fleather.dart';
 import 'package:uuid/uuid.dart';
+
+import 'parchment_converted.dart';
 
 // assuming that your file is called filename.dart. This will give an error at
 // first, but it's needed for drift to know about the generated code
@@ -12,7 +15,7 @@ const _uuid = Uuid();
 
 class JournalEntry extends Table {
   TextColumn get id => text().unique().clientDefault(() => _uuid.v4())();
-  TextColumn get description => text()();
+  TextColumn get document => text().map(const ParchmentDocumentConverter())();
   DateTimeColumn get creationTime =>
       dateTime().withDefault(currentDateAndTime)();
   BoolColumn get hidden => boolean().clientDefault(() => false)();

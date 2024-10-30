@@ -17,12 +17,14 @@ class $JournalEntryTable extends JournalEntry
       requiredDuringInsert: false,
       defaultConstraints: GeneratedColumn.constraintIsAlways('UNIQUE'),
       clientDefault: () => _uuid.v4());
-  static const VerificationMeta _descriptionMeta =
-      const VerificationMeta('description');
+  static const VerificationMeta _documentMeta =
+      const VerificationMeta('document');
   @override
-  late final GeneratedColumn<String> description = GeneratedColumn<String>(
-      'description', aliasedName, false,
-      type: DriftSqlType.string, requiredDuringInsert: true);
+  late final GeneratedColumnWithTypeConverter<ParchmentDocument, String>
+      document = GeneratedColumn<String>('document', aliasedName, false,
+              type: DriftSqlType.string, requiredDuringInsert: true)
+          .withConverter<ParchmentDocument>(
+              $JournalEntryTable.$converterdocument);
   static const VerificationMeta _creationTimeMeta =
       const VerificationMeta('creationTime');
   @override
@@ -41,7 +43,7 @@ class $JournalEntryTable extends JournalEntry
           GeneratedColumn.constraintIsAlways('CHECK ("hidden" IN (0, 1))'),
       clientDefault: () => false);
   @override
-  List<GeneratedColumn> get $columns => [id, description, creationTime, hidden];
+  List<GeneratedColumn> get $columns => [id, document, creationTime, hidden];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -55,14 +57,7 @@ class $JournalEntryTable extends JournalEntry
     if (data.containsKey('id')) {
       context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
     }
-    if (data.containsKey('description')) {
-      context.handle(
-          _descriptionMeta,
-          description.isAcceptableOrUnknown(
-              data['description']!, _descriptionMeta));
-    } else if (isInserting) {
-      context.missing(_descriptionMeta);
-    }
+    context.handle(_documentMeta, const VerificationResult.success());
     if (data.containsKey('creation_time')) {
       context.handle(
           _creationTimeMeta,
@@ -84,8 +79,9 @@ class $JournalEntryTable extends JournalEntry
     return JournalEntryData(
       id: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}id'])!,
-      description: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}description'])!,
+      document: $JournalEntryTable.$converterdocument.fromSql(attachedDatabase
+          .typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}document'])!),
       creationTime: attachedDatabase.typeMapping.read(
           DriftSqlType.dateTime, data['${effectivePrefix}creation_time'])!,
       hidden: attachedDatabase.typeMapping
@@ -97,24 +93,30 @@ class $JournalEntryTable extends JournalEntry
   $JournalEntryTable createAlias(String alias) {
     return $JournalEntryTable(attachedDatabase, alias);
   }
+
+  static TypeConverter<ParchmentDocument, String> $converterdocument =
+      const ParchmentDocumentConverter();
 }
 
 class JournalEntryData extends DataClass
     implements Insertable<JournalEntryData> {
   final String id;
-  final String description;
+  final ParchmentDocument document;
   final DateTime creationTime;
   final bool hidden;
   const JournalEntryData(
       {required this.id,
-      required this.description,
+      required this.document,
       required this.creationTime,
       required this.hidden});
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
     map['id'] = Variable<String>(id);
-    map['description'] = Variable<String>(description);
+    {
+      map['document'] = Variable<String>(
+          $JournalEntryTable.$converterdocument.toSql(document));
+    }
     map['creation_time'] = Variable<DateTime>(creationTime);
     map['hidden'] = Variable<bool>(hidden);
     return map;
@@ -123,7 +125,7 @@ class JournalEntryData extends DataClass
   JournalEntryCompanion toCompanion(bool nullToAbsent) {
     return JournalEntryCompanion(
       id: Value(id),
-      description: Value(description),
+      document: Value(document),
       creationTime: Value(creationTime),
       hidden: Value(hidden),
     );
@@ -134,7 +136,7 @@ class JournalEntryData extends DataClass
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return JournalEntryData(
       id: serializer.fromJson<String>(json['id']),
-      description: serializer.fromJson<String>(json['description']),
+      document: serializer.fromJson<ParchmentDocument>(json['document']),
       creationTime: serializer.fromJson<DateTime>(json['creationTime']),
       hidden: serializer.fromJson<bool>(json['hidden']),
     );
@@ -144,7 +146,7 @@ class JournalEntryData extends DataClass
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return <String, dynamic>{
       'id': serializer.toJson<String>(id),
-      'description': serializer.toJson<String>(description),
+      'document': serializer.toJson<ParchmentDocument>(document),
       'creationTime': serializer.toJson<DateTime>(creationTime),
       'hidden': serializer.toJson<bool>(hidden),
     };
@@ -152,20 +154,19 @@ class JournalEntryData extends DataClass
 
   JournalEntryData copyWith(
           {String? id,
-          String? description,
+          ParchmentDocument? document,
           DateTime? creationTime,
           bool? hidden}) =>
       JournalEntryData(
         id: id ?? this.id,
-        description: description ?? this.description,
+        document: document ?? this.document,
         creationTime: creationTime ?? this.creationTime,
         hidden: hidden ?? this.hidden,
       );
   JournalEntryData copyWithCompanion(JournalEntryCompanion data) {
     return JournalEntryData(
       id: data.id.present ? data.id.value : this.id,
-      description:
-          data.description.present ? data.description.value : this.description,
+      document: data.document.present ? data.document.value : this.document,
       creationTime: data.creationTime.present
           ? data.creationTime.value
           : this.creationTime,
@@ -177,7 +178,7 @@ class JournalEntryData extends DataClass
   String toString() {
     return (StringBuffer('JournalEntryData(')
           ..write('id: $id, ')
-          ..write('description: $description, ')
+          ..write('document: $document, ')
           ..write('creationTime: $creationTime, ')
           ..write('hidden: $hidden')
           ..write(')'))
@@ -185,47 +186,47 @@ class JournalEntryData extends DataClass
   }
 
   @override
-  int get hashCode => Object.hash(id, description, creationTime, hidden);
+  int get hashCode => Object.hash(id, document, creationTime, hidden);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       (other is JournalEntryData &&
           other.id == this.id &&
-          other.description == this.description &&
+          other.document == this.document &&
           other.creationTime == this.creationTime &&
           other.hidden == this.hidden);
 }
 
 class JournalEntryCompanion extends UpdateCompanion<JournalEntryData> {
   final Value<String> id;
-  final Value<String> description;
+  final Value<ParchmentDocument> document;
   final Value<DateTime> creationTime;
   final Value<bool> hidden;
   final Value<int> rowid;
   const JournalEntryCompanion({
     this.id = const Value.absent(),
-    this.description = const Value.absent(),
+    this.document = const Value.absent(),
     this.creationTime = const Value.absent(),
     this.hidden = const Value.absent(),
     this.rowid = const Value.absent(),
   });
   JournalEntryCompanion.insert({
     this.id = const Value.absent(),
-    required String description,
+    required ParchmentDocument document,
     this.creationTime = const Value.absent(),
     this.hidden = const Value.absent(),
     this.rowid = const Value.absent(),
-  }) : description = Value(description);
+  }) : document = Value(document);
   static Insertable<JournalEntryData> custom({
     Expression<String>? id,
-    Expression<String>? description,
+    Expression<String>? document,
     Expression<DateTime>? creationTime,
     Expression<bool>? hidden,
     Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
-      if (description != null) 'description': description,
+      if (document != null) 'document': document,
       if (creationTime != null) 'creation_time': creationTime,
       if (hidden != null) 'hidden': hidden,
       if (rowid != null) 'rowid': rowid,
@@ -234,13 +235,13 @@ class JournalEntryCompanion extends UpdateCompanion<JournalEntryData> {
 
   JournalEntryCompanion copyWith(
       {Value<String>? id,
-      Value<String>? description,
+      Value<ParchmentDocument>? document,
       Value<DateTime>? creationTime,
       Value<bool>? hidden,
       Value<int>? rowid}) {
     return JournalEntryCompanion(
       id: id ?? this.id,
-      description: description ?? this.description,
+      document: document ?? this.document,
       creationTime: creationTime ?? this.creationTime,
       hidden: hidden ?? this.hidden,
       rowid: rowid ?? this.rowid,
@@ -253,8 +254,9 @@ class JournalEntryCompanion extends UpdateCompanion<JournalEntryData> {
     if (id.present) {
       map['id'] = Variable<String>(id.value);
     }
-    if (description.present) {
-      map['description'] = Variable<String>(description.value);
+    if (document.present) {
+      map['document'] = Variable<String>(
+          $JournalEntryTable.$converterdocument.toSql(document.value));
     }
     if (creationTime.present) {
       map['creation_time'] = Variable<DateTime>(creationTime.value);
@@ -272,7 +274,7 @@ class JournalEntryCompanion extends UpdateCompanion<JournalEntryData> {
   String toString() {
     return (StringBuffer('JournalEntryCompanion(')
           ..write('id: $id, ')
-          ..write('description: $description, ')
+          ..write('document: $document, ')
           ..write('creationTime: $creationTime, ')
           ..write('hidden: $hidden, ')
           ..write('rowid: $rowid')
@@ -295,7 +297,7 @@ abstract class _$SharedDatabase extends GeneratedDatabase {
 typedef $$JournalEntryTableCreateCompanionBuilder = JournalEntryCompanion
     Function({
   Value<String> id,
-  required String description,
+  required ParchmentDocument document,
   Value<DateTime> creationTime,
   Value<bool> hidden,
   Value<int> rowid,
@@ -303,7 +305,7 @@ typedef $$JournalEntryTableCreateCompanionBuilder = JournalEntryCompanion
 typedef $$JournalEntryTableUpdateCompanionBuilder = JournalEntryCompanion
     Function({
   Value<String> id,
-  Value<String> description,
+  Value<ParchmentDocument> document,
   Value<DateTime> creationTime,
   Value<bool> hidden,
   Value<int> rowid,
@@ -321,8 +323,10 @@ class $$JournalEntryTableFilterComposer
   ColumnFilters<String> get id => $composableBuilder(
       column: $table.id, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<String> get description => $composableBuilder(
-      column: $table.description, builder: (column) => ColumnFilters(column));
+  ColumnWithTypeConverterFilters<ParchmentDocument, ParchmentDocument, String>
+      get document => $composableBuilder(
+          column: $table.document,
+          builder: (column) => ColumnWithTypeConverterFilters(column));
 
   ColumnFilters<DateTime> get creationTime => $composableBuilder(
       column: $table.creationTime, builder: (column) => ColumnFilters(column));
@@ -343,8 +347,8 @@ class $$JournalEntryTableOrderingComposer
   ColumnOrderings<String> get id => $composableBuilder(
       column: $table.id, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<String> get description => $composableBuilder(
-      column: $table.description, builder: (column) => ColumnOrderings(column));
+  ColumnOrderings<String> get document => $composableBuilder(
+      column: $table.document, builder: (column) => ColumnOrderings(column));
 
   ColumnOrderings<DateTime> get creationTime => $composableBuilder(
       column: $table.creationTime,
@@ -366,8 +370,8 @@ class $$JournalEntryTableAnnotationComposer
   GeneratedColumn<String> get id =>
       $composableBuilder(column: $table.id, builder: (column) => column);
 
-  GeneratedColumn<String> get description => $composableBuilder(
-      column: $table.description, builder: (column) => column);
+  GeneratedColumnWithTypeConverter<ParchmentDocument, String> get document =>
+      $composableBuilder(column: $table.document, builder: (column) => column);
 
   GeneratedColumn<DateTime> get creationTime => $composableBuilder(
       column: $table.creationTime, builder: (column) => column);
@@ -403,28 +407,28 @@ class $$JournalEntryTableTableManager extends RootTableManager<
               $$JournalEntryTableAnnotationComposer($db: db, $table: table),
           updateCompanionCallback: ({
             Value<String> id = const Value.absent(),
-            Value<String> description = const Value.absent(),
+            Value<ParchmentDocument> document = const Value.absent(),
             Value<DateTime> creationTime = const Value.absent(),
             Value<bool> hidden = const Value.absent(),
             Value<int> rowid = const Value.absent(),
           }) =>
               JournalEntryCompanion(
             id: id,
-            description: description,
+            document: document,
             creationTime: creationTime,
             hidden: hidden,
             rowid: rowid,
           ),
           createCompanionCallback: ({
             Value<String> id = const Value.absent(),
-            required String description,
+            required ParchmentDocument document,
             Value<DateTime> creationTime = const Value.absent(),
             Value<bool> hidden = const Value.absent(),
             Value<int> rowid = const Value.absent(),
           }) =>
               JournalEntryCompanion.insert(
             id: id,
-            description: description,
+            document: document,
             creationTime: creationTime,
             hidden: hidden,
             rowid: rowid,

@@ -1,10 +1,10 @@
 import 'dart:async';
-import 'dart:convert';
 
 import 'package:drift/drift.dart';
 import 'package:fleather/fleather.dart';
 import 'package:flutter/material.dart';
 
+import '../helpers/datetime.dart';
 import '../models/core.dart';
 import '../models/drift.dart';
 import 'newentry.dart';
@@ -64,14 +64,14 @@ class _MyHomePageState extends State<MyHomePage> {
       actions: [
         Padding(
           padding: const EdgeInsets.only(right: 20.0),
-          child: GestureDetector(
-            onTap: () {
+          child: IconButton(
+            onPressed: () {
               setState(() {
                 _showHidden = !_showHidden;
               });
               _addWatcher();
             },
-            child: Icon(
+            icon: Icon(
               _showHidden ? Icons.visibility : Icons.visibility_off,
               size: 26.0,
             ),
@@ -79,11 +79,11 @@ class _MyHomePageState extends State<MyHomePage> {
         ),
         Padding(
           padding: const EdgeInsets.only(right: 20.0),
-          child: GestureDetector(
-            onTap: () {
+          child: IconButton(
+            onPressed: () {
               Navigator.pushNamed(context, "/settings");
             },
-            child: const Icon(
+            icon: const Icon(
               Icons.settings,
               size: 26.0,
             ),
@@ -114,7 +114,9 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget _buildJournalList() {
     return ListView.builder(
       padding: const EdgeInsets.fromLTRB(0, 0, 0, 80),
-      itemCount: _journalEntries != null ? _journalEntries!.length : 1,
+      itemCount: (_journalEntries != null && _journalEntries!.isNotEmpty)
+          ? _journalEntries!.length
+          : 1,
       itemBuilder: (BuildContext context, int index) {
         if (_journalEntries == null) {
           return const Center(
@@ -160,6 +162,10 @@ class JournalEntryContainerTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final firstLine = journalEntry.document.lookupLine(0);
+    final displayDocument = firstLine.node != null
+        ? ParchmentDocument.fromDelta(firstLine.node!.toDelta())
+        : journalEntry.document;
     return Container(
       margin: const EdgeInsets.symmetric(
         vertical: 12.0,
@@ -172,13 +178,11 @@ class JournalEntryContainerTile extends StatelessWidget {
             showCursor: false,
             enableInteractiveSelection: false,
             controller: FleatherController(
-              document: ParchmentDocument.fromJson(
-                jsonDecode(journalEntry.description) as List<dynamic>,
-              ),
+              document: displayDocument,
             ),
           ),
           title: Text(
-            journalEntry.creationTime.toString(),
+            formatDateTime(journalEntry.creationTime),
           ),
           onTap: () {
             JournalEntryForm.editEntry(

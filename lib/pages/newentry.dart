@@ -1,24 +1,23 @@
-import 'dart:convert';
-
 import 'package:drift/drift.dart' as drift;
 import 'package:fleather/fleather.dart';
 import 'package:flutter/material.dart';
 
+import '../helpers/datetime.dart';
 import '../models/core.dart';
 import '../models/drift.dart';
 
 class JournalEntryForm extends StatefulWidget {
   const JournalEntryForm({
     super.key,
-    required this.title,
+    this.onDelete,
     this.creationTime,
-    this.description,
+    this.document,
     this.hidden = false,
   });
   final DateTime? creationTime;
-  final String? description;
+  final ParchmentDocument? document;
   final bool hidden;
-  final String title;
+  final Future<void> Function()? onDelete;
 
   @override
   State<JournalEntryForm> createState() => _JournalEntryFormState();
@@ -29,7 +28,7 @@ class JournalEntryForm extends StatefulWidget {
     final entry = await showDialog<JournalEntryCompanion?>(
       context: context,
       builder: (BuildContext context) {
-        return const JournalEntryForm(title: "New Entry");
+        return const JournalEntryForm();
       },
     );
     if (entry != null) {
@@ -47,10 +46,14 @@ class JournalEntryForm extends StatefulWidget {
       context: context,
       builder: (BuildContext context) {
         return JournalEntryForm(
-          title: journalEntry.creationTime.toString(),
           creationTime: journalEntry.creationTime,
-          description: journalEntry.description,
+          document: journalEntry.document,
           hidden: journalEntry.hidden,
+          onDelete: () async {
+            await (MyDatabase.instance.delete(MyDatabase.instance.journalEntry)
+                  ..where((tbl) => tbl.id.equals(journalEntry.id)))
+                .go();
+          },
         );
       },
     );
@@ -64,33 +67,81 @@ class JournalEntryForm extends StatefulWidget {
 
 class _JournalEntryFormState extends State<JournalEntryForm> {
   late final _controller = FleatherController(
-    document: widget.description == null
-        ? null
-        : ParchmentDocument.fromJson(
-            jsonDecode(widget.description!) as List<dynamic>,
-          ),
+    document: widget.document,
   );
-  late final DateTime _selectedDate =
+  late DateTime _selectedDate =
       widget.creationTime?.toLocal() ?? DateTime.now();
 
   late var _hidden = widget.hidden;
 
   void _saveEntry() {
+    if (_controller.document.toPlainText().trim().isEmpty) {
+      Navigator.of(context).pop();
+      return;
+    }
     Navigator.of(context).pop<JournalEntryCompanion>(
       JournalEntryCompanion(
         creationTime: drift.Value(_selectedDate),
-        description: drift.Value(jsonEncode(_controller.document.toJson())),
+        document: drift.Value(_controller.document),
         hidden: drift.Value(_hidden),
       ),
     );
+  }
+
+  Future<void> _deleteEntry() async {
+    if (widget.onDelete != null) {
+      await widget.onDelete!();
+    }
+    if (context.mounted) {
+      // ignore: use_build_context_synchronously
+      Navigator.pop(context);
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.title),
+        leading: IconButton(
+          onPressed: _saveEntry,
+          icon: Icon(Icons.arrow_back),
+        ),
+        title: GestureDetector(
+          child: Text(formatDateTime(_selectedDate)),
+          onTap: () async {
+            final selectedDate = await showDatePicker(
+              context: context,
+              initialDate: _selectedDate,
+              currentDate: _selectedDate,
+              initialEntryMode: DatePickerEntryMode.calendar,
+              firstDate: DateTime(_selectedDate.year - 20),
+              lastDate: DateTime(_selectedDate.year + 20),
+            );
+            if (selectedDate != null && context.mounted) {
+              final selectedTime = await showTimePicker(
+                context: context,
+                initialTime: TimeOfDay.fromDateTime(_selectedDate),
+              );
+              if (selectedTime != null) {
+                DateTime selectedDateTime = DateTime(
+                  selectedDate.year,
+                  selectedDate.month,
+                  selectedDate.day,
+                  selectedTime.hour,
+                  selectedTime.minute,
+                );
+                setState(() {
+                  _selectedDate = selectedDateTime;
+                });
+              }
+            }
+          },
+        ),
         actions: [
+          IconButton(
+            onPressed: _deleteEntry,
+            icon: const Icon(Icons.delete),
+          ),
           IconButton(
             onPressed: _saveEntry,
             icon: const Icon(Icons.save),
