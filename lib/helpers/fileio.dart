@@ -9,6 +9,7 @@ import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 
 import 'constants.dart';
+import 'logger.dart';
 import 'sync.dart';
 
 void downloadContent(BuildContext context) async {
@@ -88,7 +89,9 @@ void uploadContent(BuildContext context) async {
         if (context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text("Error while syncing"),
+              content: Text(
+                parseErrorToString(e, stack, "Error while syncing"),
+              ),
             ),
           );
         }
