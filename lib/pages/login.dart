@@ -14,9 +14,7 @@ class LoginScreen extends StatelessWidget {
       builder: (context, snapshot) {
         if (!snapshot.hasData) {
           return SignInScreen(
-            providers: [
-              EmailAuthProvider(),
-            ],
+            providers: [EmailAuthProvider()],
           );
         }
 

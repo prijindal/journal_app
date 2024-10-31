@@ -101,7 +101,7 @@ class _MyHomePageState extends State<MyHomePage> {
               action: SnackBarAction(
                 label: "Login",
                 onPressed: () async {
-                  Navigator.pushNamed(context, "/login");
+                  await Navigator.pushNamed(context, "/login");
                   await _syncDb();
                 },
               ),

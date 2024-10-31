@@ -86,6 +86,15 @@ class _ProfileAuthTileState extends State<ProfileAuthTile> {
             mainAxisSize: MainAxisSize.min,
             children: [
               ListTile(
+                leading: user!.photoURL != null
+                    ? Image.network(user!.photoURL!)
+                    : null,
+                title: Text(user!.email ?? user!.uid),
+                onTap: () async {
+                  await Navigator.pushNamed(context, "/profile");
+                },
+              ),
+              ListTile(
                 title: const Text("Sync database"),
                 onTap: () async {
                   try {
@@ -176,7 +185,7 @@ class _ProfileAuthTileState extends State<ProfileAuthTile> {
               "Login",
             ),
             onTap: () async {
-              await Navigator.pushNamed<UserCredential?>(context, "/login");
+              await Navigator.pushNamed(context, "/login");
             },
           );
   }
