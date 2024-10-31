@@ -55,9 +55,7 @@ class MyMaterialApp extends StatelessWidget {
         "/login": (context) => const LoginScreen(),
         '/profile': (context) {
           return ProfileScreen(
-            providers: [
-              EmailAuthProvider(),
-            ],
+            providers: authProviders,
             actions: [
               SignedOutAction((context) {
                 Navigator.pushReplacementNamed(context, '/settings');

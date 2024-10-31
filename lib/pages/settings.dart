@@ -5,6 +5,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../helpers/constants.dart';
 import '../helpers/fileio.dart';
 import '../helpers/logger.dart';
 import '../helpers/sync.dart';
@@ -68,7 +69,7 @@ class _ProfileAuthTileState extends State<ProfileAuthTile> {
   void _syncMetadata() async {
     if (user != null) {
       try {
-        final ref = FirebaseStorage.instance.ref("${user!.uid}/db.json");
+        final ref = FirebaseStorage.instance.ref("${user!.uid}/$dbExportName");
         final metadata = await ref.getMetadata();
         setState(() {
           this.metadata = metadata;

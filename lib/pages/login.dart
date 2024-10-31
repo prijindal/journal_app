@@ -1,8 +1,18 @@
 import 'dart:async';
 
-import 'package:firebase_auth/firebase_auth.dart' hide EmailAuthProvider;
+import 'package:firebase_auth/firebase_auth.dart'
+    hide EmailAuthProvider, AuthProvider;
 import 'package:firebase_ui_auth/firebase_ui_auth.dart';
+import 'package:firebase_ui_oauth_google/firebase_ui_oauth_google.dart';
 import 'package:flutter/material.dart';
+
+import '../helpers/constants.dart';
+
+List<AuthProvider<AuthListener, AuthCredential>>? authProviders = [
+  EmailAuthProvider(),
+  if (googleSignInClientId != null)
+    GoogleProvider(clientId: googleSignInClientId!),
+];
 
 class LoginScreen extends StatelessWidget {
   const LoginScreen({super.key});
@@ -14,7 +24,7 @@ class LoginScreen extends StatelessWidget {
       builder: (context, snapshot) {
         if (!snapshot.hasData) {
           return SignInScreen(
-            providers: [EmailAuthProvider()],
+            providers: authProviders,
           );
         }
 
