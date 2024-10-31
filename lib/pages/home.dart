@@ -5,6 +5,8 @@ import 'package:fleather/fleather.dart';
 import 'package:flutter/material.dart';
 
 import '../helpers/datetime.dart';
+import '../helpers/logger.dart';
+import '../helpers/sync.dart';
 import '../models/core.dart';
 import '../models/drift.dart';
 import 'newentry.dart';
@@ -24,6 +26,10 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   void initState() {
     _addWatcher();
+    Timer(
+      const Duration(seconds: 5),
+      _checkLoginAndSyncDb,
+    );
     super.initState();
   }
 
@@ -56,6 +62,54 @@ class _MyHomePageState extends State<MyHomePage> {
         _journalEntries = event;
       });
     });
+  }
+
+  Future<void> _syncDb() async {
+    try {
+      await syncDb();
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text("Sync successfully"),
+          ),
+        );
+      }
+    } catch (e, stack) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              parseErrorToString(e, stack, "Error while syncing"),
+            ),
+          ),
+        );
+      }
+    }
+  }
+
+  Future<void> _checkLoginAndSyncDb() async {
+    final isInitialized = isFirebaseInitialized();
+    if (isInitialized) {
+      final user = await getUser();
+      if (user != null) {
+        await _syncDb();
+      } else {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: const Text("Please login to allow sync"),
+              action: SnackBarAction(
+                label: "Login",
+                onPressed: () async {
+                  Navigator.pushNamed(context, "/login");
+                  await _syncDb();
+                },
+              ),
+            ),
+          );
+        }
+      }
+    }
   }
 
   AppBar _buildAppBar() {
@@ -147,7 +201,10 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: _buildAppBar(),
-      body: _buildJournalList(),
+      body: RefreshIndicator(
+        onRefresh: _checkLoginAndSyncDb,
+        child: _buildJournalList(),
+      ),
       floatingActionButton: _buildFab(),
     );
   }

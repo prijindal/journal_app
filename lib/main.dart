@@ -1,4 +1,5 @@
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_ui_auth/firebase_ui_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -6,6 +7,7 @@ import './firebase_options.dart';
 import './helpers/logger.dart';
 import './models/theme.dart';
 import './pages/home.dart';
+import 'pages/login.dart';
 import 'pages/settings.dart';
 // import 'pages/login.dart';
 
@@ -50,7 +52,19 @@ class MyMaterialApp extends StatelessWidget {
       routes: {
         "/": (context) => const MyHomePage(),
         "/settings": (context) => const SettingsScreen(),
-        // "/login": (context) => const LoginScreen(),
+        "/login": (context) => const LoginScreen(),
+        '/profile': (context) {
+          return ProfileScreen(
+            providers: [
+              EmailAuthProvider(),
+            ],
+            actions: [
+              SignedOutAction((context) {
+                Navigator.pushReplacementNamed(context, '/settings');
+              }),
+            ],
+          );
+        },
       },
       initialRoute: "/",
       theme: ThemeData(primarySwatch: Colors.blue, useMaterial3: true),
