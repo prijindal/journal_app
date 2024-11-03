@@ -2,7 +2,7 @@ import 'package:drift/drift.dart' as drift;
 import 'package:fleather/fleather.dart';
 import 'package:flutter/material.dart';
 
-import '../helpers/datetime.dart';
+import '../components/journal_date.dart';
 import '../models/core.dart';
 import '../models/drift.dart';
 
@@ -107,7 +107,7 @@ class _JournalEntryFormState extends State<JournalEntryForm> {
           icon: Icon(Icons.arrow_back),
         ),
         title: GestureDetector(
-          child: Text(formatDateTime(_selectedDate)),
+          child: JournalDate(creationTime: _selectedDate),
           onTap: () async {
             final selectedDate = await showDatePicker(
               context: context,

@@ -4,7 +4,7 @@ import 'package:drift/drift.dart';
 import 'package:fleather/fleather.dart';
 import 'package:flutter/material.dart';
 
-import '../helpers/datetime.dart';
+import '../components/journal_date.dart';
 import '../helpers/logger.dart';
 import '../helpers/sync.dart';
 import '../models/core.dart';
@@ -238,9 +238,7 @@ class JournalEntryContainerTile extends StatelessWidget {
               document: displayDocument,
             ),
           ),
-          title: Text(
-            formatDateTime(journalEntry.creationTime),
-          ),
+          title: JournalDate(creationTime: journalEntry.creationTime),
           onTap: () {
             JournalEntryForm.editEntry(
               context: context,
