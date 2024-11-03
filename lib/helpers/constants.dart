@@ -11,3 +11,12 @@ String? googleSignInClientId =
     googleSignInClientIdFromEnv == "GOOGLE_SIGNIN_CLIENT_ID"
         ? null
         : googleSignInClientIdFromEnv;
+
+const String recaptchaSiteKeyFromEnv = String.fromEnvironment(
+    'RECAPTCHA_SITE_KEY',
+    defaultValue: "RECAPTCHA_SITE_KEY");
+
+// In env where we don't override above value, google sign in client id is null
+String? recaptchaSiteKey = recaptchaSiteKeyFromEnv == "RECAPTCHA_SITE_KEY"
+    ? null
+    : recaptchaSiteKeyFromEnv;

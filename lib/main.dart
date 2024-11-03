@@ -8,6 +8,7 @@ import './firebase_options.dart';
 import './helpers/logger.dart';
 import './models/theme.dart';
 import './pages/home.dart';
+import 'helpers/constants.dart';
 import 'pages/login.dart';
 import 'pages/settings.dart';
 // import 'pages/login.dart';
@@ -22,6 +23,9 @@ void main() async {
       options: DefaultFirebaseOptions.currentPlatform,
     );
     await FirebaseAppCheck.instance.activate(
+      webProvider: recaptchaSiteKey != null
+          ? ReCaptchaV3Provider(recaptchaSiteKey!)
+          : null,
       androidProvider: AndroidProvider.playIntegrity,
     );
   } catch (e, stack) {

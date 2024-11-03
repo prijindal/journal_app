@@ -109,9 +109,10 @@ jobs:
       - run: flutterfire configure -y --platforms=web --ios-bundle-id=com.prijindal.journal-app --macos-bundle-id=com.prijindal.journal-app --web-app-id=1:903944243626:web:575096b9f07bed49f9c3d3 --android-package-name=com.prijindal.journal_app --windows-app-id=1:903944243626:web:575096b9f07bed49f9c3d3
         env:
           GOOGLE_APPLICATION_CREDENTIALS: google-application-credentials.json
-      - run: flutter build web --release --dart-define=GOOGLE_SIGNIN_CLIENT_ID=$GOOGLE_SIGNIN_CLIENT_ID
+      - run: flutter build web --release --dart-define=GOOGLE_SIGNIN_CLIENT_ID=$GOOGLE_SIGNIN_CLIENT_ID --dart-define=RECAPTCHA_SITE_KEY=$RECAPTCHA_SITE_KEY
         env:
           GOOGLE_SIGNIN_CLIENT_ID: ${{secrets.GOOGLE_SIGNIN_CLIENT_ID}}
+          RECAPTCHA_SITE_KEY: ${{secrets.RECAPTCHA_SITE_KEY}}
       - uses: FirebaseExtended/action-hosting-deploy@v0
         with:
           repoToken: '${{ secrets.GITHUB_TOKEN }}'
@@ -123,7 +124,10 @@ jobs:
           name: web
           path: build/web
           retention-days: 1
-      - run: flutter build linux --release
+      - run: flutter build linux --release --dart-define=GOOGLE_SIGNIN_CLIENT_ID=$GOOGLE_SIGNIN_CLIENT_ID --dart-define=RECAPTCHA_SITE_KEY=$RECAPTCHA_SITE_KEY
+        env:
+          GOOGLE_SIGNIN_CLIENT_ID: ${{secrets.GOOGLE_SIGNIN_CLIENT_ID}}
+          RECAPTCHA_SITE_KEY: ${{secrets.RECAPTCHA_SITE_KEY}}
       - uses: actions/upload-artifact@v4
         with:
           name: linux
@@ -203,7 +207,10 @@ jobs:
       # - run: flutterfire configure -y --platforms=windows --ios-bundle-id=com.prijindal.journal-app --macos-bundle-id=com.prijindal.journal-app --web-app-id=1:903944243626:web:575096b9f07bed49f9c3d3 --android-package-name=com.prijindal.journal_app --windows-app-id=1:903944243626:web:575096b9f07bed49f9c3d3
       #   env:
       #     GOOGLE_APPLICATION_CREDENTIALS: google-application-credentials.json
-      - run: flutter build windows --release
+      - run: flutter build windows --release --dart-define=GOOGLE_SIGNIN_CLIENT_ID=$GOOGLE_SIGNIN_CLIENT_ID --dart-define=RECAPTCHA_SITE_KEY=$RECAPTCHA_SITE_KEY
+        env:
+          GOOGLE_SIGNIN_CLIENT_ID: ${{secrets.GOOGLE_SIGNIN_CLIENT_ID}}
+          RECAPTCHA_SITE_KEY: ${{secrets.RECAPTCHA_SITE_KEY}}
       - uses: actions/upload-artifact@v4
         with:
           name: windows
