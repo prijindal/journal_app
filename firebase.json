@@ -2,17 +2,6 @@
   "hosting": {
     "public": "build/web",
     "ignore": [],
-    "rewrites": [],
-    "headers": [
-      {
-        "source": "*",
-        "headers": [
-          {
-            "key": "Access-Control-Allow-Origin",
-            "value": "*"
-          }
-        ]
-      }
-    ]
+    "rewrites": []
   }
 }
