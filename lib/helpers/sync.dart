@@ -4,6 +4,7 @@ import 'package:drift/drift.dart';
 import 'package:firebase_auth/firebase_auth.dart' as auth;
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:fleather/fleather.dart';
 
 import '../models/core.dart';
 import '../models/drift.dart';
@@ -30,7 +31,12 @@ Future<void> jsonToDb(String jsonEncoded) async {
     batch.insertAll(
       MyDatabase.instance.journalEntry,
       entries.map(
-        (a) => JournalEntryData.fromJson(a as Map<String, dynamic>),
+        (a) {
+          // Workaround to make it so that the document in json is properly inserted back to db
+          a["document"] =
+              ParchmentDocument.fromJson(a["document"] as List<dynamic>);
+          return JournalEntryData.fromJson(a as Map<String, dynamic>);
+        },
       ),
       mode: InsertMode.insertOrIgnore,
     );
