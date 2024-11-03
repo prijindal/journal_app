@@ -18,10 +18,12 @@ void main() async {
   );
   try {
     WidgetsFlutterBinding.ensureInitialized();
-    Firebase.initializeApp(
+    await Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform,
     );
-    await FirebaseAppCheck.instance.activate();
+    await FirebaseAppCheck.instance.activate(
+      androidProvider: AndroidProvider.playIntegrity,
+    );
   } catch (e, stack) {
     AppLogger.instance.e(
       "Firebase cannot be initialized",
