@@ -3,12 +3,14 @@ import 'package:fleather/fleather.dart';
 import 'package:flutter/material.dart';
 
 import '../components/journal_date.dart';
+import '../helpers/logger.dart';
 import '../models/core.dart';
 import '../models/drift.dart';
 
 class JournalEntryForm extends StatefulWidget {
   const JournalEntryForm({
     super.key,
+    required this.onSave,
     this.onDelete,
     this.creationTime,
     this.document,
@@ -17,6 +19,7 @@ class JournalEntryForm extends StatefulWidget {
   final DateTime? creationTime;
   final ParchmentDocument? document;
   final bool hidden;
+  final Future<void> Function(JournalEntryCompanion entry) onSave;
   final Future<void> Function()? onDelete;
 
   @override
@@ -25,24 +28,25 @@ class JournalEntryForm extends StatefulWidget {
   static Future<void> newEntry({
     required BuildContext context,
   }) async {
-    final entry = await showDialog<JournalEntryCompanion?>(
+    await showDialog<void>(
       context: context,
       builder: (BuildContext context) {
-        return const JournalEntryForm();
+        return JournalEntryForm(
+          onSave: (entry) async {
+            await MyDatabase.instance
+                .into(MyDatabase.instance.journalEntry)
+                .insert(entry);
+          },
+        );
       },
     );
-    if (entry != null) {
-      await MyDatabase.instance
-          .into(MyDatabase.instance.journalEntry)
-          .insert(entry);
-    }
   }
 
   static Future<void> editEntry({
     required BuildContext context,
     required JournalEntryData journalEntry,
   }) async {
-    final editedData = await showDialog<JournalEntryCompanion?>(
+    await showDialog<void>(
       context: context,
       builder: (BuildContext context) {
         return JournalEntryForm(
@@ -54,14 +58,14 @@ class JournalEntryForm extends StatefulWidget {
                   ..where((tbl) => tbl.id.equals(journalEntry.id)))
                 .go();
           },
+          onSave: (editedData) async {
+            await (MyDatabase.instance.update(MyDatabase.instance.journalEntry)
+                  ..where((tbl) => tbl.id.equals(journalEntry.id)))
+                .write(editedData);
+          },
         );
       },
     );
-    if (editedData != null) {
-      (MyDatabase.instance.update(MyDatabase.instance.journalEntry)
-            ..where((tbl) => tbl.id.equals(journalEntry.id)))
-          .write(editedData);
-    }
   }
 }
 
@@ -74,18 +78,31 @@ class _JournalEntryFormState extends State<JournalEntryForm> {
 
   late var _hidden = widget.hidden;
 
-  void _saveEntry() {
-    if (_controller.document.toPlainText().trim().isEmpty) {
-      Navigator.of(context).pop();
-      return;
-    }
-    Navigator.of(context).pop<JournalEntryCompanion>(
+  bool get isEmpty => _controller.document.toPlainText().trim().isEmpty;
+
+  Future<void> _saveEntry() async {
+    await widget.onSave(
       JournalEntryCompanion(
         creationTime: drift.Value(_selectedDate),
         document: drift.Value(_controller.document),
         hidden: drift.Value(_hidden),
       ),
     );
+  }
+
+  Future<void> _saveEntryAndPop() async {
+    if (isEmpty) {
+      // If it is empty, don't save and pop
+      Navigator.of(context).pop();
+      return;
+    } else {
+      // If it is not empty, save and pop
+      _saveEntry();
+      if (context.mounted) {
+        // ignore: use_build_context_synchronously
+        Navigator.of(context).pop();
+      }
+    }
   }
 
   Future<void> _deleteEntry() async {
@@ -102,10 +119,6 @@ class _JournalEntryFormState extends State<JournalEntryForm> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        leading: IconButton(
-          onPressed: _saveEntry,
-          icon: Icon(Icons.arrow_back),
-        ),
         title: GestureDetector(
           child: JournalDate(creationTime: _selectedDate),
           onTap: () async {
@@ -139,50 +152,60 @@ class _JournalEntryFormState extends State<JournalEntryForm> {
         ),
         actions: [
           IconButton(
-            onPressed: _deleteEntry,
+            onPressed: widget.onDelete != null ? _deleteEntry : null,
             icon: const Icon(Icons.delete),
           ),
           IconButton(
-            onPressed: _saveEntry,
+            onPressed: _saveEntryAndPop,
             icon: const Icon(Icons.save),
           )
         ],
       ),
-      body: Column(
-        children: [
-          Expanded(
-            child: FleatherEditor(
-              controller: _controller,
-              padding: const EdgeInsets.symmetric(
-                vertical: 0,
-                horizontal: 12,
+      body: PopScope(
+        onPopInvokedWithResult: (didPop, result) async {
+          if (isEmpty) {
+            AppLogger.instance.i("Popping allowed since text is empty");
+          } else {
+            await _saveEntry();
+            AppLogger.instance.i("Saving this entry");
+          }
+        },
+        child: Column(
+          children: [
+            Expanded(
+              child: FleatherEditor(
+                controller: _controller,
+                padding: const EdgeInsets.symmetric(
+                  vertical: 0,
+                  horizontal: 12,
+                ),
+                autofocus: true,
               ),
-              autofocus: true,
             ),
-          ),
-          FleatherToolbar.basic(
-            controller: _controller,
-            leading: [
-              defaultToggleStyleButtonBuilder(
-                context,
-                ParchmentAttribute.code,
-                Icons.visibility,
-                _hidden,
-                () {
-                  setState(() {
-                    _hidden = !_hidden;
-                  });
-                },
-              ),
-              const SizedBox(width: 1),
-              VerticalDivider(
-                indent: 16,
-                endIndent: 16,
-                color: Colors.grey.shade400,
-              )
-            ],
-          )
-        ],
+            FleatherToolbar.basic(
+              controller: _controller,
+              leading: [
+                defaultToggleStyleButtonBuilder(
+                  context,
+                  ParchmentAttribute.code,
+                  Icons.visibility,
+                  _hidden,
+                  () {
+                    setState(() {
+                      _hidden = !_hidden;
+                    });
+                  },
+                ),
+                const SizedBox(width: 1),
+                VerticalDivider(
+                  indent: 16,
+                  endIndent: 16,
+                  color: Colors.grey.shade400,
+                )
+              ],
+            )
+          ],
+        ),
       ),
     );
   }
