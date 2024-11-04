@@ -60,7 +60,7 @@ class JournalEntryContainerTile extends StatelessWidget {
         : journalEntry.document;
     return Container(
       margin: const EdgeInsets.symmetric(
-        vertical: 12.0,
+        vertical: 4.0,
         horizontal: 8.0,
       ),
       child: Card(

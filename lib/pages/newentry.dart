@@ -90,21 +90,6 @@ class _JournalEntryFormState extends State<JournalEntryForm> {
     );
   }
 
-  Future<void> _saveEntryAndPop() async {
-    if (isEmpty) {
-      // If it is empty, don't save and pop
-      Navigator.of(context).pop();
-      return;
-    } else {
-      // If it is not empty, save and pop
-      _saveEntry();
-      if (context.mounted) {
-        // ignore: use_build_context_synchronously
-        Navigator.of(context).pop();
-      }
-    }
-  }
-
   Future<void> _deleteEntry() async {
     if (widget.onDelete != null) {
       await widget.onDelete!();
@@ -156,7 +141,9 @@ class _JournalEntryFormState extends State<JournalEntryForm> {
             icon: const Icon(Icons.delete),
           ),
           IconButton(
-            onPressed: _saveEntryAndPop,
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
             icon: const Icon(Icons.save),
           )
         ],
