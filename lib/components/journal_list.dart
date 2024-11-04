@@ -1,5 +1,7 @@
 import 'package:fleather/fleather.dart';
 import 'package:flutter/material.dart';
+import 'package:grouped_list/grouped_list.dart';
+import 'package:intl/intl.dart';
 
 import '../models/core.dart';
 import '../pages/newentry.dart';
@@ -15,27 +17,32 @@ class JournalList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListView.builder(
-      padding: const EdgeInsets.fromLTRB(0, 0, 0, 80),
-      itemCount: (entries != null && entries!.isNotEmpty) ? entries!.length : 1,
-      itemBuilder: (BuildContext context, int index) {
-        if (entries == null) {
-          return const Center(
-            key: Key("JournalListLoading"),
-            child: Text(
-              "Loading...",
-            ),
-          );
-        }
-        if (entries!.isEmpty) {
-          return const Center(
-            key: Key("JournalListEmpty"),
-            child: Text(
-              "No Journals added",
-            ),
-          );
-        }
-        final journalEntry = entries![index];
+    if (entries == null) {
+      return const Center(
+        key: Key("JournalListLoading"),
+        child: Text(
+          "Loading...",
+        ),
+      );
+    }
+    if (entries!.isEmpty) {
+      return const Center(
+        key: Key("JournalListEmpty"),
+        child: Text(
+          "No Journals added",
+        ),
+      );
+    }
+    return GroupedListView<JournalEntryData, String>(
+      elements: entries!,
+      groupBy: (element) => (DateFormat("MMM y").format(element.creationTime)),
+      groupSeparatorBuilder: (String groupByValue) => Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text(groupByValue),
+        ],
+      ),
+      itemBuilder: (BuildContext context, JournalEntryData journalEntry) {
         return JournalEntryContainerTile(
           key: Key("${journalEntry.id}-tile"),
           journalEntry: journalEntry,
