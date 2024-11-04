@@ -10,6 +10,7 @@ import './models/theme.dart';
 import './pages/home.dart';
 import 'helpers/constants.dart';
 import 'pages/login.dart';
+import 'pages/search.dart';
 import 'pages/settings.dart';
 // import 'pages/login.dart';
 
@@ -58,7 +59,8 @@ class MyMaterialApp extends StatelessWidget {
     AppLogger.instance.d("Building MyApp");
     return MaterialApp(
       routes: {
-        "/": (context) => const MyHomePage(),
+        "/": (context) => const HomeScreen(),
+        "/search": (context) => const SearchScreen(),
         "/settings": (context) => const SettingsScreen(),
         "/login": (context) => const LoginScreen(),
         '/profile': (context) {

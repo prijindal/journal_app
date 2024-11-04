@@ -1,24 +1,23 @@
 import 'dart:async';
 
 import 'package:drift/drift.dart';
-import 'package:fleather/fleather.dart';
 import 'package:flutter/material.dart';
 
-import '../components/journal_date.dart';
+import '../components/journal_list.dart';
 import '../helpers/logger.dart';
 import '../helpers/sync.dart';
 import '../models/core.dart';
 import '../models/drift.dart';
 import 'newentry.dart';
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key});
+class HomeScreen extends StatefulWidget {
+  const HomeScreen({super.key});
 
   @override
-  State<MyHomePage> createState() => _MyHomePageState();
+  State<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
+class _HomeScreenState extends State<HomeScreen> {
   List<JournalEntryData>? _journalEntries;
   StreamSubscription<List<JournalEntryData>>? _subscription;
   bool _showHidden = false;
@@ -116,31 +115,32 @@ class _MyHomePageState extends State<MyHomePage> {
     return AppBar(
       title: const Text("Journals"),
       actions: [
-        Padding(
-          padding: const EdgeInsets.only(right: 20.0),
-          child: IconButton(
-            onPressed: () {
-              setState(() {
-                _showHidden = !_showHidden;
-              });
-              _addWatcher();
-            },
-            icon: Icon(
-              _showHidden ? Icons.visibility : Icons.visibility_off,
-              size: 26.0,
-            ),
+        IconButton(
+          onPressed: () {
+            Navigator.pushNamed(context, "/search");
+          },
+          icon: Icon(
+            Icons.search,
           ),
         ),
-        Padding(
-          padding: const EdgeInsets.only(right: 20.0),
-          child: IconButton(
-            onPressed: () {
-              Navigator.pushNamed(context, "/settings");
-            },
-            icon: const Icon(
-              Icons.settings,
-              size: 26.0,
-            ),
+        IconButton(
+          onPressed: () {
+            setState(() {
+              _showHidden = !_showHidden;
+            });
+            _addWatcher();
+          },
+          icon: Icon(
+            _showHidden ? Icons.visibility : Icons.visibility_off,
+          ),
+        ),
+        IconButton(
+          onPressed: () {
+            Navigator.pushNamed(context, "/settings");
+          },
+          icon: const Icon(
+            Icons.settings,
+            size: 26.0,
           ),
         ),
       ],
@@ -166,35 +166,7 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Widget _buildJournalList() {
-    return ListView.builder(
-      padding: const EdgeInsets.fromLTRB(0, 0, 0, 80),
-      itemCount: (_journalEntries != null && _journalEntries!.isNotEmpty)
-          ? _journalEntries!.length
-          : 1,
-      itemBuilder: (BuildContext context, int index) {
-        if (_journalEntries == null) {
-          return const Center(
-            key: Key("JournalListLoading"),
-            child: Text(
-              "Loading...",
-            ),
-          );
-        }
-        if (_journalEntries!.isEmpty) {
-          return const Center(
-            key: Key("JournalListEmpty"),
-            child: Text(
-              "No Journals added",
-            ),
-          );
-        }
-        final journalEntry = _journalEntries![index];
-        return JournalEntryContainerTile(
-          key: Key("${journalEntry.id}-tile"),
-          journalEntry: journalEntry,
-        );
-      },
-    );
+    return JournalList(entries: _journalEntries);
   }
 
   @override
@@ -206,47 +178,6 @@ class _MyHomePageState extends State<MyHomePage> {
         child: _buildJournalList(),
       ),
       floatingActionButton: _buildFab(),
-    );
-  }
-}
-
-class JournalEntryContainerTile extends StatelessWidget {
-  const JournalEntryContainerTile({
-    super.key,
-    required this.journalEntry,
-  });
-  final JournalEntryData journalEntry;
-
-  @override
-  Widget build(BuildContext context) {
-    final firstLine = journalEntry.document.lookupLine(0);
-    final displayDocument = firstLine.node != null
-        ? ParchmentDocument.fromDelta(firstLine.node!.toDelta())
-        : journalEntry.document;
-    return Container(
-      margin: const EdgeInsets.symmetric(
-        vertical: 12.0,
-        horizontal: 0,
-      ),
-      child: Card(
-        child: ListTile(
-          subtitle: FleatherEditor(
-            readOnly: true,
-            showCursor: false,
-            enableInteractiveSelection: false,
-            controller: FleatherController(
-              document: displayDocument,
-            ),
-          ),
-          title: JournalDate(creationTime: journalEntry.creationTime),
-          onTap: () {
-            JournalEntryForm.editEntry(
-              context: context,
-              journalEntry: journalEntry,
-            );
-          },
-        ),
-      ),
     );
   }
 }
