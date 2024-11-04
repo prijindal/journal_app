@@ -4,6 +4,7 @@ import 'package:grouped_list/grouped_list.dart';
 import 'package:intl/intl.dart';
 
 import '../models/core.dart';
+import '../models/drift.dart';
 import '../pages/newentry.dart';
 import 'journal_date.dart';
 
@@ -71,22 +72,72 @@ class JournalEntryContainerTile extends StatelessWidget {
         horizontal: 8.0,
       ),
       child: Card(
-        child: ListTile(
-          subtitle: FleatherEditor(
-            readOnly: true,
-            showCursor: false,
-            enableInteractiveSelection: false,
-            controller: FleatherController(
-              document: displayDocument,
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: [
+            Expanded(
+              child: ListTile(
+                subtitle: FleatherEditor(
+                  readOnly: true,
+                  showCursor: false,
+                  enableInteractiveSelection: false,
+                  controller: FleatherController(
+                    document: displayDocument,
+                  ),
+                ),
+                title: JournalDate(creationTime: journalEntry.creationTime),
+                onTap: () {
+                  JournalEntryForm.editEntry(
+                    context: context,
+                    journalEntry: journalEntry,
+                  );
+                },
+              ),
             ),
-          ),
-          title: JournalDate(creationTime: journalEntry.creationTime),
-          onTap: () {
-            JournalEntryForm.editEntry(
-              context: context,
-              journalEntry: journalEntry,
-            );
-          },
+            MenuAnchor(
+              alignmentOffset: Offset.fromDirection(0, -80),
+              builder: (BuildContext context, MenuController controller,
+                  Widget? child) {
+                return IconButton(
+                  onPressed: () {
+                    if (controller.isOpen) {
+                      controller.close();
+                    } else {
+                      controller.open();
+                    }
+                  },
+                  icon: const Icon(Icons.more_horiz),
+                  tooltip: 'Show menu',
+                );
+              },
+              menuChildren: [
+                MenuItemButton(
+                  child: Text("Edit"),
+                  onPressed: () {
+                    JournalEntryForm.editEntry(
+                      context: context,
+                      journalEntry: journalEntry,
+                    );
+                  },
+                ),
+                // TODO: Implement hidden
+                // MenuItemButton(
+                //   child: Text("Mark as hidden"),
+                //   onPressed: () {},
+                // ),
+                MenuItemButton(
+                  child: Text("Delete"),
+                  onPressed: () async {
+                    // TODO: Implement Confirmation dialog
+                    await (MyDatabase.instance
+                            .delete(MyDatabase.instance.journalEntry)
+                          ..where((tbl) => tbl.id.equals(journalEntry.id)))
+                        .go();
+                  },
+                ),
+              ],
+            ),
+          ],
         ),
       ),
     );

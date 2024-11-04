@@ -29,6 +29,8 @@ class SettingsScreen extends StatelessWidget {
           title: const Text("Upload from file"),
           onTap: () => uploadContent(context),
         ),
+        // TODO: Add settings for group by
+        // TODO: Add settings for date format
         const ThemeSelectorTile(),
         if (isFirebaseInitialized()) const ProfileAuthTile(),
       ]),

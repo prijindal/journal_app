@@ -54,6 +54,7 @@ class JournalEntryForm extends StatefulWidget {
           document: journalEntry.document,
           hidden: journalEntry.hidden,
           onDelete: () async {
+            // TODO: Implement Confirmation dialog
             await (MyDatabase.instance.delete(MyDatabase.instance.journalEntry)
                   ..where((tbl) => tbl.id.equals(journalEntry.id)))
                 .go();
