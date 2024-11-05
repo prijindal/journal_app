@@ -49,13 +49,21 @@ class JournalList extends StatelessWidget {
         ),
       );
     }
-    return GroupedListView<JournalEntryData, String>(
+    return GroupedListView<JournalEntryData, DateTime>(
       elements: entries!,
-      groupBy: (element) => (DateFormat("MMM y").format(element.creationTime)),
-      groupSeparatorBuilder: (String groupByValue) => Row(
+      groupComparator: (a, b) {
+        return -a.compareTo(b);
+      },
+      groupBy: (element) {
+        return DateTime(
+          element.creationTime.year,
+          element.creationTime.month,
+        );
+      },
+      groupSeparatorBuilder: (DateTime groupByValue) => Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Text(groupByValue),
+          Text(DateFormat("MMM y").format(groupByValue)),
         ],
       ),
       itemBuilder: (BuildContext context, JournalEntryData journalEntry) {
@@ -86,12 +94,12 @@ class JournalEntryContainerTile extends StatelessWidget {
   const JournalEntryContainerTile({
     super.key,
     required this.journalEntry,
-    required this.onSelect,
-    required this.selected,
+    this.onSelect,
+    this.selected = false,
     required this.onTap,
   });
   final JournalEntryData journalEntry;
-  final VoidCallback onSelect;
+  final VoidCallback? onSelect;
   final VoidCallback onTap;
   final bool selected;
 

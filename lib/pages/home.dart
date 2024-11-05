@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:drift/drift.dart';
 import 'package:flutter/material.dart';
 
+import '../components/calendars.dart';
 import '../components/confirmation_dialog.dart';
 import '../components/journal_list.dart';
 import '../helpers/logger.dart';
@@ -22,6 +23,7 @@ class _HomeScreenState extends State<HomeScreen> {
   List<JournalEntryData>? _journalEntries;
   StreamSubscription<List<JournalEntryData>>? _subscription;
   List<String> _selectedEntries = [];
+  int _currentPageIndex = 0;
 
   @override
   void initState() {
@@ -196,6 +198,27 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+  Widget _buildJournalCalendar() {
+    if (_journalEntries == null) {
+      return const Center(
+        key: Key("JournalCalendarLoading"),
+        child: Text(
+          "Loading...",
+        ),
+      );
+    }
+    return JournalCalendar(
+      entries: _journalEntries!,
+    );
+  }
+
+  Widget _buildBody() {
+    return [
+      _buildJournalList(),
+      _buildJournalCalendar(),
+    ].elementAt(_currentPageIndex);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -204,9 +227,29 @@ class _HomeScreenState extends State<HomeScreen> {
           : _buildSelectedEntriesAppBar(),
       body: RefreshIndicator(
         onRefresh: _checkLoginAndSyncDb,
-        child: _buildJournalList(),
+        child: _buildBody(),
       ),
       floatingActionButton: _buildFab(),
+      bottomNavigationBar: NavigationBar(
+        onDestinationSelected: (int index) {
+          setState(() {
+            _currentPageIndex = index;
+          });
+        },
+        selectedIndex: _currentPageIndex,
+        destinations: [
+          NavigationDestination(
+            selectedIcon: Icon(Icons.list),
+            icon: Icon(Icons.list_outlined),
+            label: 'List',
+          ),
+          NavigationDestination(
+            selectedIcon: Icon(Icons.calendar_month),
+            icon: Icon(Icons.calendar_month_outlined),
+            label: 'Calendar',
+          ),
+        ],
+      ),
     );
   }
 }

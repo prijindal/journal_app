@@ -123,18 +123,19 @@ class _JournalEntryFormState extends State<JournalEntryForm> {
                 context: context,
                 initialTime: TimeOfDay.fromDateTime(_selectedDate),
               );
+              DateTime selectedDateTime = selectedDate;
               if (selectedTime != null) {
-                DateTime selectedDateTime = DateTime(
+                selectedDateTime = DateTime(
                   selectedDate.year,
                   selectedDate.month,
                   selectedDate.day,
                   selectedTime.hour,
                   selectedTime.minute,
                 );
-                setState(() {
-                  _selectedDate = selectedDateTime;
-                });
               }
+              setState(() {
+                _selectedDate = selectedDateTime;
+              });
             }
           },
         ),
