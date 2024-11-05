@@ -24,6 +24,7 @@ class JournalEntry extends Table {
       .withDefault(Constant(jsonEncode([])))();
   DateTimeColumn get creationTime =>
       dateTime().withDefault(currentDateAndTime)();
+  BoolColumn get hidden => boolean().withDefault(Constant(false))();
 
   @override
   Set<Column> get primaryKey => {id};

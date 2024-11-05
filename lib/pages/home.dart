@@ -11,6 +11,7 @@ import '../helpers/sync.dart';
 import '../models/core.dart';
 import '../models/drift.dart';
 import 'newentry.dart';
+import 'search.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -22,6 +23,7 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   List<JournalEntryData>? _journalEntries;
   StreamSubscription<List<JournalEntryData>>? _subscription;
+  bool _showHidden = false;
   List<String> _selectedEntries = [];
   int _currentPageIndex = 0;
 
@@ -46,6 +48,9 @@ class _HomeScreenState extends State<HomeScreen> {
       _subscription?.cancel();
     }
     final query = MyDatabase.instance.journalEntry.select();
+    if (!_showHidden) {
+      query.where((tbl) => tbl.hidden.equals(false));
+    }
     _subscription = (query
           ..orderBy(
             [
@@ -117,10 +122,28 @@ class _HomeScreenState extends State<HomeScreen> {
       actions: [
         IconButton(
           onPressed: () {
-            Navigator.pushNamed(context, "/search");
+            Navigator.push(
+              context,
+              MaterialPageRoute<void>(
+                builder: (context) => SearchScreen(
+                  showHidden: _showHidden,
+                ),
+              ),
+            );
           },
           icon: Icon(
             Icons.search,
+          ),
+        ),
+        IconButton(
+          onPressed: () {
+            setState(() {
+              _showHidden = !_showHidden;
+            });
+            _addWatcher();
+          },
+          icon: Icon(
+            _showHidden ? Icons.visibility : Icons.visibility_off,
           ),
         ),
         IconButton(

@@ -6,9 +6,9 @@ import 'package:provider/provider.dart';
 
 import './firebase_options.dart';
 import './helpers/logger.dart';
-import './models/theme.dart';
 import './pages/home.dart';
 import 'helpers/constants.dart';
+import 'models/settings.dart';
 import 'pages/login.dart';
 import 'pages/search.dart';
 import 'pages/settings.dart';
@@ -43,9 +43,12 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider<ThemeModeNotifier>(
+    return ChangeNotifierProvider<SettingsStorageNotifier>(
       child: const MyMaterialApp(),
-      create: (context) => ThemeModeNotifier(ThemeMode.system),
+      create: (context) => SettingsStorageNotifier(
+        ThemeMode.system,
+        HiddenEncryptionMode.unknown,
+      ),
     );
   }
 }
@@ -55,7 +58,7 @@ class MyMaterialApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    final themeNotifier = Provider.of<ThemeModeNotifier>(context);
+    final settingsStorage = Provider.of<SettingsStorageNotifier>(context);
     AppLogger.instance.d("Building MyApp");
     return MaterialApp(
       routes: {
@@ -77,7 +80,7 @@ class MyMaterialApp extends StatelessWidget {
       initialRoute: "/",
       theme: ThemeData(primarySwatch: Colors.blue, useMaterial3: true),
       darkTheme: ThemeData.dark(useMaterial3: true),
-      themeMode: themeNotifier.getTheme(),
+      themeMode: settingsStorage.getTheme(),
     );
   }
 }

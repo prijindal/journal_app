@@ -10,7 +10,9 @@ import '../models/drift.dart';
 class SearchScreen extends StatefulWidget {
   const SearchScreen({
     super.key,
+    this.showHidden = false,
   });
+  final bool showHidden;
 
   @override
   State<SearchScreen> createState() => _SearchScreenState();
@@ -37,9 +39,15 @@ class _SearchScreenState extends State<SearchScreen> {
     if (_subscription != null) {
       _subscription?.cancel();
     }
-    final query = MyDatabase.instance.journalEntry.select();
+    var query = MyDatabase.instance.journalEntry.select();
+    if (!widget.showHidden) {
+      query.where((tbl) => tbl.hidden.equals(false));
+    }
     if (_searchQueryController.text.isNotEmpty) {
-      query.where((tbl) => tbl.document.contains(_searchQueryController.text));
+      query = query
+        ..where((tbl) =>
+            tbl.tags.contains(_searchQueryController.text) |
+            tbl.document.contains(_searchQueryController.text));
     }
     _subscription = (query
           ..orderBy(

@@ -9,7 +9,7 @@ import '../helpers/constants.dart';
 import '../helpers/fileio.dart';
 import '../helpers/logger.dart';
 import '../helpers/sync.dart';
-import '../models/theme.dart';
+import '../models/settings.dart';
 
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
@@ -36,6 +36,7 @@ class SettingsScreen extends StatelessWidget {
         // TODO: rethink hidden/tags/categories
         // TODO: Add settings for save on back button
         const ThemeSelectorTile(),
+        // const LockHiddenSettingsTile(),
         if (isFirebaseInitialized()) const ProfileAuthTile(),
       ]),
     );
@@ -216,10 +217,10 @@ class ThemeSelectorTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final themeNotifier = Provider.of<ThemeModeNotifier>(context);
+    final settingsStorage = Provider.of<SettingsStorageNotifier>(context);
     return ListTile(
       title: DropdownButton<ThemeMode>(
-        value: themeNotifier.getTheme(),
+        value: settingsStorage.getTheme(),
         items: ThemeMode.values
             .map(
               (e) => DropdownMenuItem<ThemeMode>(
@@ -229,7 +230,47 @@ class ThemeSelectorTile extends StatelessWidget {
             )
             .toList(),
         onChanged: (newValue) async {
-          await themeNotifier.setTheme(newValue ?? ThemeMode.system);
+          await settingsStorage.setTheme(newValue ?? ThemeMode.system);
+        },
+      ),
+    );
+  }
+}
+
+class LockHiddenSettingsTile extends StatelessWidget {
+  const LockHiddenSettingsTile({super.key});
+
+  String hiddenEncryptionModeToText(HiddenEncryptionMode themeMode) {
+    switch (themeMode) {
+      case HiddenEncryptionMode.none:
+        return "Not encrypted";
+      case HiddenEncryptionMode.biometrics:
+        return "Encrypted with biometrocs";
+      case HiddenEncryptionMode.unknown:
+        return "Invalid value";
+      default:
+        return "None";
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final settingsStorage = Provider.of<SettingsStorageNotifier>(context);
+    return ListTile(
+      subtitle: Text("Select Encryption method for hidden entries"),
+      title: DropdownButton<HiddenEncryptionMode>(
+        value: settingsStorage.getHiddenEncryptionMode(),
+        items: [HiddenEncryptionMode.none, HiddenEncryptionMode.biometrics]
+            .map(
+              (e) => DropdownMenuItem<HiddenEncryptionMode>(
+                value: e,
+                child: Text(hiddenEncryptionModeToText(e)),
+              ),
+            )
+            .toList(),
+        onChanged: (newValue) async {
+          await settingsStorage
+              .setHiddenEncryptionMode(newValue ?? HiddenEncryptionMode.none);
         },
       ),
     );

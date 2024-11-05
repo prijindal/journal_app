@@ -44,19 +44,32 @@ class JournalEntryContainerTile extends StatelessWidget {
                 ),
               ),
               Row(
-                children: journalEntry.tags
-                    .map<Widget>(
-                      (a) => Padding(
-                        padding: const EdgeInsets.fromLTRB(
-                          0,
-                          0,
-                          6.0,
-                          0,
-                        ),
-                        child: Text('#$a'),
+                children: [
+                  if (journalEntry.hidden)
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(
+                        0.0,
+                        0,
+                        8.0,
+                        0,
                       ),
-                    )
-                    .toList(),
+                      child: Icon(
+                        Icons.visibility_off,
+                        size: 20,
+                      ),
+                    ),
+                  ...journalEntry.tags.map<Widget>(
+                    (a) => Padding(
+                      padding: const EdgeInsets.fromLTRB(
+                        0.0,
+                        0,
+                        8.0,
+                        0,
+                      ),
+                      child: Text('#$a'),
+                    ),
+                  )
+                ],
               )
             ],
           ),

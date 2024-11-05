@@ -15,12 +15,14 @@ class JournalEntryForm extends StatefulWidget {
     required this.onSave,
     this.onDelete,
     this.creationTime,
+    this.hidden = false,
     this.tags,
     this.document,
   });
   final DateTime? creationTime;
   final List<String>? tags;
   final ParchmentDocument? document;
+  final bool hidden;
   final Future<void> Function(JournalEntryCompanion entry) onSave;
   final Future<bool> Function()? onDelete;
 
@@ -55,6 +57,7 @@ class JournalEntryForm extends StatefulWidget {
           creationTime: journalEntry.creationTime,
           document: journalEntry.document,
           tags: journalEntry.tags,
+          hidden: journalEntry.hidden,
           onDelete: () async {
             final shouldDelete = await showDialog<bool>(
               context: context,
@@ -85,6 +88,7 @@ class _JournalEntryFormState extends State<JournalEntryForm> {
   late DateTime _selectedDate =
       widget.creationTime?.toLocal() ?? DateTime.now();
   late List<String> _tags = widget.tags ?? [];
+  late bool _hidden = widget.hidden;
 
   bool get isEmpty => _controller.document.toPlainText().trim().isEmpty;
 
@@ -93,6 +97,7 @@ class _JournalEntryFormState extends State<JournalEntryForm> {
       JournalEntryCompanion(
         creationTime: drift.Value(_selectedDate),
         document: drift.Value(_controller.document),
+        hidden: drift.Value(_hidden),
         tags: drift.Value(_tags),
       ),
     );
@@ -199,6 +204,17 @@ class _JournalEntryFormState extends State<JournalEntryForm> {
                         _tags = changedTags;
                       });
                     }
+                  },
+                ),
+                defaultToggleStyleButtonBuilder(
+                  context,
+                  ParchmentAttribute.code,
+                  _hidden ? Icons.visibility_off : Icons.visibility,
+                  _hidden,
+                  () {
+                    setState(() {
+                      _hidden = !_hidden;
+                    });
                   },
                 ),
                 const SizedBox(width: 1),

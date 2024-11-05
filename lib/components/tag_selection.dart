@@ -93,8 +93,9 @@ class _TagSelectionState extends State<TagSelection> {
                       decoration: InputDecoration(
                         hintText: "Add tag",
                         border: InputBorder.none,
-                        hintStyle: TextStyle(color: Colors.black87),
+                        hintStyle: TextStyle(color: Colors.white30),
                       ),
+                      style: TextStyle(color: Colors.white, fontSize: 16.0),
                     ),
                   ),
                   IconButton(
