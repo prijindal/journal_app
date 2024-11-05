@@ -15,7 +15,6 @@ class $JournalEntryTable extends JournalEntry
       'id', aliasedName, false,
       type: DriftSqlType.string,
       requiredDuringInsert: false,
-      defaultConstraints: GeneratedColumn.constraintIsAlways('UNIQUE'),
       clientDefault: () => _uuid.v4());
   static const VerificationMeta _documentMeta =
       const VerificationMeta('document');
@@ -25,6 +24,14 @@ class $JournalEntryTable extends JournalEntry
               type: DriftSqlType.string, requiredDuringInsert: true)
           .withConverter<ParchmentDocument>(
               $JournalEntryTable.$converterdocument);
+  static const VerificationMeta _tagsMeta = const VerificationMeta('tags');
+  @override
+  late final GeneratedColumnWithTypeConverter<List<String>, String> tags =
+      GeneratedColumn<String>('tags', aliasedName, false,
+              type: DriftSqlType.string,
+              requiredDuringInsert: false,
+              defaultValue: Constant(jsonEncode([])))
+          .withConverter<List<String>>($JournalEntryTable.$convertertags);
   static const VerificationMeta _creationTimeMeta =
       const VerificationMeta('creationTime');
   @override
@@ -34,7 +41,7 @@ class $JournalEntryTable extends JournalEntry
       requiredDuringInsert: false,
       defaultValue: currentDateAndTime);
   @override
-  List<GeneratedColumn> get $columns => [id, document, creationTime];
+  List<GeneratedColumn> get $columns => [id, document, tags, creationTime];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -49,6 +56,7 @@ class $JournalEntryTable extends JournalEntry
       context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
     }
     context.handle(_documentMeta, const VerificationResult.success());
+    context.handle(_tagsMeta, const VerificationResult.success());
     if (data.containsKey('creation_time')) {
       context.handle(
           _creationTimeMeta,
@@ -59,7 +67,7 @@ class $JournalEntryTable extends JournalEntry
   }
 
   @override
-  Set<GeneratedColumn> get $primaryKey => const {};
+  Set<GeneratedColumn> get $primaryKey => {id};
   @override
   JournalEntryData map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
@@ -69,6 +77,9 @@ class $JournalEntryTable extends JournalEntry
       document: $JournalEntryTable.$converterdocument.fromSql(attachedDatabase
           .typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}document'])!),
+      tags: $JournalEntryTable.$convertertags.fromSql(attachedDatabase
+          .typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}tags'])!),
       creationTime: attachedDatabase.typeMapping.read(
           DriftSqlType.dateTime, data['${effectivePrefix}creation_time'])!,
     );
@@ -81,15 +92,21 @@ class $JournalEntryTable extends JournalEntry
 
   static TypeConverter<ParchmentDocument, String> $converterdocument =
       const ParchmentDocumentConverter();
+  static TypeConverter<List<String>, String> $convertertags =
+      const StringListConverter();
 }
 
 class JournalEntryData extends DataClass
     implements Insertable<JournalEntryData> {
   final String id;
   final ParchmentDocument document;
+  final List<String> tags;
   final DateTime creationTime;
   const JournalEntryData(
-      {required this.id, required this.document, required this.creationTime});
+      {required this.id,
+      required this.document,
+      required this.tags,
+      required this.creationTime});
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
@@ -97,6 +114,10 @@ class JournalEntryData extends DataClass
     {
       map['document'] = Variable<String>(
           $JournalEntryTable.$converterdocument.toSql(document));
+    }
+    {
+      map['tags'] =
+          Variable<String>($JournalEntryTable.$convertertags.toSql(tags));
     }
     map['creation_time'] = Variable<DateTime>(creationTime);
     return map;
@@ -106,6 +127,7 @@ class JournalEntryData extends DataClass
     return JournalEntryCompanion(
       id: Value(id),
       document: Value(document),
+      tags: Value(tags),
       creationTime: Value(creationTime),
     );
   }
@@ -116,6 +138,7 @@ class JournalEntryData extends DataClass
     return JournalEntryData(
       id: serializer.fromJson<String>(json['id']),
       document: serializer.fromJson<ParchmentDocument>(json['document']),
+      tags: serializer.fromJson<List<String>>(json['tags']),
       creationTime: serializer.fromJson<DateTime>(json['creationTime']),
     );
   }
@@ -125,21 +148,27 @@ class JournalEntryData extends DataClass
     return <String, dynamic>{
       'id': serializer.toJson<String>(id),
       'document': serializer.toJson<ParchmentDocument>(document),
+      'tags': serializer.toJson<List<String>>(tags),
       'creationTime': serializer.toJson<DateTime>(creationTime),
     };
   }
 
   JournalEntryData copyWith(
-          {String? id, ParchmentDocument? document, DateTime? creationTime}) =>
+          {String? id,
+          ParchmentDocument? document,
+          List<String>? tags,
+          DateTime? creationTime}) =>
       JournalEntryData(
         id: id ?? this.id,
         document: document ?? this.document,
+        tags: tags ?? this.tags,
         creationTime: creationTime ?? this.creationTime,
       );
   JournalEntryData copyWithCompanion(JournalEntryCompanion data) {
     return JournalEntryData(
       id: data.id.present ? data.id.value : this.id,
       document: data.document.present ? data.document.value : this.document,
+      tags: data.tags.present ? data.tags.value : this.tags,
       creationTime: data.creationTime.present
           ? data.creationTime.value
           : this.creationTime,
@@ -151,48 +180,55 @@ class JournalEntryData extends DataClass
     return (StringBuffer('JournalEntryData(')
           ..write('id: $id, ')
           ..write('document: $document, ')
+          ..write('tags: $tags, ')
           ..write('creationTime: $creationTime')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => Object.hash(id, document, creationTime);
+  int get hashCode => Object.hash(id, document, tags, creationTime);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       (other is JournalEntryData &&
           other.id == this.id &&
           other.document == this.document &&
+          other.tags == this.tags &&
           other.creationTime == this.creationTime);
 }
 
 class JournalEntryCompanion extends UpdateCompanion<JournalEntryData> {
   final Value<String> id;
   final Value<ParchmentDocument> document;
+  final Value<List<String>> tags;
   final Value<DateTime> creationTime;
   final Value<int> rowid;
   const JournalEntryCompanion({
     this.id = const Value.absent(),
     this.document = const Value.absent(),
+    this.tags = const Value.absent(),
     this.creationTime = const Value.absent(),
     this.rowid = const Value.absent(),
   });
   JournalEntryCompanion.insert({
     this.id = const Value.absent(),
     required ParchmentDocument document,
+    this.tags = const Value.absent(),
     this.creationTime = const Value.absent(),
     this.rowid = const Value.absent(),
   }) : document = Value(document);
   static Insertable<JournalEntryData> custom({
     Expression<String>? id,
     Expression<String>? document,
+    Expression<String>? tags,
     Expression<DateTime>? creationTime,
     Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
       if (document != null) 'document': document,
+      if (tags != null) 'tags': tags,
       if (creationTime != null) 'creation_time': creationTime,
       if (rowid != null) 'rowid': rowid,
     });
@@ -201,11 +237,13 @@ class JournalEntryCompanion extends UpdateCompanion<JournalEntryData> {
   JournalEntryCompanion copyWith(
       {Value<String>? id,
       Value<ParchmentDocument>? document,
+      Value<List<String>>? tags,
       Value<DateTime>? creationTime,
       Value<int>? rowid}) {
     return JournalEntryCompanion(
       id: id ?? this.id,
       document: document ?? this.document,
+      tags: tags ?? this.tags,
       creationTime: creationTime ?? this.creationTime,
       rowid: rowid ?? this.rowid,
     );
@@ -221,6 +259,10 @@ class JournalEntryCompanion extends UpdateCompanion<JournalEntryData> {
       map['document'] = Variable<String>(
           $JournalEntryTable.$converterdocument.toSql(document.value));
     }
+    if (tags.present) {
+      map['tags'] =
+          Variable<String>($JournalEntryTable.$convertertags.toSql(tags.value));
+    }
     if (creationTime.present) {
       map['creation_time'] = Variable<DateTime>(creationTime.value);
     }
@@ -235,6 +277,7 @@ class JournalEntryCompanion extends UpdateCompanion<JournalEntryData> {
     return (StringBuffer('JournalEntryCompanion(')
           ..write('id: $id, ')
           ..write('document: $document, ')
+          ..write('tags: $tags, ')
           ..write('creationTime: $creationTime, ')
           ..write('rowid: $rowid')
           ..write(')'))
@@ -257,6 +300,7 @@ typedef $$JournalEntryTableCreateCompanionBuilder = JournalEntryCompanion
     Function({
   Value<String> id,
   required ParchmentDocument document,
+  Value<List<String>> tags,
   Value<DateTime> creationTime,
   Value<int> rowid,
 });
@@ -264,6 +308,7 @@ typedef $$JournalEntryTableUpdateCompanionBuilder = JournalEntryCompanion
     Function({
   Value<String> id,
   Value<ParchmentDocument> document,
+  Value<List<String>> tags,
   Value<DateTime> creationTime,
   Value<int> rowid,
 });
@@ -285,6 +330,11 @@ class $$JournalEntryTableFilterComposer
           column: $table.document,
           builder: (column) => ColumnWithTypeConverterFilters(column));
 
+  ColumnWithTypeConverterFilters<List<String>, List<String>, String> get tags =>
+      $composableBuilder(
+          column: $table.tags,
+          builder: (column) => ColumnWithTypeConverterFilters(column));
+
   ColumnFilters<DateTime> get creationTime => $composableBuilder(
       column: $table.creationTime, builder: (column) => ColumnFilters(column));
 }
@@ -303,6 +353,9 @@ class $$JournalEntryTableOrderingComposer
 
   ColumnOrderings<String> get document => $composableBuilder(
       column: $table.document, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get tags => $composableBuilder(
+      column: $table.tags, builder: (column) => ColumnOrderings(column));
 
   ColumnOrderings<DateTime> get creationTime => $composableBuilder(
       column: $table.creationTime,
@@ -323,6 +376,9 @@ class $$JournalEntryTableAnnotationComposer
 
   GeneratedColumnWithTypeConverter<ParchmentDocument, String> get document =>
       $composableBuilder(column: $table.document, builder: (column) => column);
+
+  GeneratedColumnWithTypeConverter<List<String>, String> get tags =>
+      $composableBuilder(column: $table.tags, builder: (column) => column);
 
   GeneratedColumn<DateTime> get creationTime => $composableBuilder(
       column: $table.creationTime, builder: (column) => column);
@@ -356,24 +412,28 @@ class $$JournalEntryTableTableManager extends RootTableManager<
           updateCompanionCallback: ({
             Value<String> id = const Value.absent(),
             Value<ParchmentDocument> document = const Value.absent(),
+            Value<List<String>> tags = const Value.absent(),
             Value<DateTime> creationTime = const Value.absent(),
             Value<int> rowid = const Value.absent(),
           }) =>
               JournalEntryCompanion(
             id: id,
             document: document,
+            tags: tags,
             creationTime: creationTime,
             rowid: rowid,
           ),
           createCompanionCallback: ({
             Value<String> id = const Value.absent(),
             required ParchmentDocument document,
+            Value<List<String>> tags = const Value.absent(),
             Value<DateTime> creationTime = const Value.absent(),
             Value<int> rowid = const Value.absent(),
           }) =>
               JournalEntryCompanion.insert(
             id: id,
             document: document,
+            tags: tags,
             creationTime: creationTime,
             rowid: rowid,
           ),

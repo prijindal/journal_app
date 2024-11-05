@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 
 import '../components/confirmation_dialog.dart';
 import '../components/journal_date.dart';
+import '../components/tag_selection.dart';
 import '../helpers/logger.dart';
 import '../models/core.dart';
 import '../models/drift.dart';
@@ -14,9 +15,11 @@ class JournalEntryForm extends StatefulWidget {
     required this.onSave,
     this.onDelete,
     this.creationTime,
+    this.tags,
     this.document,
   });
   final DateTime? creationTime;
+  final List<String>? tags;
   final ParchmentDocument? document;
   final Future<void> Function(JournalEntryCompanion entry) onSave;
   final Future<bool> Function()? onDelete;
@@ -51,6 +54,7 @@ class JournalEntryForm extends StatefulWidget {
         return JournalEntryForm(
           creationTime: journalEntry.creationTime,
           document: journalEntry.document,
+          tags: journalEntry.tags,
           onDelete: () async {
             final shouldDelete = await showDialog<bool>(
               context: context,
@@ -80,6 +84,7 @@ class _JournalEntryFormState extends State<JournalEntryForm> {
   );
   late DateTime _selectedDate =
       widget.creationTime?.toLocal() ?? DateTime.now();
+  late List<String> _tags = widget.tags ?? [];
 
   bool get isEmpty => _controller.document.toPlainText().trim().isEmpty;
 
@@ -88,6 +93,7 @@ class _JournalEntryFormState extends State<JournalEntryForm> {
       JournalEntryCompanion(
         creationTime: drift.Value(_selectedDate),
         document: drift.Value(_controller.document),
+        tags: drift.Value(_tags),
       ),
     );
   }
@@ -176,17 +182,25 @@ class _JournalEntryFormState extends State<JournalEntryForm> {
             FleatherToolbar.basic(
               controller: _controller,
               leading: [
-                // defaultToggleStyleButtonBuilder(
-                //   context,
-                //   ParchmentAttribute.code,
-                //   Icons.visibility,
-                //   _hidden,
-                //   () {
-                //     setState(() {
-                //       _hidden = !_hidden;
-                //     });
-                //   },
-                // ),
+                defaultToggleStyleButtonBuilder(
+                  context,
+                  ParchmentAttribute.code,
+                  Icons.tag,
+                  false,
+                  () async {
+                    final changedTags = await showDialog<List<String>>(
+                      context: context,
+                      builder: (context) => TagSelection(
+                        selectedTags: _tags,
+                      ),
+                    );
+                    if (changedTags != null) {
+                      setState(() {
+                        _tags = changedTags;
+                      });
+                    }
+                  },
+                ),
                 const SizedBox(width: 1),
                 VerticalDivider(
                   indent: 16,
