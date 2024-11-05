@@ -34,6 +34,7 @@ class SettingsScreen extends StatelessWidget {
         // TODO: Add settings for sync on or off, add ability to sync every x days
         // TODO: Add settings for default view
         // TODO: rethink hidden/tags/categories
+        // TODO: Add settings for save on back button
         const ThemeSelectorTile(),
         if (isFirebaseInitialized()) const ProfileAuthTile(),
       ]),

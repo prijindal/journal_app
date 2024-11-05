@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:drift/drift.dart';
 import 'package:flutter/material.dart';
 
+import '../components/confirmation_dialog.dart';
 import '../components/journal_list.dart';
 import '../helpers/logger.dart';
 import '../helpers/sync.dart';
@@ -20,6 +21,7 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   List<JournalEntryData>? _journalEntries;
   StreamSubscription<List<JournalEntryData>>? _subscription;
+  List<String> _selectedEntries = [];
 
   @override
   void initState() {
@@ -132,6 +134,38 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+  AppBar _buildSelectedEntriesAppBar() {
+    return AppBar(
+      leading: IconButton(
+        onPressed: () {
+          setState(() {
+            _selectedEntries = [];
+          });
+        },
+        icon: Icon(Icons.arrow_back),
+      ),
+      title: Text("${_selectedEntries.length} Selected"),
+      actions: [
+        IconButton(
+          onPressed: () async {
+            final shouldDelete = await showDialog<bool>(
+              context: context,
+              builder: (context) => ConfirmationDialog(),
+            );
+            if (shouldDelete != null && shouldDelete) {
+              await MyDatabase.instance.journalEntry
+                  .deleteWhere((tbl) => tbl.id.isIn(_selectedEntries));
+              setState(() {
+                _selectedEntries = [];
+              });
+            }
+          },
+          icon: Icon(Icons.delete),
+        ),
+      ],
+    );
+  }
+
   Widget _buildFab() {
     return LayoutBuilder(
       builder: (BuildContext context, BoxConstraints constraints) {
@@ -151,13 +185,23 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildJournalList() {
-    return JournalList(entries: _journalEntries);
+    return JournalList(
+      entries: _journalEntries,
+      selectedEntries: _selectedEntries,
+      onSelectedEntriesChange: (entries) {
+        setState(() {
+          _selectedEntries = entries;
+        });
+      },
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: _buildAppBar(),
+      appBar: _selectedEntries.isEmpty
+          ? _buildAppBar()
+          : _buildSelectedEntriesAppBar(),
       body: RefreshIndicator(
         onRefresh: _checkLoginAndSyncDb,
         child: _buildJournalList(),

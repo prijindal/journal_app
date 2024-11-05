@@ -4,7 +4,6 @@ import 'package:grouped_list/grouped_list.dart';
 import 'package:intl/intl.dart';
 
 import '../models/core.dart';
-import '../models/drift.dart';
 import '../pages/newentry.dart';
 import 'journal_date.dart';
 
@@ -12,9 +11,25 @@ class JournalList extends StatelessWidget {
   const JournalList({
     super.key,
     required this.entries,
+    this.selectedEntries = const [],
+    this.onSelectedEntriesChange,
   });
 
   final List<JournalEntryData>? entries;
+  final List<String> selectedEntries;
+  final void Function(List<String>)? onSelectedEntriesChange;
+
+  void _toggleSelected(JournalEntryData journalEntry) {
+    final entries = selectedEntries;
+    if (entries.contains(journalEntry.id)) {
+      entries.remove(journalEntry.id);
+    } else {
+      entries.add(journalEntry.id);
+    }
+    if (onSelectedEntriesChange != null) {
+      onSelectedEntriesChange!(entries);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -47,6 +62,20 @@ class JournalList extends StatelessWidget {
         return JournalEntryContainerTile(
           key: Key("${journalEntry.id}-tile"),
           journalEntry: journalEntry,
+          selected: selectedEntries.contains(journalEntry.id),
+          onTap: selectedEntries.isEmpty
+              ? () {
+                  JournalEntryForm.editEntry(
+                    context: context,
+                    journalEntry: journalEntry,
+                  );
+                }
+              : () {
+                  _toggleSelected(journalEntry);
+                },
+          onSelect: () {
+            _toggleSelected(journalEntry);
+          },
         );
       },
     );
@@ -57,8 +86,14 @@ class JournalEntryContainerTile extends StatelessWidget {
   const JournalEntryContainerTile({
     super.key,
     required this.journalEntry,
+    required this.onSelect,
+    required this.selected,
+    required this.onTap,
   });
   final JournalEntryData journalEntry;
+  final VoidCallback onSelect;
+  final VoidCallback onTap;
+  final bool selected;
 
   @override
   Widget build(BuildContext context) {
@@ -72,72 +107,21 @@ class JournalEntryContainerTile extends StatelessWidget {
         horizontal: 8.0,
       ),
       child: Card(
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.end,
-          children: [
-            Expanded(
-              child: ListTile(
-                subtitle: FleatherEditor(
-                  readOnly: true,
-                  showCursor: false,
-                  enableInteractiveSelection: false,
-                  controller: FleatherController(
-                    document: displayDocument,
-                  ),
-                ),
-                // TODO: Add hidden indicator
-                title: JournalDate(creationTime: journalEntry.creationTime),
-                onTap: () {
-                  JournalEntryForm.editEntry(
-                    context: context,
-                    journalEntry: journalEntry,
-                  );
-                },
-              ),
+        elevation: selected ? 2 : 1,
+        child: ListTile(
+          selected: selected,
+          subtitle: FleatherEditor(
+            readOnly: true,
+            showCursor: false,
+            enableInteractiveSelection: false,
+            controller: FleatherController(
+              document: displayDocument,
             ),
-            MenuAnchor(
-              builder: (BuildContext context, MenuController controller,
-                  Widget? child) {
-                return IconButton(
-                  onPressed: () {
-                    if (controller.isOpen) {
-                      controller.close();
-                    } else {
-                      controller.open();
-                    }
-                  },
-                  icon: const Icon(Icons.more_horiz),
-                  tooltip: 'Show menu',
-                );
-              },
-              menuChildren: [
-                MenuItemButton(
-                  child: Text("Edit"),
-                  onPressed: () {
-                    JournalEntryForm.editEntry(
-                      context: context,
-                      journalEntry: journalEntry,
-                    );
-                  },
-                ),
-                // TODO: Implement hidden
-                // MenuItemButton(
-                //   child: Text("Mark as hidden"),
-                //   onPressed: () {},
-                // ),
-                MenuItemButton(
-                  child: Text("Delete"),
-                  onPressed: () async {
-                    // TODO: Implement Confirmation dialog
-                    await (MyDatabase.instance
-                            .delete(MyDatabase.instance.journalEntry)
-                          ..where((tbl) => tbl.id.equals(journalEntry.id)))
-                        .go();
-                  },
-                ),
-              ],
-            ),
-          ],
+          ),
+          // TODO: Add hidden indicator
+          title: JournalDate(creationTime: journalEntry.creationTime),
+          onTap: onTap,
+          onLongPress: onSelect,
         ),
       ),
     );

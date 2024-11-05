@@ -2,6 +2,7 @@ import 'package:drift/drift.dart' as drift;
 import 'package:fleather/fleather.dart';
 import 'package:flutter/material.dart';
 
+import '../components/confirmation_dialog.dart';
 import '../components/journal_date.dart';
 import '../helpers/logger.dart';
 import '../models/core.dart';
@@ -18,7 +19,7 @@ class JournalEntryForm extends StatefulWidget {
   final DateTime? creationTime;
   final ParchmentDocument? document;
   final Future<void> Function(JournalEntryCompanion entry) onSave;
-  final Future<void> Function()? onDelete;
+  final Future<bool> Function()? onDelete;
 
   @override
   State<JournalEntryForm> createState() => _JournalEntryFormState();
@@ -51,10 +52,16 @@ class JournalEntryForm extends StatefulWidget {
           creationTime: journalEntry.creationTime,
           document: journalEntry.document,
           onDelete: () async {
-            // TODO: Implement Confirmation dialog
-            await (MyDatabase.instance.delete(MyDatabase.instance.journalEntry)
-                  ..where((tbl) => tbl.id.equals(journalEntry.id)))
-                .go();
+            final shouldDelete = await showDialog<bool>(
+              context: context,
+              builder: (context) => ConfirmationDialog(),
+            );
+            if (shouldDelete != null && shouldDelete) {
+              await MyDatabase.instance.journalEntry
+                  .deleteWhere((tbl) => tbl.id.equals(journalEntry.id));
+              return true;
+            }
+            return false;
           },
           onSave: (editedData) async {
             await (MyDatabase.instance.update(MyDatabase.instance.journalEntry)
@@ -86,10 +93,11 @@ class _JournalEntryFormState extends State<JournalEntryForm> {
   }
 
   Future<void> _deleteEntry() async {
+    bool deleted = false;
     if (widget.onDelete != null) {
-      await widget.onDelete!();
+      deleted = await widget.onDelete!();
     }
-    if (context.mounted) {
+    if (context.mounted && deleted) {
       // ignore: use_build_context_synchronously
       Navigator.pop(context);
     }
