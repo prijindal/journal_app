@@ -1,6 +1,6 @@
 {
-    "name": "journal_app",
-    "short_name": "journal_app",
+    "name": "Journal App",
+    "short_name": "Journal App",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",
