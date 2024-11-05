@@ -18,7 +18,6 @@ class JournalEntry extends Table {
   TextColumn get document => text().map(const ParchmentDocumentConverter())();
   DateTimeColumn get creationTime =>
       dateTime().withDefault(currentDateAndTime)();
-  BoolColumn get hidden => boolean().clientDefault(() => false)();
 }
 
 // this annotation tells drift to prepare a database class that uses both of the

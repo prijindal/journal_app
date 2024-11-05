@@ -20,7 +20,6 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   List<JournalEntryData>? _journalEntries;
   StreamSubscription<List<JournalEntryData>>? _subscription;
-  bool _showHidden = false;
 
   @override
   void initState() {
@@ -43,9 +42,6 @@ class _HomeScreenState extends State<HomeScreen> {
       _subscription?.cancel();
     }
     final query = MyDatabase.instance.journalEntry.select();
-    if (!_showHidden) {
-      query.where((tbl) => tbl.hidden.equals(false));
-    }
     _subscription = (query
           ..orderBy(
             [
@@ -121,17 +117,6 @@ class _HomeScreenState extends State<HomeScreen> {
           },
           icon: Icon(
             Icons.search,
-          ),
-        ),
-        IconButton(
-          onPressed: () {
-            setState(() {
-              _showHidden = !_showHidden;
-            });
-            _addWatcher();
-          },
-          icon: Icon(
-            _showHidden ? Icons.visibility : Icons.visibility_off,
           ),
         ),
         IconButton(

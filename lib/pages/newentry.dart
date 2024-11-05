@@ -14,11 +14,9 @@ class JournalEntryForm extends StatefulWidget {
     this.onDelete,
     this.creationTime,
     this.document,
-    this.hidden = false,
   });
   final DateTime? creationTime;
   final ParchmentDocument? document;
-  final bool hidden;
   final Future<void> Function(JournalEntryCompanion entry) onSave;
   final Future<void> Function()? onDelete;
 
@@ -52,7 +50,6 @@ class JournalEntryForm extends StatefulWidget {
         return JournalEntryForm(
           creationTime: journalEntry.creationTime,
           document: journalEntry.document,
-          hidden: journalEntry.hidden,
           onDelete: () async {
             // TODO: Implement Confirmation dialog
             await (MyDatabase.instance.delete(MyDatabase.instance.journalEntry)
@@ -77,8 +74,6 @@ class _JournalEntryFormState extends State<JournalEntryForm> {
   late DateTime _selectedDate =
       widget.creationTime?.toLocal() ?? DateTime.now();
 
-  late var _hidden = widget.hidden;
-
   bool get isEmpty => _controller.document.toPlainText().trim().isEmpty;
 
   Future<void> _saveEntry() async {
@@ -86,7 +81,6 @@ class _JournalEntryFormState extends State<JournalEntryForm> {
       JournalEntryCompanion(
         creationTime: drift.Value(_selectedDate),
         document: drift.Value(_controller.document),
-        hidden: drift.Value(_hidden),
       ),
     );
   }
@@ -173,17 +167,17 @@ class _JournalEntryFormState extends State<JournalEntryForm> {
             FleatherToolbar.basic(
               controller: _controller,
               leading: [
-                defaultToggleStyleButtonBuilder(
-                  context,
-                  ParchmentAttribute.code,
-                  Icons.visibility,
-                  _hidden,
-                  () {
-                    setState(() {
-                      _hidden = !_hidden;
-                    });
-                  },
-                ),
+                // defaultToggleStyleButtonBuilder(
+                //   context,
+                //   ParchmentAttribute.code,
+                //   Icons.visibility,
+                //   _hidden,
+                //   () {
+                //     setState(() {
+                //       _hidden = !_hidden;
+                //     });
+                //   },
+                // ),
                 const SizedBox(width: 1),
                 VerticalDivider(
                   indent: 16,

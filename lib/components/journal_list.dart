@@ -85,6 +85,7 @@ class JournalEntryContainerTile extends StatelessWidget {
                     document: displayDocument,
                   ),
                 ),
+                // TODO: Add hidden indicator
                 title: JournalDate(creationTime: journalEntry.creationTime),
                 onTap: () {
                   JournalEntryForm.editEntry(
@@ -95,7 +96,6 @@ class JournalEntryContainerTile extends StatelessWidget {
               ),
             ),
             MenuAnchor(
-              alignmentOffset: Offset.fromDirection(0, -80),
               builder: (BuildContext context, MenuController controller,
                   Widget? child) {
                 return IconButton(
