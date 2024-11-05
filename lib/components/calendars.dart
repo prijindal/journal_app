@@ -3,7 +3,7 @@ import 'package:table_calendar/table_calendar.dart';
 
 import '../models/core.dart';
 import '../pages/newentry.dart';
-import 'journal_list.dart';
+import 'journal_entry_tile.dart';
 
 class JournalCalendar extends StatefulWidget {
   const JournalCalendar({
