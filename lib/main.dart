@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:firebase_app_check/firebase_app_check.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_ui_auth/firebase_ui_auth.dart';
@@ -23,12 +25,15 @@ void main() async {
     await Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform,
     );
-    await FirebaseAppCheck.instance.activate(
-      webProvider: recaptchaSiteKey != null
-          ? ReCaptchaV3Provider(recaptchaSiteKey!)
-          : null,
-      androidProvider: AndroidProvider.playIntegrity,
-    );
+    if (!Platform.isWindows && !Platform.isLinux) {
+      // Firebase app check is not supported on android and linux
+      await FirebaseAppCheck.instance.activate(
+        webProvider: recaptchaSiteKey != null
+            ? ReCaptchaV3Provider(recaptchaSiteKey!)
+            : null,
+        androidProvider: AndroidProvider.playIntegrity,
+      );
+    }
   } catch (e, stack) {
     AppLogger.instance.e(
       "Firebase cannot be initialized",
