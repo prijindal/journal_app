@@ -7,4 +7,5 @@
 
 [![Google Play Store badge](https://play.google.com/intl/en_us/badges/images/badge_new.png)](https://play.google.com/store/apps/details?id=com.prijindal.journal_app) &nbsp;&nbsp;
 
+- [Web Version](https://journal-app-prijindal.web.app/)
 - [Download Builds](https://nightly.link/prijindal/journal_app/workflows/flutter/main)
