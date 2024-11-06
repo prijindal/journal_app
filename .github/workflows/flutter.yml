@@ -73,14 +73,6 @@ jobs:
         with:
           name: android
           path: build/app/outputs/apk/release/
-          retention-days: 1
-      - uses: ncipollo/release-action@v1
-        with:
-          artifacts: "build/app/outputs/apk/release/*.apk"
-          generateReleaseNotes: true
-          makeLatest: true
-          tag: ${{ github.sha }}
-          commit: ${{ github.sha }}
 
   linux:
     runs-on: ubuntu-latest
@@ -137,7 +129,6 @@ jobs:
         with:
           name: web
           path: build/web
-          retention-days: 1
       - run: flutter build linux --release --dart-define=GOOGLE_SIGNIN_CLIENT_ID=$GOOGLE_SIGNIN_CLIENT_ID --dart-define=RECAPTCHA_SITE_KEY=$RECAPTCHA_SITE_KEY
         env:
           GOOGLE_SIGNIN_CLIENT_ID: ${{secrets.GOOGLE_SIGNIN_CLIENT_ID}}
@@ -146,7 +137,6 @@ jobs:
         with:
           name: linux
           path: build/linux
-          retention-days: 1
 
   # macos:
   #   runs-on: macos-latest
@@ -236,4 +226,3 @@ jobs:
         with:
           name: windows
           path: build/windows/x64/runner/Release
-          retention-days: 1
