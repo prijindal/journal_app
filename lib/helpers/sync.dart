@@ -35,6 +35,9 @@ Future<void> jsonToDb(String jsonEncoded) async {
           // Workaround to make it so that the document in json is properly inserted back to db
           a["document"] =
               ParchmentDocument.fromJson(a["document"] as List<dynamic>);
+          a["tags"] = (a["tags"] as List<dynamic>)
+              .map<String>((a) => a as String)
+              .toList();
           return JournalEntryData.fromJson(a as Map<String, dynamic>);
         },
       ),
