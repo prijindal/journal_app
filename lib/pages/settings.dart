@@ -74,7 +74,7 @@ class _ProfileAuthTileState extends State<ProfileAuthTile> {
     super.dispose();
   }
 
-  void _syncMetadata() async {
+  Future<void> _syncMetadata() async {
     if (user != null) {
       try {
         final ref = FirebaseStorage.instance.ref("${user!.uid}/$dbExportName");
@@ -115,6 +115,7 @@ class _ProfileAuthTileState extends State<ProfileAuthTile> {
                         ),
                       );
                     }
+                    await _syncMetadata();
                   } catch (e, stack) {
                     if (context.mounted) {
                       ScaffoldMessenger.of(context).showSnackBar(
@@ -140,6 +141,7 @@ class _ProfileAuthTileState extends State<ProfileAuthTile> {
                         ),
                       );
                     }
+                    await _syncMetadata();
                   } catch (e, stack) {
                     if (context.mounted) {
                       ScaffoldMessenger.of(context).showSnackBar(
