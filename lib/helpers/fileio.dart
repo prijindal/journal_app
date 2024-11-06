@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:download/download.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -13,56 +14,38 @@ import 'logger.dart';
 import 'sync.dart';
 
 void downloadContent(BuildContext context) async {
-  // TODO: Better universal ways to download file, make sure it works on all platforms
-  if (kIsWeb) {
+  final encoded = await extractDbJson();
+  if (Platform.isAndroid || Platform.isIOS) {
+    final params = SaveFileDialogParams(
+      data: Uint8List.fromList(encoded.codeUnits),
+      fileName: dbExportName,
+    );
+    final filePath = await FlutterFileDialog.saveFile(params: params);
     if (context.mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("Not Supported"),
+        SnackBar(
+          content: Text("Content saved at $filePath"),
         ),
       );
     }
+    return;
   } else {
-    final encoded = await extractDbJson();
-    String? downloadDirectory;
-    if (Platform.isAndroid) {
-      final params = SaveFileDialogParams(
-        data: Uint8List.fromList(encoded.codeUnits),
-        fileName: dbExportName,
-      );
-      final filePath = await FlutterFileDialog.saveFile(params: params);
-      if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text("Content saved at $filePath"),
-          ),
-        );
-      }
-    } else {
+    String downloadDirectory = "";
+    if (!kIsWeb) {
       final downloadFolder = await getDownloadsDirectory();
       if (downloadFolder != null) {
         downloadDirectory = downloadFolder.path;
       }
-      if (downloadDirectory != null) {
-        final path = p.join(downloadDirectory, dbExportName);
-        final file = File(path);
-        await file.writeAsString(encoded);
-        if (context.mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text("Content saved at $path"),
-            ),
-          );
-        }
-      } else {
-        if (context.mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text("Can't find download directory"),
-            ),
-          );
-        }
-      }
+    }
+    final path = p.join(downloadDirectory, dbExportName);
+    final stream = Stream.fromIterable(encoded.codeUnits);
+    await download(stream, path);
+    if (context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("Content downloaded as $path"),
+        ),
+      );
     }
   }
 }

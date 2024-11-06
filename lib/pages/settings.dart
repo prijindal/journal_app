@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:local_auth/local_auth.dart';
 import 'package:provider/provider.dart';
@@ -257,23 +258,25 @@ class _LockHiddenSettingsTileState extends State<LockHiddenSettingsTile> {
   }
 
   void _checkLocalAuth() async {
-    final LocalAuthentication auth = LocalAuthentication();
-    final canCheckBiometrics = await auth.isDeviceSupported();
-    if (canCheckBiometrics) {
-      final availableBiometrics = await auth.getAvailableBiometrics();
-      if (availableBiometrics.isEmpty) {
-        AppLogger.instance.d("Biometrics not enabled on this device");
+    if (!kIsWeb) {
+      final LocalAuthentication auth = LocalAuthentication();
+      final canCheckBiometrics = await auth.isDeviceSupported();
+      if (canCheckBiometrics) {
+        final availableBiometrics = await auth.getAvailableBiometrics();
+        if (availableBiometrics.isEmpty) {
+          AppLogger.instance.d("Biometrics not enabled on this device");
+        } else {
+          AppLogger.instance.d(availableBiometrics);
+          setState(() {
+            _availableModes = [
+              HiddenEncryptionMode.none,
+              HiddenEncryptionMode.biometrics
+            ];
+          });
+        }
       } else {
-        AppLogger.instance.d(availableBiometrics);
-        setState(() {
-          _availableModes = [
-            HiddenEncryptionMode.none,
-            HiddenEncryptionMode.biometrics
-          ];
-        });
+        AppLogger.instance.d("Biometrics not supported on this device");
       }
-    } else {
-      AppLogger.instance.d("Biometrics not supported on this device");
     }
   }
 

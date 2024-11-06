@@ -1,16 +1,10 @@
-# journal_app
+# Journal App
 
-A new Flutter project.
+[![Flutter](https://github.com/prijindal/journal_app/actions/workflows/flutter.yml/badge.svg)](https://github.com/prijindal/journal_app/actions/workflows/flutter.yml)
+[![codecov](https://codecov.io/gh/prijindal/journal_app/branch/main/graph/badge.svg?token=75K4JMDVSJ)](https://codecov.io/gh/prijindal/journal_app)
 
-## Getting Started
+## How to get Journal App...
 
-This project is a starting point for a Flutter application.
+[![Google Play Store badge](https://play.google.com/intl/en_us/badges/images/badge_new.png)](https://play.google.com/store/apps/details?id=com.prijindal.journal_app) &nbsp;&nbsp;
 
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+- [Download Builds](https://nightly.link/prijindal/journal_app/workflows/flutter/main)
