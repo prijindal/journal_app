@@ -80,6 +80,7 @@ jobs:
           generateReleaseNotes: true
           makeLatest: true
           tag: ${{ github.ref_name }}
+          commit: ${{ github.sha }}
 
   linux:
     runs-on: ubuntu-latest
