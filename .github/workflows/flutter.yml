@@ -210,6 +210,7 @@ jobs:
       - run: flutter test
       - run: npm install -g firebase-tools
       - run: echo "$FIREBASE_SERVICE_ACCOUNT_JOURNAL_APP_PRIJINDAL" > google-application-credentials.json
+        shell: bash
         env:
           FIREBASE_SERVICE_ACCOUNT_JOURNAL_APP_PRIJINDAL: ${{secrets.FIREBASE_SERVICE_ACCOUNT_JOURNAL_APP_PRIJINDAL}}
       - run: rm lib/firebase_options.dart
