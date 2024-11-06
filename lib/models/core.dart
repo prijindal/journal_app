@@ -11,9 +11,6 @@ import 'string_list.dart';
 // first, but it's needed for drift to know about the generated code
 part 'core.g.dart';
 
-// this will generate a table called "todos" for us. The rows of that table will
-// be represented by a class called "Todo".
-
 const _uuid = Uuid();
 
 class JournalEntry extends Table {

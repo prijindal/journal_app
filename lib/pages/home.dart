@@ -228,6 +228,7 @@ class _HomeScreenState extends State<HomeScreen> {
         return FloatingActionButton(
           onPressed: _recordJournalEntry,
           tooltip: 'New Journal',
+          key: Key("New Journal"),
           child: const Icon(Icons.add),
         );
       },

@@ -73,7 +73,6 @@ class JournalEntryContainerTile extends StatelessWidget {
               )
             ],
           ),
-          // TODO: Add tags
           onTap: onTap,
           onLongPress: onSelect,
         ),
