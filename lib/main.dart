@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:firebase_app_check/firebase_app_check.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_ui_auth/firebase_ui_auth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -25,8 +26,8 @@ void main() async {
     await Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform,
     );
-    if (!Platform.isWindows && !Platform.isLinux) {
-      // Firebase app check is not supported on android and linux
+    if (kIsWeb || Platform.isAndroid || Platform.isIOS || Platform.isMacOS) {
+      // Firebase app check is only supported on these platforms
       await FirebaseAppCheck.instance.activate(
         webProvider: recaptchaSiteKey != null
             ? ReCaptchaV3Provider(recaptchaSiteKey!)

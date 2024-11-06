@@ -13,6 +13,7 @@ import 'logger.dart';
 import 'sync.dart';
 
 void downloadContent(BuildContext context) async {
+  // TODO: Better universal ways to download file, make sure it works on all platforms
   if (kIsWeb) {
     if (context.mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
