@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:local_auth/local_auth.dart';
 import 'package:provider/provider.dart';
 
 import '../helpers/constants.dart';
@@ -36,7 +37,7 @@ class SettingsScreen extends StatelessWidget {
         // TODO: rethink hidden/tags/categories
         // TODO: Add settings for save on back button
         const ThemeSelectorTile(),
-        // const LockHiddenSettingsTile(),
+        const LockHiddenSettingsTile(),
         if (isFirebaseInitialized()) const ProfileAuthTile(),
       ]),
     );
@@ -237,15 +238,49 @@ class ThemeSelectorTile extends StatelessWidget {
   }
 }
 
-class LockHiddenSettingsTile extends StatelessWidget {
+class LockHiddenSettingsTile extends StatefulWidget {
   const LockHiddenSettingsTile({super.key});
+
+  @override
+  State<LockHiddenSettingsTile> createState() => _LockHiddenSettingsTileState();
+}
+
+class _LockHiddenSettingsTileState extends State<LockHiddenSettingsTile> {
+  List<HiddenEncryptionMode> _availableModes = [HiddenEncryptionMode.none];
+
+  @override
+  initState() {
+    _checkLocalAuth();
+    super.initState();
+  }
+
+  void _checkLocalAuth() async {
+    final LocalAuthentication auth = LocalAuthentication();
+    final canCheckBiometrics = await auth.isDeviceSupported();
+    if (canCheckBiometrics) {
+      final availableBiometrics = await auth.getAvailableBiometrics();
+      if (availableBiometrics.isEmpty) {
+        AppLogger.instance.d("Biometrics not enabled on this device");
+      } else {
+        AppLogger.instance.d(availableBiometrics);
+        setState(() {
+          _availableModes = [
+            HiddenEncryptionMode.none,
+            HiddenEncryptionMode.biometrics
+          ];
+        });
+      }
+    } else {
+      AppLogger.instance.d("Biometrics not supported on this device");
+    }
+  }
 
   String hiddenEncryptionModeToText(HiddenEncryptionMode themeMode) {
     switch (themeMode) {
       case HiddenEncryptionMode.none:
         return "Not encrypted";
       case HiddenEncryptionMode.biometrics:
-        return "Encrypted with biometrocs";
+        return "Encrypted with biometrics";
       case HiddenEncryptionMode.unknown:
         return "Invalid value";
       default:
@@ -253,26 +288,51 @@ class LockHiddenSettingsTile extends StatelessWidget {
     }
   }
 
+  Widget _buildTitle() {
+    if (_availableModes.length <= 1) {
+      return Text("Encryption not available");
+    }
+    final settingsStorage = Provider.of<SettingsStorageNotifier>(context);
+    final currentEncryptionMode = settingsStorage.getHiddenEncryptionMode();
+    return DropdownButton<HiddenEncryptionMode>(
+      value: currentEncryptionMode,
+      items: _availableModes
+          .map(
+            (e) => DropdownMenuItem<HiddenEncryptionMode>(
+              value: e,
+              child: Text(hiddenEncryptionModeToText(e)),
+            ),
+          )
+          .toList(),
+      onChanged: (newValue) async {
+        if (newValue == HiddenEncryptionMode.biometrics ||
+            currentEncryptionMode == HiddenEncryptionMode.biometrics) {
+          final LocalAuthentication auth = LocalAuthentication();
+
+          final authenticated = await auth.authenticate(
+            localizedReason: "Biometrics scan for hiding entries",
+          );
+          if (!authenticated) {
+            AppLogger.instance
+                .i("Biometrics authenticated failed, not changing values");
+            return;
+          } else {
+            AppLogger.instance.d(
+                "Biometrics authenticated successful, enabling biometrics authentication");
+          }
+          // If new value or existing value is biometrics, authenticate using biometrics first
+        }
+        await settingsStorage
+            .setHiddenEncryptionMode(newValue ?? HiddenEncryptionMode.none);
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    final settingsStorage = Provider.of<SettingsStorageNotifier>(context);
     return ListTile(
       subtitle: Text("Select Encryption method for hidden entries"),
-      title: DropdownButton<HiddenEncryptionMode>(
-        value: settingsStorage.getHiddenEncryptionMode(),
-        items: [HiddenEncryptionMode.none, HiddenEncryptionMode.biometrics]
-            .map(
-              (e) => DropdownMenuItem<HiddenEncryptionMode>(
-                value: e,
-                child: Text(hiddenEncryptionModeToText(e)),
-              ),
-            )
-            .toList(),
-        onChanged: (newValue) async {
-          await settingsStorage
-              .setHiddenEncryptionMode(newValue ?? HiddenEncryptionMode.none);
-        },
-      ),
+      title: _buildTitle(),
     );
   }
 }

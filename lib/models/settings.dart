@@ -10,9 +10,11 @@ enum HiddenEncryptionMode {
   unknown,
 
   none,
-  pin,
-  password,
   biometrics,
+
+  // TODO: Implement pin encryption
+  // pin,
+  // password,
 }
 
 class SettingsStorageNotifier with ChangeNotifier {
@@ -68,7 +70,7 @@ class SettingsStorageNotifier with ChangeNotifier {
       themeMode.name,
     );
     AppLogger.instance
-        .d("Written $themeMode as $appThemeMode to shared_preferences");
+        .d("Written ${themeMode.name} as $appThemeMode to shared_preferences");
     notifyListeners();
   }
 
@@ -81,7 +83,7 @@ class SettingsStorageNotifier with ChangeNotifier {
       newHiddenEncryptionMode.name,
     );
     AppLogger.instance.d(
-        "Written $newHiddenEncryptionMode as $hiddenEncryptionMode to shared_preferences");
+        "Written ${newHiddenEncryptionMode.name} as $hiddenEncryptionMode to shared_preferences");
     notifyListeners();
   }
 }

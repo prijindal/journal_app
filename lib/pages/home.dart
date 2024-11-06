@@ -2,6 +2,8 @@ import 'dart:async';
 
 import 'package:drift/drift.dart';
 import 'package:flutter/material.dart';
+import 'package:local_auth/local_auth.dart';
+import 'package:provider/provider.dart';
 
 import '../components/calendars.dart';
 import '../components/confirmation_dialog.dart';
@@ -10,6 +12,7 @@ import '../helpers/logger.dart';
 import '../helpers/sync.dart';
 import '../models/core.dart';
 import '../models/drift.dart';
+import '../models/settings.dart';
 import 'newentry.dart';
 import 'search.dart';
 
@@ -116,7 +119,40 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
+  Future<void> _toggleHidden(HiddenEncryptionMode currentEncryptionMode) async {
+    final newValue = !_showHidden;
+    if (newValue) {
+      if (currentEncryptionMode == HiddenEncryptionMode.biometrics) {
+        final LocalAuthentication auth = LocalAuthentication();
+
+        final authenticated = await auth.authenticate(
+          localizedReason: "Biometrics scan for showing entries",
+        );
+        if (!authenticated) {
+          AppLogger.instance
+              .i("Biometrics authenticated failed, not changing values");
+          if (context.mounted) {
+            // ignore: use_build_context_synchronously
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text("Biometrics failed, can't authenticate"),
+              ),
+            );
+          }
+          return;
+        }
+      }
+      // If encryption mode is biometrics, authenticate
+    }
+    setState(() {
+      _showHidden = newValue;
+    });
+    _addWatcher();
+  }
+
   AppBar _buildAppBar() {
+    final settingsStorage = Provider.of<SettingsStorageNotifier>(context);
+    final currentEncryptionMode = settingsStorage.getHiddenEncryptionMode();
     return AppBar(
       title: const Text("Journals"),
       actions: [
@@ -136,12 +172,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ),
         IconButton(
-          onPressed: () {
-            setState(() {
-              _showHidden = !_showHidden;
-            });
-            _addWatcher();
-          },
+          onPressed: () => _toggleHidden(currentEncryptionMode),
           icon: Icon(
             _showHidden ? Icons.visibility : Icons.visibility_off,
           ),
