@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 
 import '../models/core.dart';
 import 'journal_date.dart';
+import 'journal_entry_tags.dart';
 
 class JournalEntryContainerTile extends StatelessWidget {
   const JournalEntryContainerTile({
@@ -43,34 +44,7 @@ class JournalEntryContainerTile extends StatelessWidget {
                   document: displayDocument,
                 ),
               ),
-              Row(
-                children: [
-                  if (journalEntry.hidden)
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(
-                        0.0,
-                        0,
-                        8.0,
-                        0,
-                      ),
-                      child: Icon(
-                        Icons.visibility_off,
-                        size: 20,
-                      ),
-                    ),
-                  ...journalEntry.tags.map<Widget>(
-                    (a) => Padding(
-                      padding: const EdgeInsets.fromLTRB(
-                        0.0,
-                        0,
-                        8.0,
-                        0,
-                      ),
-                      child: Text('#$a'),
-                    ),
-                  )
-                ],
-              )
+              JournalEntryTags(journalEntry: journalEntry)
             ],
           ),
           onTap: onTap,

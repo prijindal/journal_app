@@ -32,17 +32,16 @@ class JournalEntryForm extends StatefulWidget {
   static Future<void> newEntry({
     required BuildContext context,
   }) async {
-    await showDialog<void>(
-      context: context,
-      builder: (BuildContext context) {
-        return JournalEntryForm(
+    await Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (context) => JournalEntryForm(
           onSave: (entry) async {
             await MyDatabase.instance
                 .into(MyDatabase.instance.journalEntry)
                 .insert(entry);
           },
-        );
-      },
+        ),
+      ),
     );
   }
 
@@ -50,10 +49,9 @@ class JournalEntryForm extends StatefulWidget {
     required BuildContext context,
     required JournalEntryData journalEntry,
   }) async {
-    await showDialog<void>(
-      context: context,
-      builder: (BuildContext context) {
-        return JournalEntryForm(
+    await Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (context) => JournalEntryForm(
           creationTime: journalEntry.creationTime,
           document: journalEntry.document,
           tags: journalEntry.tags,
@@ -75,8 +73,8 @@ class JournalEntryForm extends StatefulWidget {
                   ..where((tbl) => tbl.id.equals(journalEntry.id)))
                 .write(editedData);
           },
-        );
-      },
+        ),
+      ),
     );
   }
 }

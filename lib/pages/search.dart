@@ -93,6 +93,7 @@ class _SearchScreenState extends State<SearchScreen> {
             )
           : JournalList(
               entries: _journalEntries,
+              showHidden: widget.showHidden,
             ),
     );
   }

@@ -119,10 +119,10 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
-  Future<void> _toggleHidden(HiddenEncryptionMode currentEncryptionMode) async {
+  Future<void> _toggleHidden(HiddenLockedMode currentLockedMode) async {
     final newValue = !_showHidden;
     if (newValue) {
-      if (currentEncryptionMode == HiddenEncryptionMode.biometrics) {
+      if (currentLockedMode == HiddenLockedMode.biometrics) {
         final LocalAuthentication auth = LocalAuthentication();
 
         final authenticated = await auth.authenticate(
@@ -152,7 +152,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   AppBar _buildAppBar() {
     final settingsStorage = Provider.of<SettingsStorageNotifier>(context);
-    final currentEncryptionMode = settingsStorage.getHiddenEncryptionMode();
+    final currentLockedMode = settingsStorage.getHiddenLockedMode();
     return AppBar(
       title: const Text("Journals"),
       actions: [
@@ -172,7 +172,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ),
         IconButton(
-          onPressed: () => _toggleHidden(currentEncryptionMode),
+          onPressed: () => _toggleHidden(currentLockedMode),
           icon: Icon(
             _showHidden ? Icons.visibility : Icons.visibility_off,
           ),
@@ -244,6 +244,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _buildJournalList() {
     return JournalList(
       entries: _journalEntries,
+      showHidden: _showHidden,
       selectedEntries: _selectedEntries,
       onSelectedEntriesChange: (entries) {
         setState(() {

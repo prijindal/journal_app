@@ -125,7 +125,7 @@ class _JournalCalendarState extends State<JournalCalendar> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
+    return ListView(
       children: [
         _buildCalendar(),
         const SizedBox(height: 8.0),

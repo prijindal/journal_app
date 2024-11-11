@@ -53,7 +53,7 @@ class MyApp extends StatelessWidget {
       child: const MyMaterialApp(),
       create: (context) => SettingsStorageNotifier(
         ThemeMode.system,
-        HiddenEncryptionMode.unknown,
+        HiddenLockedMode.unknown,
       ),
     );
   }

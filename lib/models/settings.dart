@@ -5,7 +5,7 @@ import '../helpers/constants.dart';
 import '../helpers/logger.dart';
 
 // Determines the way that hidden entries are encrypted
-enum HiddenEncryptionMode {
+enum HiddenLockedMode {
   // unknown is only meant to be selected before initializing
   unknown,
 
@@ -19,9 +19,9 @@ enum HiddenEncryptionMode {
 
 class SettingsStorageNotifier with ChangeNotifier {
   ThemeMode _themeMode;
-  HiddenEncryptionMode _hiddenEncryptionMode;
+  HiddenLockedMode _hiddenLockedMode;
 
-  SettingsStorageNotifier(this._themeMode, this._hiddenEncryptionMode) {
+  SettingsStorageNotifier(this._themeMode, this._hiddenLockedMode) {
     init();
   }
 
@@ -35,16 +35,15 @@ class SettingsStorageNotifier with ChangeNotifier {
         .d("Read $appThemeMode as $preference from shared_preferences");
   }
 
-  Future<void> _readHiddenEncryptionMode(SharedPreferences instance) async {
+  Future<void> _readHiddenLockedMode(SharedPreferences instance) async {
+    AppLogger.instance.d("Reading $hiddenLockedMode from shared_preferences");
+    final preference = instance.getString(hiddenLockedMode);
+    _hiddenLockedMode = preference == null
+        ? HiddenLockedMode.none
+        : HiddenLockedMode.values.asNameMap()[preference] ??
+            HiddenLockedMode.none;
     AppLogger.instance
-        .d("Reading $hiddenEncryptionMode from shared_preferences");
-    final preference = instance.getString(hiddenEncryptionMode);
-    _hiddenEncryptionMode = preference == null
-        ? HiddenEncryptionMode.none
-        : HiddenEncryptionMode.values.asNameMap()[preference] ??
-            HiddenEncryptionMode.none;
-    AppLogger.instance
-        .d("Read $hiddenEncryptionMode as $preference from shared_preferences");
+        .d("Read $hiddenLockedMode as $preference from shared_preferences");
   }
 
   void init() async {
@@ -52,13 +51,13 @@ class SettingsStorageNotifier with ChangeNotifier {
     await Future.wait(
       [
         _readThemeFromStorage(instance),
-        _readHiddenEncryptionMode(instance),
+        _readHiddenLockedMode(instance),
       ],
     );
     notifyListeners();
   }
 
-  HiddenEncryptionMode getHiddenEncryptionMode() => _hiddenEncryptionMode;
+  HiddenLockedMode getHiddenLockedMode() => _hiddenLockedMode;
 
   ThemeMode getTheme() => _themeMode;
 
@@ -74,16 +73,15 @@ class SettingsStorageNotifier with ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> setHiddenEncryptionMode(
-      HiddenEncryptionMode newHiddenEncryptionMode) async {
-    _hiddenEncryptionMode = newHiddenEncryptionMode;
+  Future<void> setHiddenLockedMode(HiddenLockedMode newHiddenLockedMode) async {
+    _hiddenLockedMode = newHiddenLockedMode;
     final instance = await SharedPreferences.getInstance();
     await instance.setString(
-      hiddenEncryptionMode,
-      newHiddenEncryptionMode.name,
+      hiddenLockedMode,
+      newHiddenLockedMode.name,
     );
     AppLogger.instance.d(
-        "Written ${newHiddenEncryptionMode.name} as $hiddenEncryptionMode to shared_preferences");
+        "Written ${newHiddenLockedMode.name} as $hiddenLockedMode to shared_preferences");
     notifyListeners();
   }
 }

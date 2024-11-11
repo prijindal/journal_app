@@ -248,7 +248,7 @@ class LockHiddenSettingsTile extends StatefulWidget {
 }
 
 class _LockHiddenSettingsTileState extends State<LockHiddenSettingsTile> {
-  List<HiddenEncryptionMode> _availableModes = [HiddenEncryptionMode.none];
+  List<HiddenLockedMode> _availableModes = [HiddenLockedMode.none];
 
   @override
   initState() {
@@ -268,8 +268,8 @@ class _LockHiddenSettingsTileState extends State<LockHiddenSettingsTile> {
           AppLogger.instance.d(availableBiometrics);
           setState(() {
             _availableModes = [
-              HiddenEncryptionMode.none,
-              HiddenEncryptionMode.biometrics
+              HiddenLockedMode.none,
+              HiddenLockedMode.biometrics
             ];
           });
         }
@@ -279,13 +279,13 @@ class _LockHiddenSettingsTileState extends State<LockHiddenSettingsTile> {
     }
   }
 
-  String hiddenEncryptionModeToText(HiddenEncryptionMode themeMode) {
+  String hiddenLockedModeToText(HiddenLockedMode themeMode) {
     switch (themeMode) {
-      case HiddenEncryptionMode.none:
+      case HiddenLockedMode.none:
         return "Not encrypted";
-      case HiddenEncryptionMode.biometrics:
+      case HiddenLockedMode.biometrics:
         return "Encrypted with biometrics";
-      case HiddenEncryptionMode.unknown:
+      case HiddenLockedMode.unknown:
         return "Invalid value";
       default:
         return "None";
@@ -294,23 +294,23 @@ class _LockHiddenSettingsTileState extends State<LockHiddenSettingsTile> {
 
   Widget _buildTitle() {
     if (_availableModes.length <= 1) {
-      return Text("Encryption not available");
+      return Text("Locking not available");
     }
     final settingsStorage = Provider.of<SettingsStorageNotifier>(context);
-    final currentEncryptionMode = settingsStorage.getHiddenEncryptionMode();
-    return DropdownButton<HiddenEncryptionMode>(
-      value: currentEncryptionMode,
+    final currentLockedMode = settingsStorage.getHiddenLockedMode();
+    return DropdownButton<HiddenLockedMode>(
+      value: currentLockedMode,
       items: _availableModes
           .map(
-            (e) => DropdownMenuItem<HiddenEncryptionMode>(
+            (e) => DropdownMenuItem<HiddenLockedMode>(
               value: e,
-              child: Text(hiddenEncryptionModeToText(e)),
+              child: Text(hiddenLockedModeToText(e)),
             ),
           )
           .toList(),
       onChanged: (newValue) async {
-        if (newValue == HiddenEncryptionMode.biometrics ||
-            currentEncryptionMode == HiddenEncryptionMode.biometrics) {
+        if (newValue == HiddenLockedMode.biometrics ||
+            currentLockedMode == HiddenLockedMode.biometrics) {
           final LocalAuthentication auth = LocalAuthentication();
 
           final authenticated = await auth.authenticate(
@@ -327,7 +327,7 @@ class _LockHiddenSettingsTileState extends State<LockHiddenSettingsTile> {
           // If new value or existing value is biometrics, authenticate using biometrics first
         }
         await settingsStorage
-            .setHiddenEncryptionMode(newValue ?? HiddenEncryptionMode.none);
+            .setHiddenLockedMode(newValue ?? HiddenLockedMode.none);
       },
     );
   }
@@ -335,7 +335,7 @@ class _LockHiddenSettingsTileState extends State<LockHiddenSettingsTile> {
   @override
   Widget build(BuildContext context) {
     return ListTile(
-      subtitle: Text("Select Encryption method for hidden entries"),
+      subtitle: Text("Select Locking method for hidden entries"),
       title: _buildTitle(),
     );
   }
