@@ -141,53 +141,53 @@ jobs:
           name: linux
           path: build/linux
 
-  # macos:
-  #   runs-on: macos-latest
-  #   steps:
-  #     - uses: actions/checkout@v4
-  #     - uses: subosito/flutter-action@v2
-  #       with:
-  #         channel: "stable" # or: 'beta', 'dev' or 'master'
-  #         architecture: x64 # optional, x64 or arm64
-  #         cache: true
-  #         cache-key: 'flutter-${{ github.job }}-:os:-:channel:-:version:-:arch:-:hash:'
-  #         cache-path: '${{ runner.tool_cache }}/flutter/:channel:-:version:-:arch:'
+  macos:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: "stable" # or: 'beta', 'dev' or 'master'
+          architecture: x64 # optional, x64 or arm64
+          cache: true
+          cache-key: 'flutter-${{ github.job }}-:os:-:channel:-:version:-:arch:-:hash:'
+          cache-path: '${{ runner.tool_cache }}/flutter/:channel:-:version:-:arch:'
       
-  #     - name: Cache
-  #       uses: actions/cache@v4
-  #       with:
-  #         path: build/
-  #         key: ${{ runner.os }}-flutter-${{ github.job }}-${{ hashFiles('pubspec.lock') }}
+      - name: Cache
+        uses: actions/cache@v4
+        with:
+          path: build/
+          key: ${{ runner.os }}-flutter-${{ github.job }}-${{ hashFiles('pubspec.lock') }}
       
-  #     - run: flutter --version
-  #     - run: flutter pub global activate flutterfire_cli
-  #     - run: flutter pub get
-  #     - run: flutter analyze
-  #     - run: flutter test
-  #     - run: curl -sL https://firebase.tools | bash
-  #     - run: echo "$FIREBASE_SERVICE_ACCOUNT_JOURNAL_APP_PRIJINDAL" > google-application-credentials.json
-  #       env:
-  #         FIREBASE_SERVICE_ACCOUNT_JOURNAL_APP_PRIJINDAL: ${{secrets.FIREBASE_SERVICE_ACCOUNT_JOURNAL_APP_PRIJINDAL}}
-  #     - run: rm lib/firebase_options.dart
-  #     - run: flutterfire configure -y --platforms=macos,ios --ios-bundle-id=com.prijindal.journal-app --macos-bundle-id=com.prijindal.journal-app --web-app-id=1:903944243626:web:575096b9f07bed49f9c3d3 --android-package-name=com.prijindal.journal_app --windows-app-id=1:903944243626:web:575096b9f07bed49f9c3d3
-  #       env:
-  #         GOOGLE_APPLICATION_CREDENTIALS: google-application-credentials.json
-  #     - run: flutter build macos --release --release --dart-define=GOOGLE_SIGNIN_CLIENT_ID=$GOOGLE_SIGNIN_CLIENT_ID --dart-define=RECAPTCHA_SITE_KEY=$RECAPTCHA_SITE_KEY
-  #       env:
-  #         GOOGLE_SIGNIN_CLIENT_ID: ${{secrets.GOOGLE_SIGNIN_CLIENT_ID}}
-  #         RECAPTCHA_SITE_KEY: ${{secrets.RECAPTCHA_SITE_KEY}}
-  #     - uses: actions/upload-artifact@v4
-  #       with:
-  #         name: macos
-  #         path: build/macos
-  #     - run: flutter build ios --release --no-codesign --release --dart-define=GOOGLE_SIGNIN_CLIENT_ID=$GOOGLE_SIGNIN_CLIENT_ID --dart-define=RECAPTCHA_SITE_KEY=$RECAPTCHA_SITE_KEY
-  #       env:
-  #         GOOGLE_SIGNIN_CLIENT_ID: ${{secrets.GOOGLE_SIGNIN_CLIENT_ID}}
-  #         RECAPTCHA_SITE_KEY: ${{secrets.RECAPTCHA_SITE_KEY}}
-  #     - uses: actions/upload-artifact@v4
-  #       with:
-  #         name: ios
-  #         path: build/ios
+      - run: flutter --version
+      - run: flutter pub global activate flutterfire_cli
+      - run: flutter pub get
+      - run: flutter analyze
+      - run: flutter test
+      - run: curl -sL https://firebase.tools | bash
+      - run: echo "$FIREBASE_SERVICE_ACCOUNT_JOURNAL_APP_PRIJINDAL" > google-application-credentials.json
+        env:
+          FIREBASE_SERVICE_ACCOUNT_JOURNAL_APP_PRIJINDAL: ${{secrets.FIREBASE_SERVICE_ACCOUNT_JOURNAL_APP_PRIJINDAL}}
+      - run: rm lib/firebase_options.dart
+      - run: flutterfire configure -y --platforms=macos,ios --ios-bundle-id=com.prijindal.journal-app --macos-bundle-id=com.prijindal.journal-app --web-app-id=1:903944243626:web:575096b9f07bed49f9c3d3 --android-package-name=com.prijindal.journal_app --windows-app-id=1:903944243626:web:575096b9f07bed49f9c3d3
+        env:
+          GOOGLE_APPLICATION_CREDENTIALS: google-application-credentials.json
+      - run: flutter build macos --release --dart-define=GOOGLE_SIGNIN_CLIENT_ID=$GOOGLE_SIGNIN_CLIENT_ID --dart-define=RECAPTCHA_SITE_KEY=$RECAPTCHA_SITE_KEY
+        env:
+          GOOGLE_SIGNIN_CLIENT_ID: ${{secrets.GOOGLE_SIGNIN_CLIENT_ID}}
+          RECAPTCHA_SITE_KEY: ${{secrets.RECAPTCHA_SITE_KEY}}
+      - uses: actions/upload-artifact@v4
+        with:
+          name: macos
+          path: build/macos
+      - run: flutter build ios --release --no-codesign --release --dart-define=GOOGLE_SIGNIN_CLIENT_ID=$GOOGLE_SIGNIN_CLIENT_ID --dart-define=RECAPTCHA_SITE_KEY=$RECAPTCHA_SITE_KEY
+        env:
+          GOOGLE_SIGNIN_CLIENT_ID: ${{secrets.GOOGLE_SIGNIN_CLIENT_ID}}
+          RECAPTCHA_SITE_KEY: ${{secrets.RECAPTCHA_SITE_KEY}}
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ios
+          path: build/ios
 
   windows:
     runs-on: windows-latest
