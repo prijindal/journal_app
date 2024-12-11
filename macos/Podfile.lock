@@ -11,67 +11,67 @@ PODS:
     - PromisesObjC (~> 2.4)
   - desktop_webview_auth (0.0.1):
     - FlutterMacOS
-  - Firebase/AppCheck (11.2.0):
+  - Firebase/AppCheck (11.4.2):
     - Firebase/CoreOnly
-    - FirebaseAppCheck (~> 11.2.0)
-  - Firebase/Auth (11.2.0):
+    - FirebaseAppCheck (~> 11.4.0)
+  - Firebase/Auth (11.4.2):
     - Firebase/CoreOnly
-    - FirebaseAuth (~> 11.2.0)
-  - Firebase/CoreOnly (11.2.0):
-    - FirebaseCore (= 11.2.0)
-  - Firebase/Storage (11.2.0):
+    - FirebaseAuth (~> 11.4.0)
+  - Firebase/CoreOnly (11.4.2):
+    - FirebaseCore (= 11.4.2)
+  - Firebase/Storage (11.4.2):
     - Firebase/CoreOnly
-    - FirebaseStorage (~> 11.2.0)
-  - firebase_app_check (0.3.1-4):
-    - Firebase/AppCheck (~> 11.2.0)
-    - Firebase/CoreOnly (~> 11.2.0)
+    - FirebaseStorage (~> 11.4.0)
+  - firebase_app_check (0.3.1-7):
+    - Firebase/AppCheck (~> 11.4.0)
+    - Firebase/CoreOnly (~> 11.4.0)
     - firebase_core
     - FlutterMacOS
-  - firebase_auth (5.3.1):
-    - Firebase/Auth (~> 11.2.0)
-    - Firebase/CoreOnly (~> 11.2.0)
+  - firebase_auth (5.3.4):
+    - Firebase/Auth (~> 11.4.0)
+    - Firebase/CoreOnly (~> 11.4.0)
     - firebase_core
     - FlutterMacOS
-  - firebase_core (3.6.0):
-    - Firebase/CoreOnly (~> 11.2.0)
+  - firebase_core (3.8.1):
+    - Firebase/CoreOnly (~> 11.4.0)
     - FlutterMacOS
-  - firebase_storage (12.3.4):
-    - Firebase/CoreOnly (~> 11.2.0)
-    - Firebase/Storage (~> 11.2.0)
+  - firebase_storage (12.3.7):
+    - Firebase/CoreOnly (~> 11.4.0)
+    - Firebase/Storage (~> 11.4.0)
     - firebase_core
     - FlutterMacOS
-  - FirebaseAppCheck (11.2.0):
+  - FirebaseAppCheck (11.4.0):
     - AppCheckCore (~> 11.0)
     - FirebaseAppCheckInterop (~> 11.0)
     - FirebaseCore (~> 11.0)
     - GoogleUtilities/Environment (~> 8.0)
     - GoogleUtilities/UserDefaults (~> 8.0)
   - FirebaseAppCheckInterop (11.6.0)
-  - FirebaseAuth (11.2.0):
+  - FirebaseAuth (11.4.0):
     - FirebaseAppCheckInterop (~> 11.0)
     - FirebaseAuthInterop (~> 11.0)
-    - FirebaseCore (~> 11.0)
-    - FirebaseCoreExtension (~> 11.0)
+    - FirebaseCore (~> 11.4)
+    - FirebaseCoreExtension (~> 11.4)
     - GoogleUtilities/AppDelegateSwizzler (~> 8.0)
     - GoogleUtilities/Environment (~> 8.0)
-    - GTMSessionFetcher/Core (~> 3.4)
+    - GTMSessionFetcher/Core (< 5.0, >= 3.4)
     - RecaptchaInterop (~> 100.0)
   - FirebaseAuthInterop (11.6.0)
-  - FirebaseCore (11.2.0):
-    - FirebaseCoreInternal (~> 11.0)
+  - FirebaseCore (11.4.2):
+    - FirebaseCoreInternal (< 12.0, >= 11.4.2)
     - GoogleUtilities/Environment (~> 8.0)
     - GoogleUtilities/Logger (~> 8.0)
   - FirebaseCoreExtension (11.4.1):
     - FirebaseCore (~> 11.0)
   - FirebaseCoreInternal (11.6.0):
     - "GoogleUtilities/NSData+zlib (~> 8.0)"
-  - FirebaseStorage (11.2.0):
+  - FirebaseStorage (11.4.0):
     - FirebaseAppCheckInterop (~> 11.0)
     - FirebaseAuthInterop (~> 11.0)
-    - FirebaseCore (~> 11.0)
-    - FirebaseCoreExtension (~> 11.0)
+    - FirebaseCore (~> 11.4)
+    - FirebaseCoreExtension (~> 11.4)
     - GoogleUtilities/Environment (~> 8.0)
-    - GTMSessionFetcher/Core (~> 3.4)
+    - GTMSessionFetcher/Core (< 5.0, >= 3.4)
   - FlutterMacOS (1.0.0)
   - google_sign_in_ios (0.0.1):
     - AppAuth (>= 1.7.4)
@@ -137,8 +137,9 @@ PODS:
   - sqlite3/rtree (3.47.1):
     - sqlite3/common
   - sqlite3_flutter_libs (0.0.1):
+    - Flutter
     - FlutterMacOS
-    - sqlite3 (~> 3.47.0)
+    - sqlite3 (~> 3.47.1)
     - sqlite3/dbstatvtab
     - sqlite3/fts5
     - sqlite3/perf-threadsafe
@@ -155,7 +156,7 @@ DEPENDENCIES:
   - local_auth_darwin (from `Flutter/ephemeral/.symlinks/plugins/local_auth_darwin/darwin`)
   - path_provider_foundation (from `Flutter/ephemeral/.symlinks/plugins/path_provider_foundation/darwin`)
   - shared_preferences_foundation (from `Flutter/ephemeral/.symlinks/plugins/shared_preferences_foundation/darwin`)
-  - sqlite3_flutter_libs (from `Flutter/ephemeral/.symlinks/plugins/sqlite3_flutter_libs/macos`)
+  - sqlite3_flutter_libs (from `Flutter/ephemeral/.symlinks/plugins/sqlite3_flutter_libs/darwin`)
 
 SPEC REPOS:
   trunk:
@@ -199,25 +200,25 @@ EXTERNAL SOURCES:
   shared_preferences_foundation:
     :path: Flutter/ephemeral/.symlinks/plugins/shared_preferences_foundation/darwin
   sqlite3_flutter_libs:
-    :path: Flutter/ephemeral/.symlinks/plugins/sqlite3_flutter_libs/macos
+    :path: Flutter/ephemeral/.symlinks/plugins/sqlite3_flutter_libs/darwin
 
 SPEC CHECKSUMS:
   AppAuth: d4f13a8fe0baf391b2108511793e4b479691fb73
   AppCheckCore: cc8fd0a3a230ddd401f326489c99990b013f0c4f
   desktop_webview_auth: 9bba53a29c9bc6a4ff621fd0ebfbb18856c4dada
-  Firebase: 98e6bf5278170668a7983e12971a66b2cd57fc8c
-  firebase_app_check: 63d5807d5c8c091eaee743919ddf1f450a42b596
-  firebase_auth: 877e19571bf76f0351087020b280e3cefc667b20
-  firebase_core: e88f946a4601cb1854178cb07da241bba5a6508e
-  firebase_storage: 3c59d1b941f5617adf23ae2fbd4b599c959d6eac
-  FirebaseAppCheck: a6a1c1ca169d795212b9e70b5cfb880083a28e7c
+  Firebase: 7fd5466678d964be78fbf536d8a3385da19c4828
+  firebase_app_check: 6e63fd2503c1437ef53557136483b03318a0be96
+  firebase_auth: cda334a14540e3c1be90eb2cd82682f9409bea37
+  firebase_core: e4a35c426636a2cce00a5163df7ba69bfd0cca57
+  firebase_storage: 16cc41d4413a069731667e5097ae73461f3fb40d
+  FirebaseAppCheck: 933cbda29279ed316b82360bca77602ac1af1ff2
   FirebaseAppCheckInterop: 347aa09a805219a31249b58fc956888e9fcb314b
-  FirebaseAuth: 2a198b8cdbbbd457f08d74df7040feb0a0e7777a
+  FirebaseAuth: c359af98bd703cbf4293eec107a40de08ede6ce6
   FirebaseAuthInterop: a919d415797d23b7bfe195a04f322b86c65020ef
-  FirebaseCore: a282032ae9295c795714ded2ec9c522fc237f8da
+  FirebaseCore: 6b32c57269bd999aab34354c3923d92a6e5f3f84
   FirebaseCoreExtension: f1bc67a4702931a7caa097d8e4ac0a1b0d16720e
   FirebaseCoreInternal: d98ab91e2d80a56d7b246856a8885443b302c0c2
-  FirebaseStorage: 9353f926690b2329957860abfcbc8b4074fe45e8
+  FirebaseStorage: 1bf8f80ac3bb02c72844b7350e95e10be7113ef0
   FlutterMacOS: 8f6f14fa908a6fb3fba0cd85dbd81ec4b251fb24
   google_sign_in_ios: 07375bfbf2620bc93a602c0e27160d6afc6ead38
   GoogleSignIn: d4281ab6cf21542b1cfaff85c191f230b399d2db
@@ -229,7 +230,7 @@ SPEC CHECKSUMS:
   PromisesObjC: f5707f49cb48b9636751c5b2e7d227e43fba9f47
   shared_preferences_foundation: fcdcbc04712aee1108ac7fda236f363274528f78
   sqlite3: 1e522f0938463e44b7faf50393b40bdc1e1e456d
-  sqlite3_flutter_libs: f0b7a85544d8bac7b8bac12eac7d05bcfdd786d0
+  sqlite3_flutter_libs: 1b4e98da20ebd4e9b1240269b78cdcf492dbe9f3
 
 PODFILE CHECKSUM: 9ebaf0ce3d369aaa26a9ea0e159195ed94724cf3
 
