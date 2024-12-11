@@ -9,7 +9,7 @@ permissions:
   contents: write
 
 jobs:
-  android:
+  android-build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -59,7 +59,29 @@ jobs:
         env:
           GOOGLE_APPLICATION_CREDENTIALS: google-application-credentials.json
       - run: flutter build appbundle --release --dart-define=GOOGLE_SIGNIN_CLIENT_ID=$GOOGLE_SIGNIN_CLIENT_ID
-      - uses: r0adkll/upload-google-play@v1
+      - uses: actions/upload-artifact@v4
+        with:
+          name: android-appbundle
+          path: |
+            build/app/outputs/bundle/release/
+            build/app/outputs/mapping/release/
+      - run: echo "VERSION_CODE=$GITHUB_RUN_NUMBER" > android/version.properties
+      - run: flutter build apk --release --split-per-abi
+      - uses: actions/upload-artifact@v4
+        with:
+          name: android-apk
+          path: build/app/outputs/apk/release/
+
+  android-publish:
+    needs: android-build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download appbundle from android build
+        uses: actions/download-artifact@v4
+        with:
+          name: android-appbundle
+      - name: Upload to google play
+        uses: r0adkll/upload-google-play@v1
         with:
           serviceAccountJsonPlainText: ${{ secrets.SERVICE_ACCOUNT_JSON }}
           packageName: com.prijindal.journal_app
@@ -67,13 +89,8 @@ jobs:
           status: completed
           releaseFiles: build/app/outputs/bundle/release/app-release.aab
           mappingFile: build/app/outputs/mapping/release/mapping.txt
-      - run: echo "VERSION_CODE=$GITHUB_RUN_NUMBER" > android/version.properties
-      - run: flutter build apk --release --split-per-abi
-      - uses: actions/upload-artifact@v4
-        with:
-          name: android
-          path: build/app/outputs/apk/release/
 
+ 
   linux:
     runs-on: ubuntu-latest
     steps:
@@ -122,12 +139,6 @@ jobs:
         env:
           GOOGLE_SIGNIN_CLIENT_ID: ${{secrets.GOOGLE_SIGNIN_CLIENT_ID}}
           RECAPTCHA_SITE_KEY: ${{secrets.RECAPTCHA_SITE_KEY}}
-      - uses: FirebaseExtended/action-hosting-deploy@v0
-        with:
-          repoToken: '${{ secrets.GITHUB_TOKEN }}'
-          firebaseServiceAccount: '${{ secrets.FIREBASE_SERVICE_ACCOUNT_JOURNAL_APP_PRIJINDAL }}'
-          channelId: live
-          projectId: journal-app-prijindal
       - uses: actions/upload-artifact@v4
         with:
           name: web
@@ -141,6 +152,24 @@ jobs:
           name: linux
           path: build/linux
 
+  web-publish:
+    needs: linux
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download web build from linux build
+        uses: actions/download-artifact@v4
+        with:
+          name: web
+      - uses: FirebaseExtended/action-hosting-deploy@v0
+        with:
+          repoToken: '${{ secrets.GITHUB_TOKEN }}'
+          firebaseServiceAccount: '${{ secrets.FIREBASE_SERVICE_ACCOUNT_JOURNAL_APP_PRIJINDAL }}'
+          channelId: live
+          projectId: journal-app-prijindal
+      
+
+  
   macos:
     runs-on: macos-latest
     steps:
@@ -180,7 +209,6 @@ jobs:
         with:
           name: macos
           path: build/macos
-
 
   ios:
     runs-on: macos-latest
