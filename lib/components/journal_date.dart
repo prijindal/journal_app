@@ -18,7 +18,7 @@ class JournalDate extends StatelessWidget {
         Text(DateFormat("d MMM y | E").format(creationTime)),
         Text(
           DateFormat.jm().format(creationTime),
-          style: Theme.of(context).textTheme.bodySmall,
+          textScaler: TextScaler.linear(0.7),
         ),
       ],
     );
