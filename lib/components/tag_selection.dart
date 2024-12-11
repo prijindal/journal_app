@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:drift/drift.dart' as drift;
 import 'package:flutter/material.dart';
 
+import '../helpers/theme.dart';
 import '../models/drift.dart';
 
 class TagSelection extends StatefulWidget {
@@ -93,9 +94,9 @@ class _TagSelectionState extends State<TagSelection> {
                       decoration: InputDecoration(
                         hintText: "Add tag",
                         border: InputBorder.none,
-                        hintStyle: TextStyle(color: Colors.white30),
+                        hintStyle: ThemeDataWrapper.of(context).searchHintStyle,
                       ),
-                      style: TextStyle(color: Colors.white, fontSize: 16.0),
+                      style: ThemeDataWrapper.of(context).searchLabelStyle,
                     ),
                   ),
                   IconButton(

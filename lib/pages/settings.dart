@@ -37,6 +37,7 @@ class SettingsScreen extends StatelessWidget {
         // TODO: Add settings for default view
         // TODO: Add settings for save on back button
         const ThemeSelectorTile(),
+        const ColorSeedSelectorTile(),
         const LockHiddenSettingsTile(),
         if (isFirebaseInitialized()) const ProfileAuthTile(),
       ]),
@@ -222,6 +223,7 @@ class ThemeSelectorTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final settingsStorage = Provider.of<SettingsStorageNotifier>(context);
     return ListTile(
+      subtitle: Text("Select a Theme Mode"),
       title: DropdownButton<ThemeMode>(
         value: settingsStorage.getTheme(),
         items: ThemeMode.values
@@ -234,6 +236,46 @@ class ThemeSelectorTile extends StatelessWidget {
             .toList(),
         onChanged: (newValue) async {
           await settingsStorage.setTheme(newValue ?? ThemeMode.system);
+        },
+      ),
+    );
+  }
+}
+
+class ColorSeedSelectorTile extends StatelessWidget {
+  const ColorSeedSelectorTile({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final settingsStorage = Provider.of<SettingsStorageNotifier>(context);
+    return ListTile(
+      subtitle: Text("Select a Color"),
+      title: DropdownButton<ColorSeed>(
+        value: settingsStorage.getBaseColor(),
+        items: ColorSeed.values
+            .map(
+              (e) => DropdownMenuItem<ColorSeed>(
+                value: e,
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Container(
+                      margin: EdgeInsets.only(
+                        right: 10,
+                        top: 5.0,
+                      ),
+                      width: 10,
+                      height: 10,
+                      decoration: BoxDecoration(color: e.color),
+                    ),
+                    Text(e.label),
+                  ],
+                ),
+              ),
+            )
+            .toList(),
+        onChanged: (newValue) async {
+          await settingsStorage.setColor(newValue ?? ColorSeed.baseColor);
         },
       ),
     );
@@ -279,19 +321,6 @@ class _LockHiddenSettingsTileState extends State<LockHiddenSettingsTile> {
     }
   }
 
-  String hiddenLockedModeToText(HiddenLockedMode themeMode) {
-    switch (themeMode) {
-      case HiddenLockedMode.none:
-        return "Not encrypted";
-      case HiddenLockedMode.biometrics:
-        return "Encrypted with biometrics";
-      case HiddenLockedMode.unknown:
-        return "Invalid value";
-      default:
-        return "None";
-    }
-  }
-
   Widget _buildTitle() {
     if (_availableModes.length <= 1) {
       return Text("Locking not available");
@@ -304,7 +333,7 @@ class _LockHiddenSettingsTileState extends State<LockHiddenSettingsTile> {
           .map(
             (e) => DropdownMenuItem<HiddenLockedMode>(
               value: e,
-              child: Text(hiddenLockedModeToText(e)),
+              child: Text(e.label),
             ),
           )
           .toList(),

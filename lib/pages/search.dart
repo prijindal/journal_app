@@ -4,6 +4,7 @@ import 'package:drift/drift.dart' as drift;
 import 'package:flutter/material.dart';
 
 import '../components/journal_list.dart';
+import '../helpers/theme.dart';
 import '../models/core.dart';
 import '../models/drift.dart';
 
@@ -80,9 +81,9 @@ class _SearchScreenState extends State<SearchScreen> {
           decoration: InputDecoration(
             hintText: "Search Data...",
             border: InputBorder.none,
-            hintStyle: TextStyle(color: Colors.white30),
+            hintStyle: ThemeDataWrapper.of(context).searchHintStyle,
           ),
-          style: TextStyle(color: Colors.white, fontSize: 16.0),
+          style: ThemeDataWrapper.of(context).searchLabelStyle,
           onChanged: (query) => _updateSearchQuery(query),
         ),
       ),

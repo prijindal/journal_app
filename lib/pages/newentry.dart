@@ -6,6 +6,7 @@ import '../components/confirmation_dialog.dart';
 import '../components/journal_date.dart';
 import '../components/tag_selection.dart';
 import '../helpers/logger.dart';
+import '../helpers/theme.dart';
 import '../models/core.dart';
 import '../models/drift.dart';
 
@@ -219,7 +220,7 @@ class _JournalEntryFormState extends State<JournalEntryForm> {
                 VerticalDivider(
                   indent: 16,
                   endIndent: 16,
-                  color: Colors.grey.shade400,
+                  color: ThemeDataWrapper.of(context).dividerColor,
                 )
               ],
             )

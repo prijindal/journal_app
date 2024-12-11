@@ -11,6 +11,7 @@ import './firebase_options.dart';
 import './helpers/logger.dart';
 import './pages/home.dart';
 import 'helpers/constants.dart';
+import 'helpers/theme.dart';
 import 'models/settings.dart';
 import 'pages/login.dart';
 import 'pages/search.dart';
@@ -53,6 +54,7 @@ class MyApp extends StatelessWidget {
       child: const MyMaterialApp(),
       create: (context) => SettingsStorageNotifier(
         ThemeMode.system,
+        ColorSeed.baseColor,
         HiddenLockedMode.unknown,
       ),
     );
@@ -84,8 +86,8 @@ class MyMaterialApp extends StatelessWidget {
         },
       },
       initialRoute: "/",
-      theme: ThemeData(primarySwatch: Colors.blue, useMaterial3: true),
-      darkTheme: ThemeData.dark(useMaterial3: true),
+      theme: lightTheme(settingsStorage.getBaseColor().color),
+      darkTheme: darkTheme(settingsStorage.getBaseColor().color),
       themeMode: settingsStorage.getTheme(),
     );
   }
