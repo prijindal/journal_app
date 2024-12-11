@@ -78,6 +78,8 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: android-appbundle
+          path: build/app/outputs/
+      - run: ls -alh
       - name: Upload to google play
         uses: r0adkll/upload-google-play@v1
         with:
@@ -160,6 +162,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: web
+          path: build/web/
       - run: ls -alh
       - uses: FirebaseExtended/action-hosting-deploy@v0
         with:
