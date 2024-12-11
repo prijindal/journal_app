@@ -66,8 +66,16 @@ jobs:
       - run: flutter build apk --release --split-per-abi
       - uses: actions/upload-artifact@v4
         with:
-          name: android-apk
-          path: build/app/outputs/apk/release/
+          name: android-arm64-v8a
+          path: build/app/outputs/apk/release/app-arm64-v8a-release.apk
+      - uses: actions/upload-artifact@v4
+        with:
+          name: android-armeabi-v7a
+          path: build/app/outputs/apk/release/app-armeabi-v7a-release.apk
+      - uses: actions/upload-artifact@v4
+        with:
+          name: android-x86_64
+          path: build/app/outputs/apk/release/app-x86_64-release.apk
 
   android-publish:
     needs: android-build
@@ -79,7 +87,6 @@ jobs:
         with:
           name: android-appbundle
           path: build/app/outputs/
-      - run: ls -alh
       - name: Upload to google play
         uses: r0adkll/upload-google-play@v1
         with:
@@ -163,7 +170,6 @@ jobs:
         with:
           name: web
           path: build/web/
-      - run: ls -alh
       - uses: FirebaseExtended/action-hosting-deploy@v0
         with:
           repoToken: '${{ secrets.GITHUB_TOKEN }}'
