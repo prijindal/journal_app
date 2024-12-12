@@ -214,8 +214,6 @@ class ThemeSelectorTile extends StatelessWidget {
         return "Dark";
       case ThemeMode.light:
         return "Light";
-      default:
-        return "None";
     }
   }
 
