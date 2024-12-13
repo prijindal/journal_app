@@ -1,26 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:pinput/pinput.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:shared_preferences/shared_preferences.dart'
+    show SharedPreferencesAsync;
 
 import '../helpers/logger.dart';
 
 final pinKey = "PIN";
 
 Future<void> writePin(String pin) async {
-  final instance = await SharedPreferences.getInstance();
-  AppLogger.instance.d("Writting $pin as $pinKey to flutter_secure_storage");
-  await instance.setString(pinKey, pin);
+  AppLogger.instance.d("Writting $pin as $pinKey to shared_preferences");
+  await SharedPreferencesAsync().setString(pinKey, pin);
   // TODO: Use flutter secure storage
   // await storage.write(key: pinKey, value: pin);
-  AppLogger.instance.d("Written $pin as $pinKey to flutter_secure_storage");
+  AppLogger.instance.d("Written $pin as $pinKey to shared_preferences");
 }
 
 Future<String?> readPin() async {
-  final instance = await SharedPreferences.getInstance();
-  AppLogger.instance.d("Reading $pinKey from flutter_secure_storage");
-  final pin = instance.getString(pinKey);
+  AppLogger.instance.d("Reading $pinKey from shared_preferences");
+  final pin = await SharedPreferencesAsync().getString(pinKey);
   // final pin = await storage.read(key: pinKey);
-  AppLogger.instance.d("Read $pin as $pinKey from flutter_secure_storage");
+  AppLogger.instance.d("Read $pin as $pinKey from shared_preferences");
   return pin;
 }
 

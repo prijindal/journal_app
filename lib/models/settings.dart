@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:shared_preferences/shared_preferences.dart'
+    show SharedPreferencesAsync;
 
 import '../helpers/constants.dart';
 import '../helpers/logger.dart';
@@ -41,14 +42,16 @@ class SettingsStorageNotifier with ChangeNotifier {
   ThemeMode _themeMode;
   HiddenLockedMode _hiddenLockedMode;
 
+  final SharedPreferencesAsync asyncPrefs = SharedPreferencesAsync();
+
   SettingsStorageNotifier(
       this._themeMode, this._baseColor, this._hiddenLockedMode) {
     init();
   }
 
-  Future<void> _readThemeFromStorage(SharedPreferences instance) async {
+  Future<void> _readThemeFromStorage() async {
     AppLogger.instance.d("Reading $appThemeMode from shared_preferences");
-    final preference = instance.getString(appThemeMode);
+    final preference = await asyncPrefs.getString(appThemeMode);
     _themeMode = preference == null
         ? ThemeMode.system
         : ThemeMode.values.asNameMap()[preference] ?? ThemeMode.system;
@@ -56,9 +59,9 @@ class SettingsStorageNotifier with ChangeNotifier {
         .d("Read $appThemeMode as $preference from shared_preferences");
   }
 
-  Future<void> _readColorFromStorage(SharedPreferences instance) async {
+  Future<void> _readColorFromStorage() async {
     AppLogger.instance.d("Reading $appColorSeed from shared_preferences");
-    final preference = instance.getString(appColorSeed);
+    final preference = await asyncPrefs.getString(appColorSeed);
     _baseColor = preference == null
         ? ColorSeed.baseColor
         : ColorSeed.values.asNameMap()[preference] ?? ColorSeed.baseColor;
@@ -66,9 +69,9 @@ class SettingsStorageNotifier with ChangeNotifier {
         .d("Read $appColorSeed as $preference from shared_preferences");
   }
 
-  Future<void> _readHiddenLockedMode(SharedPreferences instance) async {
+  Future<void> _readHiddenLockedMode() async {
     AppLogger.instance.d("Reading $hiddenLockedMode from shared_preferences");
-    final preference = instance.getString(hiddenLockedMode);
+    final preference = await asyncPrefs.getString(hiddenLockedMode);
     _hiddenLockedMode = preference == null
         ? HiddenLockedMode.none
         : HiddenLockedMode.values.asNameMap()[preference] ??
@@ -78,12 +81,11 @@ class SettingsStorageNotifier with ChangeNotifier {
   }
 
   void init() async {
-    final instance = await SharedPreferences.getInstance();
     await Future.wait(
       [
-        _readThemeFromStorage(instance),
-        _readColorFromStorage(instance),
-        _readHiddenLockedMode(instance),
+        _readThemeFromStorage(),
+        _readColorFromStorage(),
+        _readHiddenLockedMode(),
       ],
     );
     notifyListeners();
@@ -97,8 +99,7 @@ class SettingsStorageNotifier with ChangeNotifier {
 
   Future<void> setTheme(ThemeMode themeMode) async {
     _themeMode = themeMode;
-    final instance = await SharedPreferences.getInstance();
-    await instance.setString(
+    await asyncPrefs.setString(
       appThemeMode,
       themeMode.name,
     );
@@ -109,8 +110,7 @@ class SettingsStorageNotifier with ChangeNotifier {
 
   Future<void> setColor(ColorSeed color) async {
     _baseColor = color;
-    final instance = await SharedPreferences.getInstance();
-    await instance.setString(
+    await asyncPrefs.setString(
       appColorSeed,
       color.name,
     );
@@ -121,8 +121,7 @@ class SettingsStorageNotifier with ChangeNotifier {
 
   Future<void> setHiddenLockedMode(HiddenLockedMode newHiddenLockedMode) async {
     _hiddenLockedMode = newHiddenLockedMode;
-    final instance = await SharedPreferences.getInstance();
-    await instance.setString(
+    await asyncPrefs.setString(
       hiddenLockedMode,
       newHiddenLockedMode.name,
     );
