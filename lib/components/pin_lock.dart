@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:pinput/pinput.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../helpers/logger.dart';
 
-final storage = FlutterSecureStorage();
 final pinKey = "PIN";
 
 Future<void> writePin(String pin) async {
