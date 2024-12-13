@@ -25,11 +25,11 @@ enum HiddenLockedMode {
   // unknown is only meant to be selected before initializing
   unknown('Invalid value'),
 
-  none('Not encrypted'),
-  biometrics('Encrypted with biometrics');
+  none('Not Locked'),
+  biometrics('Locked with biometrics'),
+  pin("Locked using a pin");
 
-  // TODO: Implement pin encryption
-  // pin,
+  // TODO: Implement password encryption
   // password,
 
   const HiddenLockedMode(this.label);

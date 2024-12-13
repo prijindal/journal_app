@@ -8,6 +8,7 @@ import 'package:provider/provider.dart';
 import '../components/calendars.dart';
 import '../components/confirmation_dialog.dart';
 import '../components/journal_list.dart';
+import '../components/pin_lock.dart';
 import '../helpers/logger.dart';
 import '../helpers/sync.dart';
 import '../models/core.dart';
@@ -123,6 +124,7 @@ class _HomeScreenState extends State<HomeScreen> {
     final newValue = !_showHidden;
     if (newValue) {
       if (currentLockedMode == HiddenLockedMode.biometrics) {
+        // If encryption mode is biometrics, authenticate
         final LocalAuthentication auth = LocalAuthentication();
 
         final authenticated = await auth.authenticate(
@@ -141,8 +143,19 @@ class _HomeScreenState extends State<HomeScreen> {
           }
           return;
         }
+      } else if (currentLockedMode == HiddenLockedMode.pin) {
+        final successAuth = await PinLockScreen.verifyPin(context);
+        if (!successAuth) {
+          AppLogger.instance.i("Authentication failed");
+          // ignore: use_build_context_synchronously
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text("Invalid pin, can't authenticate"),
+            ),
+          );
+          return;
+        }
       }
-      // If encryption mode is biometrics, authenticate
     }
     setState(() {
       _showHidden = newValue;

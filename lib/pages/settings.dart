@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:local_auth/local_auth.dart';
 import 'package:provider/provider.dart';
 
+import '../components/pin_lock.dart';
 import '../helpers/constants.dart';
 import '../helpers/fileio.dart';
 import '../helpers/logger.dart';
@@ -288,7 +289,10 @@ class LockHiddenSettingsTile extends StatefulWidget {
 }
 
 class _LockHiddenSettingsTileState extends State<LockHiddenSettingsTile> {
-  List<HiddenLockedMode> _availableModes = [HiddenLockedMode.none];
+  List<HiddenLockedMode> _availableModes = [
+    HiddenLockedMode.none,
+    HiddenLockedMode.pin
+  ];
 
   @override
   initState() {
@@ -309,6 +313,7 @@ class _LockHiddenSettingsTileState extends State<LockHiddenSettingsTile> {
           setState(() {
             _availableModes = [
               HiddenLockedMode.none,
+              HiddenLockedMode.pin,
               HiddenLockedMode.biometrics
             ];
           });
@@ -316,6 +321,26 @@ class _LockHiddenSettingsTileState extends State<LockHiddenSettingsTile> {
       } else {
         AppLogger.instance.d("Biometrics not supported on this device");
       }
+    }
+  }
+
+  Future<bool> _verifyLocalAuth() async {
+    final LocalAuthentication auth = LocalAuthentication();
+
+    final authenticated = await auth.authenticate(
+      localizedReason: "Biometrics scan for hiding entries",
+      options: AuthenticationOptions(
+        biometricOnly: true,
+      ),
+    );
+    if (!authenticated) {
+      AppLogger.instance
+          .i("Biometrics authenticated failed, not changing values");
+      return false;
+    } else {
+      AppLogger.instance.d(
+          "Biometrics authenticated successful, enabling biometrics authentication");
+      return true;
     }
   }
 
@@ -336,22 +361,26 @@ class _LockHiddenSettingsTileState extends State<LockHiddenSettingsTile> {
           )
           .toList(),
       onChanged: (newValue) async {
+        if (currentLockedMode == HiddenLockedMode.pin) {
+          final successAuth = await PinLockScreen.verifyPin(context);
+          if (!successAuth) {
+            return;
+          }
+        }
         if (newValue == HiddenLockedMode.biometrics ||
             currentLockedMode == HiddenLockedMode.biometrics) {
-          final LocalAuthentication auth = LocalAuthentication();
-
-          final authenticated = await auth.authenticate(
-            localizedReason: "Biometrics scan for hiding entries",
-          );
-          if (!authenticated) {
-            AppLogger.instance
-                .i("Biometrics authenticated failed, not changing values");
-            return;
-          } else {
-            AppLogger.instance.d(
-                "Biometrics authenticated successful, enabling biometrics authentication");
-          }
           // If new value or existing value is biometrics, authenticate using biometrics first
+          final successAuth = await _verifyLocalAuth();
+          if (!successAuth) {
+            return;
+          }
+        }
+        if (newValue == HiddenLockedMode.pin) {
+          // ignore: use_build_context_synchronously
+          final successAuth = await PinLockScreen.createNewPin(context);
+          if (!successAuth) {
+            return;
+          }
         }
         await settingsStorage
             .setHiddenLockedMode(newValue ?? HiddenLockedMode.none);
