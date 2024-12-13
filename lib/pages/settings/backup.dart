@@ -19,6 +19,10 @@ class BackupSettingsScreen extends StatelessWidget {
         title: const Text("Settings"),
       ),
       body: ListView(children: [
+        const ListTile(
+          title: Text("Local Backup"),
+          dense: true,
+        ),
         ListTile(
           title: const Text("Download as JSON"),
           onTap: () => downloadContent(context),
@@ -83,6 +87,10 @@ class _ProfileAuthTileState extends State<ProfileAuthTile> {
         ? Column(
             mainAxisSize: MainAxisSize.min,
             children: [
+              const ListTile(
+                title: Text("Cloud Backup"),
+                dense: true,
+              ),
               ListTile(
                 leading: user!.photoURL != null
                     ? Image.network(user!.photoURL!)

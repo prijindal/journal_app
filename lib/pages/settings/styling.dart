@@ -13,9 +13,12 @@ class StylingSettingsScreen extends StatelessWidget {
         title: const Text("Settings -> Styling"),
       ),
       body: ListView(children: [
+        const ListTile(
+          title: Text("Customize"),
+          dense: true,
+        ),
         const ThemeSelectorTile(),
         const ColorSeedSelectorTile(),
-        const DefaultViewSelectorTile(),
       ]),
     );
   }
@@ -92,32 +95,6 @@ class ColorSeedSelectorTile extends StatelessWidget {
             .toList(),
         onChanged: (newValue) async {
           await settingsStorage.setColor(newValue ?? ColorSeed.baseColor);
-        },
-      ),
-    );
-  }
-}
-
-class DefaultViewSelectorTile extends StatelessWidget {
-  const DefaultViewSelectorTile({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    final settingsStorage = Provider.of<SettingsStorageNotifier>(context);
-    return ListTile(
-      subtitle: Text("Select default view"),
-      title: DropdownButton<DefaultView>(
-        value: settingsStorage.getDefaultView(),
-        items: DefaultView.values
-            .map(
-              (e) => DropdownMenuItem<DefaultView>(
-                value: e,
-                child: Text(e.label),
-              ),
-            )
-            .toList(),
-        onChanged: (newValue) async {
-          await settingsStorage.setDefaultView(newValue ?? DefaultView.list);
         },
       ),
     );

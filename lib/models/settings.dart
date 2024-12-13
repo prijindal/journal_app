@@ -5,14 +5,6 @@ import 'package:shared_preferences/shared_preferences.dart'
 import '../helpers/constants.dart';
 import '../helpers/logger.dart';
 
-enum DefaultView {
-  list("List"),
-  calendar("Calendar");
-
-  const DefaultView(this.label);
-  final String label;
-}
-
 enum ColorSeed {
   baseColor('Default', Color(0xff6750a4)),
   indigo('Indigo', Colors.indigo),
@@ -49,14 +41,12 @@ class SettingsStorageNotifier with ChangeNotifier {
   ColorSeed _baseColor;
   ThemeMode _themeMode;
   HiddenLockedMode _hiddenLockedMode;
-  DefaultView _defaultView;
 
   final SharedPreferencesAsync asyncPrefs = SharedPreferencesAsync();
 
   SettingsStorageNotifier(
     this._themeMode,
     this._baseColor,
-    this._defaultView,
     this._hiddenLockedMode,
   ) {
     init();
@@ -99,13 +89,6 @@ class SettingsStorageNotifier with ChangeNotifier {
         : ColorSeed.values.asNameMap()[preference] ?? ColorSeed.baseColor;
   }
 
-  Future<void> _readDefaultViewFromStorage() async {
-    final preference = await _readSetting(appDefaultView);
-    _defaultView = preference == null
-        ? DefaultView.list
-        : DefaultView.values.asNameMap()[preference] ?? DefaultView.list;
-  }
-
   Future<void> _readHiddenLockedMode() async {
     final preference = await _readSetting(hiddenLockedMode);
     _hiddenLockedMode = preference == null
@@ -119,7 +102,6 @@ class SettingsStorageNotifier with ChangeNotifier {
       [
         _readThemeFromStorage(),
         _readColorFromStorage(),
-        _readDefaultViewFromStorage(),
         _readHiddenLockedMode(),
       ],
     );
@@ -131,8 +113,6 @@ class SettingsStorageNotifier with ChangeNotifier {
   ThemeMode getTheme() => _themeMode;
 
   ColorSeed getBaseColor() => _baseColor;
-
-  DefaultView getDefaultView() => _defaultView;
 
   Future<void> _setSetting(String key, String newSetting) async {
     AppLogger.instance.d("Writting newSetting as $key to shared_preferences");
@@ -152,11 +132,6 @@ class SettingsStorageNotifier with ChangeNotifier {
   Future<void> setColor(ColorSeed color) async {
     _baseColor = color;
     await _setSetting(appColorSeed, color.name);
-  }
-
-  Future<void> setDefaultView(DefaultView newDefaultVuew) async {
-    _defaultView = newDefaultVuew;
-    await _setSetting(appDefaultView, newDefaultVuew.name);
   }
 
   Future<void> setHiddenLockedMode(HiddenLockedMode newHiddenLockedMode) async {

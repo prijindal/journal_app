@@ -19,6 +19,10 @@ class SecuritySettingsScreen extends StatelessWidget {
         title: const Text("Settings"),
       ),
       body: ListView(children: [
+        const ListTile(
+          title: Text("Hidden Entries"),
+          dense: true,
+        ),
         const LockHiddenSettingsTile(),
       ]),
     );

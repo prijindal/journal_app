@@ -11,14 +11,17 @@ class SettingsScreen extends StatelessWidget {
       ),
       body: ListView(children: [
         ListTile(
+          leading: const Icon(Icons.style),
           title: const Text("Styling"),
           onTap: () => Navigator.of(context).pushNamed("/settings/styling"),
         ),
         ListTile(
+          leading: const Icon(Icons.backup),
           title: const Text("Backup"),
           onTap: () => Navigator.of(context).pushNamed("/settings/backup"),
         ),
         ListTile(
+          leading: const Icon(Icons.security),
           title: const Text("Security"),
           onTap: () => Navigator.of(context).pushNamed("/settings/security"),
         ),

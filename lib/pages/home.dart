@@ -38,16 +38,6 @@ class _HomeScreenState extends State<HomeScreen> {
       const Duration(seconds: 5),
       _checkLoginAndSyncDb,
     );
-    Future.microtask(() {
-      final defaultView =
-          // ignore: use_build_context_synchronously
-          context.read<SettingsStorageNotifier>().getDefaultView();
-      if (defaultView == DefaultView.calendar) {
-        setState(() {
-          _currentPageIndex = 1;
-        });
-      }
-    });
     super.initState();
   }
 

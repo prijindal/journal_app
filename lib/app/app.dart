@@ -23,7 +23,6 @@ class MyApp extends StatelessWidget {
       create: (context) => SettingsStorageNotifier(
         ThemeMode.system,
         ColorSeed.baseColor,
-        DefaultView.list,
         HiddenLockedMode.unknown,
       ),
     );
