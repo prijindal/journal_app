@@ -25,6 +25,11 @@ class SettingsScreen extends StatelessWidget {
           title: const Text("Security"),
           onTap: () => Navigator.of(context).pushNamed("/settings/security"),
         ),
+        ListTile(
+          leading: const Icon(Icons.help),
+          title: const Text("Help"),
+          onTap: () => Navigator.of(context).pushNamed("/settings/help"),
+        ),
         // TODO: Add settings for group by
         // TODO: Add settings for date format
         // TODO: Add settings for sync on or off, add ability to sync every x days

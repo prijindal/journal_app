@@ -9,6 +9,7 @@ import '../pages/home.dart';
 import '../pages/login.dart';
 import '../pages/search.dart';
 import '../pages/settings/backup.dart';
+import '../pages/settings/help.dart';
 import '../pages/settings/index.dart';
 import '../pages/settings/security.dart';
 import '../pages/settings/styling.dart';
@@ -41,9 +42,10 @@ class MyMaterialApp extends StatelessWidget {
         "/": (context) => const HomeScreen(),
         "/search": (context) => const SearchScreen(),
         "/settings": (context) => const SettingsScreen(),
-        "/settings/styling": (context) => const StylingSettingsScreen(),
         "/settings/backup": (context) => const BackupSettingsScreen(),
+        "/settings/help": (context) => const HelpSettingsScreen(),
         "/settings/security": (context) => const SecuritySettingsScreen(),
+        "/settings/styling": (context) => const StylingSettingsScreen(),
         "/login": (context) => const LoginScreen(),
         '/profile': (context) {
           return ProfileScreen(
