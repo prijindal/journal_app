@@ -8,7 +8,10 @@ import '../models/settings.dart';
 import '../pages/home.dart';
 import '../pages/login.dart';
 import '../pages/search.dart';
-import '../pages/settings.dart';
+import '../pages/settings/backup.dart';
+import '../pages/settings/index.dart';
+import '../pages/settings/security.dart';
+import '../pages/settings/styling.dart';
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
@@ -20,6 +23,7 @@ class MyApp extends StatelessWidget {
       create: (context) => SettingsStorageNotifier(
         ThemeMode.system,
         ColorSeed.baseColor,
+        DefaultView.list,
         HiddenLockedMode.unknown,
       ),
     );
@@ -38,6 +42,9 @@ class MyMaterialApp extends StatelessWidget {
         "/": (context) => const HomeScreen(),
         "/search": (context) => const SearchScreen(),
         "/settings": (context) => const SettingsScreen(),
+        "/settings/styling": (context) => const StylingSettingsScreen(),
+        "/settings/backup": (context) => const BackupSettingsScreen(),
+        "/settings/security": (context) => const SecuritySettingsScreen(),
         "/login": (context) => const LoginScreen(),
         '/profile': (context) {
           return ProfileScreen(

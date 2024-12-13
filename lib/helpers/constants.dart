@@ -1,5 +1,7 @@
 const appThemeMode = "APP_THEME_MODE";
 const appColorSeed = "APP_COLOR_SEED";
+const appDefaultView = "APP_DEFAULT_VIEW";
+
 const hiddenLockedMode = "HIDDEN_LOCKED_MODE";
 final pinKey = "PIN";
 const dbFileName = "journal_app.sqlite";

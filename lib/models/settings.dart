@@ -5,6 +5,14 @@ import 'package:shared_preferences/shared_preferences.dart'
 import '../helpers/constants.dart';
 import '../helpers/logger.dart';
 
+enum DefaultView {
+  list("List"),
+  calendar("Calendar");
+
+  const DefaultView(this.label);
+  final String label;
+}
+
 enum ColorSeed {
   baseColor('Default', Color(0xff6750a4)),
   indigo('Indigo', Colors.indigo),
@@ -41,11 +49,16 @@ class SettingsStorageNotifier with ChangeNotifier {
   ColorSeed _baseColor;
   ThemeMode _themeMode;
   HiddenLockedMode _hiddenLockedMode;
+  DefaultView _defaultView;
 
   final SharedPreferencesAsync asyncPrefs = SharedPreferencesAsync();
 
   SettingsStorageNotifier(
-      this._themeMode, this._baseColor, this._hiddenLockedMode) {
+    this._themeMode,
+    this._baseColor,
+    this._defaultView,
+    this._hiddenLockedMode,
+  ) {
     init();
   }
 
@@ -65,35 +78,40 @@ class SettingsStorageNotifier with ChangeNotifier {
     return pin;
   }
 
+  Future<String?> _readSetting(String key) async {
+    AppLogger.instance.d("Reading $key from shared_preferences");
+    final preference = await asyncPrefs.getString(key);
+    AppLogger.instance.d("Read $key as $preference from shared_preferences");
+    return preference;
+  }
+
   Future<void> _readThemeFromStorage() async {
-    AppLogger.instance.d("Reading $appThemeMode from shared_preferences");
-    final preference = await asyncPrefs.getString(appThemeMode);
+    final preference = await _readSetting(appThemeMode);
     _themeMode = preference == null
         ? ThemeMode.system
         : ThemeMode.values.asNameMap()[preference] ?? ThemeMode.system;
-    AppLogger.instance
-        .d("Read $appThemeMode as $preference from shared_preferences");
   }
 
   Future<void> _readColorFromStorage() async {
-    AppLogger.instance.d("Reading $appColorSeed from shared_preferences");
-    final preference = await asyncPrefs.getString(appColorSeed);
+    final preference = await _readSetting(appColorSeed);
     _baseColor = preference == null
         ? ColorSeed.baseColor
         : ColorSeed.values.asNameMap()[preference] ?? ColorSeed.baseColor;
-    AppLogger.instance
-        .d("Read $appColorSeed as $preference from shared_preferences");
+  }
+
+  Future<void> _readDefaultViewFromStorage() async {
+    final preference = await _readSetting(appDefaultView);
+    _defaultView = preference == null
+        ? DefaultView.list
+        : DefaultView.values.asNameMap()[preference] ?? DefaultView.list;
   }
 
   Future<void> _readHiddenLockedMode() async {
-    AppLogger.instance.d("Reading $hiddenLockedMode from shared_preferences");
-    final preference = await asyncPrefs.getString(hiddenLockedMode);
+    final preference = await _readSetting(hiddenLockedMode);
     _hiddenLockedMode = preference == null
         ? HiddenLockedMode.none
         : HiddenLockedMode.values.asNameMap()[preference] ??
             HiddenLockedMode.none;
-    AppLogger.instance
-        .d("Read $hiddenLockedMode as $preference from shared_preferences");
   }
 
   void init() async {
@@ -101,6 +119,7 @@ class SettingsStorageNotifier with ChangeNotifier {
       [
         _readThemeFromStorage(),
         _readColorFromStorage(),
+        _readDefaultViewFromStorage(),
         _readHiddenLockedMode(),
       ],
     );
@@ -113,36 +132,35 @@ class SettingsStorageNotifier with ChangeNotifier {
 
   ColorSeed getBaseColor() => _baseColor;
 
+  DefaultView getDefaultView() => _defaultView;
+
+  Future<void> _setSetting(String key, String newSetting) async {
+    AppLogger.instance.d("Writting newSetting as $key to shared_preferences");
+    await asyncPrefs.setString(
+      key,
+      newSetting,
+    );
+    AppLogger.instance.d("Written newSetting as $key to shared_preferences");
+    notifyListeners();
+  }
+
   Future<void> setTheme(ThemeMode themeMode) async {
     _themeMode = themeMode;
-    await asyncPrefs.setString(
-      appThemeMode,
-      themeMode.name,
-    );
-    AppLogger.instance
-        .d("Written ${themeMode.name} as $appThemeMode to shared_preferences");
-    notifyListeners();
+    await _setSetting(appThemeMode, themeMode.name);
   }
 
   Future<void> setColor(ColorSeed color) async {
     _baseColor = color;
-    await asyncPrefs.setString(
-      appColorSeed,
-      color.name,
-    );
-    AppLogger.instance
-        .d("Written ${color.name} as $appColorSeed to shared_preferences");
-    notifyListeners();
+    await _setSetting(appColorSeed, color.name);
+  }
+
+  Future<void> setDefaultView(DefaultView newDefaultVuew) async {
+    _defaultView = newDefaultVuew;
+    await _setSetting(appDefaultView, newDefaultVuew.name);
   }
 
   Future<void> setHiddenLockedMode(HiddenLockedMode newHiddenLockedMode) async {
     _hiddenLockedMode = newHiddenLockedMode;
-    await asyncPrefs.setString(
-      hiddenLockedMode,
-      newHiddenLockedMode.name,
-    );
-    AppLogger.instance.d(
-        "Written ${newHiddenLockedMode.name} as $hiddenLockedMode to shared_preferences");
-    notifyListeners();
+    await _setSetting(hiddenLockedMode, newHiddenLockedMode.name);
   }
 }
