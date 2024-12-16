@@ -45,7 +45,7 @@ dependencies:
   provider: ^6.1.2
   sqlite3_flutter_libs: ^0.5.24
   fleather: ^1.18.0
-  firebase_auth: 5.3.3 # Issue: https://github.com/firebase/flutterfire/pull/16840
+  firebase_auth: 5.3.4 # Issue: https://github.com/firebase/flutterfire/pull/16840
   http: ^1.2.2
   intl: ^0.19.0
   firebase_ui_auth: ^1.16.0
