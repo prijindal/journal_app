@@ -232,6 +232,23 @@ class _HomeScreenState extends State<HomeScreen> {
       title: Text("${_selectedEntries.length} Selected"),
       actions: [
         IconButton(
+          onPressed: () {
+            if (_selectedEntries.length < _journalEntries!.length) {
+              // Select all entries
+              setState(() {
+                _selectedEntries =
+                    _journalEntries!.map<String>((a) => a.id).toList();
+              });
+            } else {
+              // Unselect all entries
+              setState(() {
+                _selectedEntries = [];
+              });
+            }
+          },
+          icon: Icon(Icons.select_all),
+        ),
+        IconButton(
           onPressed: () async {
             final shouldDelete = await showDialog<bool>(
               context: context,
