@@ -3,7 +3,6 @@ import 'package:grouped_list/grouped_list.dart';
 import 'package:intl/intl.dart';
 
 import '../models/core.dart';
-import '../pages/details.dart';
 import 'journal_entry_tile.dart';
 
 class JournalList extends StatelessWidget {
@@ -11,12 +10,14 @@ class JournalList extends StatelessWidget {
     super.key,
     required this.entries,
     required this.showHidden,
+    required this.onTap,
     this.selectedEntries = const [],
     this.onSelectedEntriesChange,
   });
 
   final List<JournalEntryData>? entries;
   final List<String> selectedEntries;
+  final void Function(JournalEntryData) onTap;
   final bool showHidden;
   final void Function(List<String>)? onSelectedEntriesChange;
 
@@ -73,16 +74,7 @@ class JournalList extends StatelessWidget {
           journalEntry: journalEntry,
           selected: selectedEntries.contains(journalEntry.id),
           onTap: selectedEntries.isEmpty
-              ? () {
-                  Navigator.of(context).push(
-                    MaterialPageRoute<void>(
-                      builder: (context) => DetailsScreen(
-                        entryId: journalEntry.id,
-                        showHidden: showHidden,
-                      ),
-                    ),
-                  );
-                }
+              ? () => onTap(journalEntry)
               : () {
                   _toggleSelected(journalEntry);
                 },

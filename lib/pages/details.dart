@@ -151,7 +151,6 @@ class _DetailsScreenState extends State<DetailsScreen> {
                   Flexible(
                     child: JourneyDetailsView(
                       journalEntry: _journalEntries[itemIndex],
-                      width: width,
                     ),
                   ),
                   Row(
@@ -189,11 +188,9 @@ class JourneyDetailsView extends StatelessWidget {
   const JourneyDetailsView({
     super.key,
     required this.journalEntry,
-    required this.width,
   });
 
   final JournalEntryData journalEntry;
-  final double width;
 
   @override
   Widget build(BuildContext context) {

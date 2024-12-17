@@ -7,6 +7,7 @@ import '../components/journal_list.dart';
 import '../helpers/theme.dart';
 import '../models/core.dart';
 import '../models/drift.dart';
+import 'details.dart';
 
 class SearchScreen extends StatefulWidget {
   const SearchScreen({
@@ -95,6 +96,16 @@ class _SearchScreenState extends State<SearchScreen> {
           : JournalList(
               entries: _journalEntries,
               showHidden: widget.showHidden,
+              onTap: (JournalEntryData journalEntry) {
+                Navigator.of(context).push(
+                  MaterialPageRoute<void>(
+                    builder: (context) => DetailsScreen(
+                      entryId: journalEntry.id,
+                      showHidden: widget.showHidden,
+                    ),
+                  ),
+                );
+              },
             ),
     );
   }

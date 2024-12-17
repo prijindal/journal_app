@@ -14,8 +14,11 @@ import '../helpers/sync.dart';
 import '../models/core.dart';
 import '../models/drift.dart';
 import '../models/settings.dart';
+import 'details.dart';
 import 'newentry.dart';
 import 'search.dart';
+
+const mediaBreakpoint = 700;
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -30,6 +33,7 @@ class _HomeScreenState extends State<HomeScreen> {
   bool _showHidden = false;
   List<String> _selectedEntries = [];
   int _currentPageIndex = 0;
+  int _selectedEntryIndex = -1;
 
   @override
   void initState() {
@@ -190,6 +194,18 @@ class _HomeScreenState extends State<HomeScreen> {
             _showHidden ? Icons.visibility : Icons.visibility_off,
           ),
         ),
+        if (_journalEntries != null &&
+            _selectedEntryIndex >= 0 &&
+            _selectedEntryIndex < _journalEntries!.length)
+          IconButton(
+            onPressed: () async {
+              await JournalEntryForm.editEntry(
+                context: context,
+                journalEntry: _journalEntries![_selectedEntryIndex],
+              );
+            },
+            icon: Icon(Icons.edit),
+          ),
         IconButton(
           onPressed: () {
             Navigator.pushNamed(context, "/settings");
@@ -254,15 +270,75 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+  Widget _buildRightHandWidget() {
+    if (_journalEntries != null &&
+        _selectedEntryIndex >= 0 &&
+        _selectedEntryIndex < _journalEntries!.length) {
+      return Expanded(
+        child: JourneyDetailsView(
+          journalEntry: _journalEntries![_selectedEntryIndex],
+        ),
+      );
+    } else {
+      return Center(
+        child: Text("Selet an entry on the left"),
+      );
+    }
+  }
+
   Widget _buildJournalList() {
-    return JournalList(
-      entries: _journalEntries,
-      showHidden: _showHidden,
-      selectedEntries: _selectedEntries,
-      onSelectedEntriesChange: (entries) {
-        setState(() {
-          _selectedEntries = entries;
-        });
+    return LayoutBuilder(
+      builder: (BuildContext context, BoxConstraints constraints) {
+        if (constraints.maxWidth > mediaBreakpoint) {
+          return Flex(
+            direction: Axis.horizontal,
+            children: [
+              SizedBox(
+                width: mediaBreakpoint / 2,
+                child: JournalList(
+                  entries: _journalEntries,
+                  showHidden: _showHidden,
+                  selectedEntries: _selectedEntries,
+                  onSelectedEntriesChange: (entries) {
+                    setState(() {
+                      _selectedEntries = entries;
+                    });
+                  },
+                  onTap: (journalEntry) {
+                    setState(
+                      () {
+                        _selectedEntryIndex = _journalEntries!
+                            .indexWhere((a) => a.id == journalEntry.id);
+                      },
+                    );
+                  },
+                ),
+              ),
+              _buildRightHandWidget(),
+            ],
+          );
+        } else {
+          return JournalList(
+            entries: _journalEntries,
+            showHidden: _showHidden,
+            selectedEntries: _selectedEntries,
+            onSelectedEntriesChange: (entries) {
+              setState(() {
+                _selectedEntries = entries;
+              });
+            },
+            onTap: (JournalEntryData journalEntry) {
+              Navigator.of(context).push(
+                MaterialPageRoute<void>(
+                  builder: (context) => DetailsScreen(
+                    entryId: journalEntry.id,
+                    showHidden: _showHidden,
+                  ),
+                ),
+              );
+            },
+          );
+        }
       },
     );
   }
