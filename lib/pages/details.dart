@@ -4,8 +4,10 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:drift/drift.dart' as drift;
 import 'package:fleather/fleather.dart';
 import 'package:flutter/material.dart';
+import 'package:share_plus/share_plus.dart';
 
 import '../components/journal_app_title.dart';
+import '../helpers/logger.dart';
 import '../models/core.dart';
 import '../models/drift.dart';
 import 'newentry.dart';
@@ -94,6 +96,15 @@ class _DetailsScreenState extends State<DetailsScreen> {
         journalEntry: journalEntry,
       ),
       actions: [
+        IconButton(
+          onPressed: () async {
+            final result =
+                await Share.share(journalEntry.document.toPlainText());
+            AppLogger.instance
+                .i("Result: ${result.status}, raw: ${result.raw}");
+          },
+          icon: Icon(Icons.share),
+        ),
         IconButton(
           onPressed: () async {
             await JournalEntryForm.editEntry(
@@ -201,7 +212,7 @@ class JourneyDetailsView extends StatelessWidget {
           scrollable: true,
           readOnly: true,
           showCursor: false,
-          enableInteractiveSelection: false,
+          enableInteractiveSelection: true,
           controller: FleatherController(
             document: journalEntry.document,
           ),
