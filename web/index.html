@@ -31,6 +31,25 @@
 
   <title>Journal App</title>
   <link rel="manifest" href="manifest.json">
+  <style id="splash-screen-style">
+    html {
+      height: 100%
+    }
+
+    body {
+      margin: 0;
+      min-height: 100%;
+      background-color: #fdf7ff;
+          background-size: 100% 100%;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      body {
+        background-color: #141218;
+          }
+    }
+  </style>
+  <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport">
 </head>
 <body>
   <script src="flutter_bootstrap.js" async></script>
