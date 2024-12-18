@@ -80,6 +80,9 @@ android {
     }
 
     buildTypes {
+        profile {
+            signingConfig signingConfigs.release
+        }
         debug {
             signingConfig signingConfigs.release
         }
