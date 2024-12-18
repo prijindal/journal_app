@@ -197,15 +197,7 @@ class _HomeScreenState extends State<HomeScreen> {
         if (_journalEntries != null &&
             _selectedEntryIndex >= 0 &&
             _selectedEntryIndex < _journalEntries!.length)
-          IconButton(
-            onPressed: () async {
-              await JournalEntryForm.editEntry(
-                context: context,
-                journalEntry: _journalEntries![_selectedEntryIndex],
-              );
-            },
-            icon: Icon(Icons.edit),
-          ),
+          ...detailsIcons(_journalEntries![_selectedEntryIndex], context),
         IconButton(
           onPressed: () {
             Navigator.pushNamed(context, "/settings");
@@ -269,15 +261,11 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildFab() {
-    return LayoutBuilder(
-      builder: (BuildContext context, BoxConstraints constraints) {
-        return FloatingActionButton(
-          onPressed: _recordJournalEntry,
-          tooltip: 'New Journal',
-          key: Key("New Journal"),
-          child: const Icon(Icons.add),
-        );
-      },
+    return FloatingActionButton(
+      onPressed: _recordJournalEntry,
+      tooltip: 'New Journal',
+      key: Key("New Journal"),
+      child: const Icon(Icons.add),
     );
   }
 

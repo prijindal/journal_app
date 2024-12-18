@@ -4,6 +4,7 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:drift/drift.dart' as drift;
 import 'package:fleather/fleather.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:share_plus/share_plus.dart';
 
 import '../components/journal_app_title.dart';
@@ -11,6 +12,41 @@ import '../helpers/logger.dart';
 import '../models/core.dart';
 import '../models/drift.dart';
 import 'newentry.dart';
+
+List<IconButton> detailsIcons(
+    JournalEntryData journalEntry, BuildContext context) {
+  return [
+    IconButton(
+      onPressed: () async {
+        await Clipboard.setData(
+            ClipboardData(text: journalEntry.document.toPlainText()));
+        // ignore: use_build_context_synchronously
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text("Copied to clipboard"),
+          ),
+        );
+      },
+      icon: Icon(Icons.copy),
+    ),
+    IconButton(
+      onPressed: () async {
+        final result = await Share.share(journalEntry.document.toPlainText());
+        AppLogger.instance.i("Result: ${result.status}, raw: ${result.raw}");
+      },
+      icon: Icon(Icons.share),
+    ),
+    IconButton(
+      onPressed: () async {
+        await JournalEntryForm.editEntry(
+          context: context,
+          journalEntry: journalEntry,
+        );
+      },
+      icon: Icon(Icons.edit),
+    ),
+  ];
+}
 
 class DetailsScreen extends StatefulWidget {
   const DetailsScreen({
@@ -96,25 +132,7 @@ class _DetailsScreenState extends State<DetailsScreen> {
         journalEntry: journalEntry,
       ),
       actions: [
-        IconButton(
-          onPressed: () async {
-            final result =
-                await Share.share(journalEntry.document.toPlainText());
-            AppLogger.instance
-                .i("Result: ${result.status}, raw: ${result.raw}");
-          },
-          icon: Icon(Icons.share),
-        ),
-        IconButton(
-          onPressed: () async {
-            await JournalEntryForm.editEntry(
-              context: context,
-              journalEntry: journalEntry,
-            );
-            await _fetchEntries();
-          },
-          icon: Icon(Icons.edit),
-        ),
+        ...detailsIcons(journalEntry, context),
       ],
     );
   }

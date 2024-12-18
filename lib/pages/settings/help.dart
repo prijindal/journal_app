@@ -76,8 +76,9 @@ class _HelpSettingsScreenState extends State<HelpSettingsScreen> {
           dense: true,
         ),
         ListTile(
-          leading: Image.network(
-            'https://avatars2.githubusercontent.com/u/10034872?s=50&v=4',
+          leading: Image.asset(
+            'assets/icon/prijindal.png',
+            width: 48,
           ),
           title: Text("Priyanshu Jindal"),
           onTap: () => launchUrlString("https://github.com/prijindal"),
