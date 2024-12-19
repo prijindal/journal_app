@@ -25,10 +25,14 @@ class DetailsScreen extends StatefulWidget {
   final String? entryId;
 
   static List<IconButton> detailsIcons(
-      JournalEntryData journalEntry, BuildContext context) {
+      String journalEntryId, BuildContext context) {
     return [
       IconButton(
         onPressed: () async {
+          final journalEntry = await (MyDatabase.instance
+                  .select(MyDatabase.instance.journalEntry)
+                ..where((tbl) => tbl.id.equals(journalEntryId)))
+              .getSingle();
           await Clipboard.setData(
               ClipboardData(text: journalEntry.document.toPlainText()));
           // ignore: use_build_context_synchronously
@@ -42,6 +46,10 @@ class DetailsScreen extends StatefulWidget {
       ),
       IconButton(
         onPressed: () async {
+          final journalEntry = await (MyDatabase.instance
+                  .select(MyDatabase.instance.journalEntry)
+                ..where((tbl) => tbl.id.equals(journalEntryId)))
+              .getSingle();
           final result = await Share.share(journalEntry.document.toPlainText());
           AppLogger.instance.i("Result: ${result.status}, raw: ${result.raw}");
         },
@@ -49,7 +57,7 @@ class DetailsScreen extends StatefulWidget {
       ),
       IconButton(
         onPressed: () async {
-          AutoRouter.of(context).pushNamed("/editjournal/${journalEntry.id}");
+          AutoRouter.of(context).pushNamed("/editjournal/$journalEntryId");
         },
         icon: Icon(Icons.edit),
       ),
@@ -130,7 +138,7 @@ class _DetailsScreenState extends State<DetailsScreen> {
         journalEntry: journalEntry,
       ),
       actions: [
-        ...DetailsScreen.detailsIcons(journalEntry, context),
+        ...DetailsScreen.detailsIcons(journalEntry.id, context),
       ],
     );
   }
@@ -207,6 +215,47 @@ class _DetailsScreenState extends State<DetailsScreen> {
           );
         },
       ),
+    );
+  }
+}
+
+class JourneyDetailsViewWrapper extends StatefulWidget {
+  const JourneyDetailsViewWrapper({super.key, required this.entryId});
+  final String entryId;
+
+  @override
+  State<JourneyDetailsViewWrapper> createState() =>
+      _JourneyDetailsViewWrapperState();
+}
+
+class _JourneyDetailsViewWrapperState extends State<JourneyDetailsViewWrapper> {
+  JournalEntryData? _journalEntryData;
+
+  @override
+  void initState() {
+    _loadData();
+    super.initState();
+  }
+
+  void _loadData() async {
+    final journalEntry =
+        await (MyDatabase.instance.select(MyDatabase.instance.journalEntry)
+              ..where((tbl) => tbl.id.equals(widget.entryId)))
+            .getSingle();
+    setState(() {
+      _journalEntryData = journalEntry;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (_journalEntryData == null) {
+      return Center(
+        child: Text("Loading..."),
+      );
+    }
+    return JourneyDetailsView(
+      journalEntry: _journalEntryData!,
     );
   }
 }

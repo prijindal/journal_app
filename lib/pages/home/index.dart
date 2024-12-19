@@ -1,14 +1,11 @@
 import 'dart:async';
 
 import 'package:auto_route/auto_route.dart';
-import 'package:drift/drift.dart';
 import 'package:flutter/material.dart';
 
 import '../../components/main_app_bar.dart';
 import '../../helpers/logger.dart';
 import '../../helpers/sync.dart';
-import '../../models/core.dart';
-import '../../models/drift.dart';
 import 'calendar.dart';
 import 'journallist.dart';
 
@@ -23,52 +20,19 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  List<JournalEntryData>? _journalEntries;
-  StreamSubscription<List<JournalEntryData>>? _subscription;
+  int _currentPageIndex = 0;
+
   bool _showHidden = false;
   List<String> _selectedEntries = [];
-  int _currentPageIndex = 0;
-  int _selectedEntryIndex = -1;
+  String? _selectedEntryId;
 
   @override
   void initState() {
-    _addWatcher();
     Timer(
       const Duration(seconds: 5),
       _checkLoginAndSyncDb,
     );
     super.initState();
-  }
-
-  @override
-  void dispose() {
-    _subscription?.cancel();
-    super.dispose();
-  }
-
-  void _addWatcher() {
-    if (_subscription != null) {
-      _subscription?.cancel();
-    }
-    final query = MyDatabase.instance.journalEntry.select();
-    if (!_showHidden) {
-      query.where((tbl) => tbl.hidden.equals(false));
-    }
-    _subscription = (query
-          ..orderBy(
-            [
-              (t) => OrderingTerm(
-                    expression: t.creationTime,
-                    mode: OrderingMode.desc,
-                  ),
-            ],
-          ))
-        .watch()
-        .listen((event) {
-      setState(() {
-        _journalEntries = event;
-      });
-    });
   }
 
   Future<void> _syncDb() async {
@@ -121,21 +85,18 @@ class _HomeScreenState extends State<HomeScreen> {
 
   PreferredSizeWidget _buildAppBar() {
     return MainAppBar(
-      journalEntries: _journalEntries,
       showHidden: _showHidden,
       onChangeHidden: (newValue) {
         setState(() {
           _showHidden = newValue;
         });
-        _addWatcher();
       },
-      selectedEntryIndex: _selectedEntryIndex,
+      selectedEntryId: _selectedEntryId,
     );
   }
 
   PreferredSizeWidget _buildSelectedEntriesAppBar() {
     return SelectedEntriesAppBar(
-      journalEntries: _journalEntries,
       selectedEntries: _selectedEntries,
       onSelectedEntriesChange: (newEntries) {
         setState(() {
@@ -157,13 +118,12 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _buildBody() {
     return [
       JournalListScreen(
-        journalEntries: _journalEntries,
         showHidden: _showHidden,
         selectedEntries: _selectedEntries,
-        selectedEntryIndex: _selectedEntryIndex,
+        selectedEntryId: _selectedEntryId,
         onSetSelectedEntryIndex: (index) {
           setState(() {
-            _selectedEntryIndex = index;
+            _selectedEntryId = index;
           });
         },
         onSelectedEntriesChange: (entries) {
@@ -173,7 +133,8 @@ class _HomeScreenState extends State<HomeScreen> {
         },
       ),
       JournalCalendarScreen(
-        journalEntries: _journalEntries,
+        key: Key("JournalCalendarScreen$_showHidden"),
+        showHidden: _showHidden,
       ),
     ].elementAt(_currentPageIndex);
   }

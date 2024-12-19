@@ -5,7 +5,6 @@ import 'package:local_auth/local_auth.dart';
 import 'package:provider/provider.dart';
 
 import '../helpers/logger.dart';
-import '../models/core.dart';
 import '../models/drift.dart';
 import '../models/settings.dart';
 import '../pages/details.dart';
@@ -15,16 +14,14 @@ import 'pin_lock.dart';
 class MainAppBar extends StatelessWidget implements PreferredSizeWidget {
   const MainAppBar({
     super.key,
-    required this.journalEntries,
     required this.showHidden,
     required this.onChangeHidden,
-    required this.selectedEntryIndex,
+    required this.selectedEntryId,
   });
 
   final bool showHidden;
   final void Function(bool) onChangeHidden;
-  final List<JournalEntryData>? journalEntries;
-  final int selectedEntryIndex;
+  final String? selectedEntryId;
   @override
   final Size preferredSize = const Size.fromHeight(kToolbarHeight);
 
@@ -92,11 +89,8 @@ class MainAppBar extends StatelessWidget implements PreferredSizeWidget {
           selector: (_, settingsStorage) =>
               settingsStorage.getHiddenLockedMode(),
         ),
-        if (journalEntries != null &&
-            selectedEntryIndex >= 0 &&
-            selectedEntryIndex < journalEntries!.length)
-          ...DetailsScreen.detailsIcons(
-              journalEntries![selectedEntryIndex], context),
+        if (selectedEntryId != null)
+          ...DetailsScreen.detailsIcons(selectedEntryId!, context),
         IconButton(
           onPressed: () {
             AutoRouter.of(context).pushNamed("/settings");
@@ -115,12 +109,10 @@ class SelectedEntriesAppBar extends StatelessWidget
     implements PreferredSizeWidget {
   const SelectedEntriesAppBar({
     super.key,
-    required this.journalEntries,
     required this.onSelectedEntriesChange,
     required this.selectedEntries,
   });
 
-  final List<JournalEntryData>? journalEntries;
   final List<String> selectedEntries;
   final void Function(List<String>) onSelectedEntriesChange;
 
@@ -139,11 +131,17 @@ class SelectedEntriesAppBar extends StatelessWidget
       title: Text("${selectedEntries.length} Selected"),
       actions: [
         IconButton(
-          onPressed: () {
-            if (selectedEntries.length < journalEntries!.length) {
+          onPressed: () async {
+            final journalEntries =
+                await (MyDatabase.instance.journalEntry.selectOnly()
+                      ..addColumns([MyDatabase.instance.journalEntry.id]))
+                    .get();
+            if (selectedEntries.length < journalEntries.length) {
               // Select all entries
-              onSelectedEntriesChange(
-                  journalEntries!.map<String>((a) => a.id).toList());
+              onSelectedEntriesChange(journalEntries
+                  .map<String>(
+                      (a) => a.read(MyDatabase.instance.journalEntry.id)!)
+                  .toList());
             } else {
               // Unselect all entries
               onSelectedEntriesChange([]);

@@ -10,7 +10,6 @@
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:auto_route/auto_route.dart' as _i15;
 import 'package:flutter/material.dart' as _i16;
-import 'package:journal_app/models/core.dart' as _i17;
 import 'package:journal_app/pages/details.dart' as _i2;
 import 'package:journal_app/pages/editentry.dart' as _i3;
 import 'package:journal_app/pages/home/calendar.dart' as _i6;
@@ -203,13 +202,15 @@ class JournalCalendarRoute
     extends _i15.PageRouteInfo<JournalCalendarRouteArgs> {
   JournalCalendarRoute({
     _i16.Key? key,
-    required List<_i17.JournalEntryData>? journalEntries,
+    required bool showHidden,
+    String? searchText,
     List<_i15.PageRouteInfo>? children,
   }) : super(
           JournalCalendarRoute.name,
           args: JournalCalendarRouteArgs(
             key: key,
-            journalEntries: journalEntries,
+            showHidden: showHidden,
+            searchText: searchText,
           ),
           initialChildren: children,
         );
@@ -222,7 +223,8 @@ class JournalCalendarRoute
       final args = data.argsAs<JournalCalendarRouteArgs>();
       return _i6.JournalCalendarScreen(
         key: args.key,
-        journalEntries: args.journalEntries,
+        showHidden: args.showHidden,
+        searchText: args.searchText,
       );
     },
   );
@@ -231,16 +233,19 @@ class JournalCalendarRoute
 class JournalCalendarRouteArgs {
   const JournalCalendarRouteArgs({
     this.key,
-    required this.journalEntries,
+    required this.showHidden,
+    this.searchText,
   });
 
   final _i16.Key? key;
 
-  final List<_i17.JournalEntryData>? journalEntries;
+  final bool showHidden;
+
+  final String? searchText;
 
   @override
   String toString() {
-    return 'JournalCalendarRouteArgs{key: $key, journalEntries: $journalEntries}';
+    return 'JournalCalendarRouteArgs{key: $key, showHidden: $showHidden, searchText: $searchText}';
   }
 }
 
@@ -249,21 +254,19 @@ class JournalCalendarRouteArgs {
 class JournalListRoute extends _i15.PageRouteInfo<JournalListRouteArgs> {
   JournalListRoute({
     _i16.Key? key,
-    required List<_i17.JournalEntryData>? journalEntries,
     required bool showHidden,
     required List<String> selectedEntries,
-    required int selectedEntryIndex,
-    required void Function(int) onSetSelectedEntryIndex,
+    required String? selectedEntryId,
+    required void Function(String?) onSetSelectedEntryIndex,
     required void Function(List<String>)? onSelectedEntriesChange,
     List<_i15.PageRouteInfo>? children,
   }) : super(
           JournalListRoute.name,
           args: JournalListRouteArgs(
             key: key,
-            journalEntries: journalEntries,
             showHidden: showHidden,
             selectedEntries: selectedEntries,
-            selectedEntryIndex: selectedEntryIndex,
+            selectedEntryId: selectedEntryId,
             onSetSelectedEntryIndex: onSetSelectedEntryIndex,
             onSelectedEntriesChange: onSelectedEntriesChange,
           ),
@@ -278,10 +281,9 @@ class JournalListRoute extends _i15.PageRouteInfo<JournalListRouteArgs> {
       final args = data.argsAs<JournalListRouteArgs>();
       return _i7.JournalListScreen(
         key: args.key,
-        journalEntries: args.journalEntries,
         showHidden: args.showHidden,
         selectedEntries: args.selectedEntries,
-        selectedEntryIndex: args.selectedEntryIndex,
+        selectedEntryId: args.selectedEntryId,
         onSetSelectedEntryIndex: args.onSetSelectedEntryIndex,
         onSelectedEntriesChange: args.onSelectedEntriesChange,
       );
@@ -292,31 +294,28 @@ class JournalListRoute extends _i15.PageRouteInfo<JournalListRouteArgs> {
 class JournalListRouteArgs {
   const JournalListRouteArgs({
     this.key,
-    required this.journalEntries,
     required this.showHidden,
     required this.selectedEntries,
-    required this.selectedEntryIndex,
+    required this.selectedEntryId,
     required this.onSetSelectedEntryIndex,
     required this.onSelectedEntriesChange,
   });
 
   final _i16.Key? key;
 
-  final List<_i17.JournalEntryData>? journalEntries;
-
   final bool showHidden;
 
   final List<String> selectedEntries;
 
-  final int selectedEntryIndex;
+  final String? selectedEntryId;
 
-  final void Function(int) onSetSelectedEntryIndex;
+  final void Function(String?) onSetSelectedEntryIndex;
 
   final void Function(List<String>)? onSelectedEntriesChange;
 
   @override
   String toString() {
-    return 'JournalListRouteArgs{key: $key, journalEntries: $journalEntries, showHidden: $showHidden, selectedEntries: $selectedEntries, selectedEntryIndex: $selectedEntryIndex, onSetSelectedEntryIndex: $onSetSelectedEntryIndex, onSelectedEntriesChange: $onSelectedEntriesChange}';
+    return 'JournalListRouteArgs{key: $key, showHidden: $showHidden, selectedEntries: $selectedEntries, selectedEntryId: $selectedEntryId, onSetSelectedEntryIndex: $onSetSelectedEntryIndex, onSelectedEntriesChange: $onSelectedEntriesChange}';
   }
 }
 
