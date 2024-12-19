@@ -1,8 +1,10 @@
+import 'package:auto_route/annotations.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../models/settings.dart';
 
+@RoutePage()
 class StylingSettingsScreen extends StatelessWidget {
   const StylingSettingsScreen({super.key});
 

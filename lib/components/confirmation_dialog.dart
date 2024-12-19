@@ -4,7 +4,7 @@ class ConfirmationDialog extends StatelessWidget {
   const ConfirmationDialog({
     super.key,
     this.title = "Are you sure?",
-    this.content = "Are you sure ypu want to continue?",
+    this.content = "Are you sure you want to continue?",
     this.cancelText = "No",
     this.confirmText = "Yes",
   });

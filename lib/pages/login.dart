@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:auto_route/auto_route.dart';
 import 'package:firebase_auth/firebase_auth.dart'
     hide EmailAuthProvider, AuthProvider;
 import 'package:firebase_ui_auth/firebase_ui_auth.dart';
@@ -8,14 +9,15 @@ import 'package:flutter/material.dart';
 
 import '../helpers/constants.dart';
 
-List<AuthProvider<AuthListener, AuthCredential>>? authProviders = [
-  EmailAuthProvider(),
-  if (googleSignInClientId != null)
-    GoogleProvider(clientId: googleSignInClientId!),
-];
-
+@RoutePage()
 class LoginScreen extends StatelessWidget {
   const LoginScreen({super.key});
+
+  static List<AuthProvider<AuthListener, AuthCredential>>? authProviders = [
+    EmailAuthProvider(),
+    if (googleSignInClientId != null)
+      GoogleProvider(clientId: googleSignInClientId!),
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -53,7 +55,7 @@ class __LoginCheckerState extends State<_LoginChecker> {
 
   void _checkCurrentUser() {
     if (FirebaseAuth.instance.currentUser != null) {
-      Navigator.of(context).pop();
+      AutoRouter.of(context).maybePop();
     }
   }
 

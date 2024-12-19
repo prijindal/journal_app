@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:auto_route/annotations.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
@@ -9,6 +10,7 @@ import '../../helpers/fileio.dart';
 import '../../helpers/logger.dart';
 import '../../helpers/sync.dart';
 
+@RoutePage()
 class BackupSettingsScreen extends StatelessWidget {
   const BackupSettingsScreen({super.key});
 

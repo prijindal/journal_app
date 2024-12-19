@@ -1,8 +1,8 @@
+import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:table_calendar/table_calendar.dart';
 
 import '../models/core.dart';
-import '../pages/newentry.dart';
 import 'journal_entry_tile.dart';
 
 class JournalCalendar extends StatefulWidget {
@@ -112,11 +112,8 @@ class _JournalCalendarState extends State<JournalCalendar> {
         final entry = entries[index];
         return JournalEntryContainerTile(
           journalEntry: entry,
-          onTap: () => {
-            JournalEntryForm.editEntry(
-              context: context,
-              journalEntry: entry,
-            )
+          onTap: () {
+            AutoRouter.of(context).pushNamed("/editjournal/${entry.id}");
           },
         );
       },

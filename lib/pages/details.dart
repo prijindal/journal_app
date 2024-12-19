@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:auto_route/auto_route.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:drift/drift.dart' as drift;
 import 'package:fleather/fleather.dart';
@@ -11,52 +12,49 @@ import '../components/journal_app_title.dart';
 import '../helpers/logger.dart';
 import '../models/core.dart';
 import '../models/drift.dart';
-import 'newentry.dart';
 
-List<IconButton> detailsIcons(
-    JournalEntryData journalEntry, BuildContext context) {
-  return [
-    IconButton(
-      onPressed: () async {
-        await Clipboard.setData(
-            ClipboardData(text: journalEntry.document.toPlainText()));
-        // ignore: use_build_context_synchronously
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text("Copied to clipboard"),
-          ),
-        );
-      },
-      icon: Icon(Icons.copy),
-    ),
-    IconButton(
-      onPressed: () async {
-        final result = await Share.share(journalEntry.document.toPlainText());
-        AppLogger.instance.i("Result: ${result.status}, raw: ${result.raw}");
-      },
-      icon: Icon(Icons.share),
-    ),
-    IconButton(
-      onPressed: () async {
-        await JournalEntryForm.editEntry(
-          context: context,
-          journalEntry: journalEntry,
-        );
-      },
-      icon: Icon(Icons.edit),
-    ),
-  ];
-}
-
+@RoutePage()
 class DetailsScreen extends StatefulWidget {
   const DetailsScreen({
     super.key,
-    required this.showHidden,
-    this.entryId,
+    @queryParam this.showHidden = false,
+    @queryParam this.entryId,
   });
 
   final bool showHidden;
   final String? entryId;
+
+  static List<IconButton> detailsIcons(
+      JournalEntryData journalEntry, BuildContext context) {
+    return [
+      IconButton(
+        onPressed: () async {
+          await Clipboard.setData(
+              ClipboardData(text: journalEntry.document.toPlainText()));
+          // ignore: use_build_context_synchronously
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text("Copied to clipboard"),
+            ),
+          );
+        },
+        icon: Icon(Icons.copy),
+      ),
+      IconButton(
+        onPressed: () async {
+          final result = await Share.share(journalEntry.document.toPlainText());
+          AppLogger.instance.i("Result: ${result.status}, raw: ${result.raw}");
+        },
+        icon: Icon(Icons.share),
+      ),
+      IconButton(
+        onPressed: () async {
+          AutoRouter.of(context).pushNamed("/editjournal/${journalEntry.id}");
+        },
+        icon: Icon(Icons.edit),
+      ),
+    ];
+  }
 
   @override
   State<DetailsScreen> createState() => _DetailsScreenState();
@@ -132,7 +130,7 @@ class _DetailsScreenState extends State<DetailsScreen> {
         journalEntry: journalEntry,
       ),
       actions: [
-        ...detailsIcons(journalEntry, context),
+        ...DetailsScreen.detailsIcons(journalEntry, context),
       ],
     );
   }

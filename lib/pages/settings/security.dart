@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:auto_route/annotations.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:local_auth/local_auth.dart';
@@ -9,6 +10,7 @@ import '../../components/pin_lock.dart';
 import '../../helpers/logger.dart';
 import '../../models/settings.dart';
 
+@RoutePage()
 class SecuritySettingsScreen extends StatelessWidget {
   const SecuritySettingsScreen({super.key});
 

@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:auto_route/auto_route.dart';
 import 'package:drift/drift.dart';
 import 'package:flutter/material.dart';
 import 'package:local_auth/local_auth.dart';
@@ -15,11 +16,10 @@ import '../models/core.dart';
 import '../models/drift.dart';
 import '../models/settings.dart';
 import 'details.dart';
-import 'newentry.dart';
-import 'search.dart';
 
 const mediaBreakpoint = 700;
 
+@RoutePage()
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
@@ -113,7 +113,7 @@ class _HomeScreenState extends State<HomeScreen> {
               action: SnackBarAction(
                 label: "Login",
                 onPressed: () async {
-                  await Navigator.pushNamed(context, "/login");
+                  await AutoRouter.of(context).pushNamed("/login");
                   await _syncDb();
                 },
               ),
@@ -175,14 +175,7 @@ class _HomeScreenState extends State<HomeScreen> {
       actions: [
         IconButton(
           onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute<void>(
-                builder: (context) => SearchScreen(
-                  showHidden: _showHidden,
-                ),
-              ),
-            );
+            AutoRouter.of(context).pushNamed("/search?showHidden=$_showHidden");
           },
           icon: Icon(
             Icons.search,
@@ -197,10 +190,11 @@ class _HomeScreenState extends State<HomeScreen> {
         if (_journalEntries != null &&
             _selectedEntryIndex >= 0 &&
             _selectedEntryIndex < _journalEntries!.length)
-          ...detailsIcons(_journalEntries![_selectedEntryIndex], context),
+          ...DetailsScreen.detailsIcons(
+              _journalEntries![_selectedEntryIndex], context),
         IconButton(
           onPressed: () {
-            Navigator.pushNamed(context, "/settings");
+            AutoRouter.of(context).pushNamed("/settings");
           },
           icon: const Icon(
             Icons.settings,
@@ -270,9 +264,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void _recordJournalEntry() {
-    JournalEntryForm.newEntry(
-      context: context,
-    );
+    AutoRouter.of(context).pushNamed("/newjournal");
   }
 
   Widget _buildRightHandWidget() {
@@ -333,14 +325,8 @@ class _HomeScreenState extends State<HomeScreen> {
               });
             },
             onTap: (JournalEntryData journalEntry) {
-              Navigator.of(context).push(
-                MaterialPageRoute<void>(
-                  builder: (context) => DetailsScreen(
-                    entryId: journalEntry.id,
-                    showHidden: _showHidden,
-                  ),
-                ),
-              );
+              AutoRouter.of(context).pushNamed(
+                  "/details?entryId=${journalEntry.id}&showHidden=$_showHidden");
             },
           );
         }

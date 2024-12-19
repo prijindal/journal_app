@@ -1,3 +1,4 @@
+import 'package:auto_route/auto_route.dart';
 import 'package:drift/drift.dart' as drift;
 import 'package:fleather/fleather.dart';
 import 'package:flutter/material.dart';
@@ -5,10 +6,94 @@ import 'package:flutter/material.dart';
 import '../components/confirmation_dialog.dart';
 import '../components/journal_date.dart';
 import '../components/tag_selection.dart';
-import '../helpers/logger.dart';
 import '../helpers/theme.dart';
 import '../models/core.dart';
 import '../models/drift.dart';
+
+@RoutePage()
+class NewEntryScreen extends StatelessWidget {
+  const NewEntryScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return JournalEntryForm(
+      onSave: (entry) async {
+        await MyDatabase.instance
+            .into(MyDatabase.instance.journalEntry)
+            .insert(entry);
+      },
+    );
+  }
+}
+
+@RoutePage()
+class EditEntryScreen extends StatefulWidget {
+  const EditEntryScreen({
+    super.key,
+    @pathParam required this.entryId,
+  });
+
+  final String entryId;
+
+  @override
+  State<EditEntryScreen> createState() => _EditEntryScreenState();
+}
+
+class _EditEntryScreenState extends State<EditEntryScreen> {
+  JournalEntryData? _journalEntry;
+
+  @override
+  void initState() {
+    _loadData();
+    super.initState();
+  }
+
+  void _loadData() async {
+    final entry =
+        await (MyDatabase.instance.select(MyDatabase.instance.journalEntry)
+              ..where((tbl) => tbl.id.equals(widget.entryId)))
+            .getSingle();
+    setState(() {
+      _journalEntry = entry;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (_journalEntry == null) {
+      return Scaffold(
+        appBar: AppBar(),
+        body: Center(
+          child: Text("Loading"),
+        ),
+      );
+    }
+    final journalEntry = _journalEntry!;
+    return JournalEntryForm(
+      creationTime: journalEntry.creationTime,
+      document: journalEntry.document,
+      tags: journalEntry.tags,
+      hidden: journalEntry.hidden,
+      onDelete: () async {
+        final shouldDelete = await showDialog<bool>(
+          context: context,
+          builder: (context) => ConfirmationDialog(),
+        );
+        if (shouldDelete != null && shouldDelete) {
+          await MyDatabase.instance.journalEntry
+              .deleteWhere((tbl) => tbl.id.equals(journalEntry.id));
+          return true;
+        }
+        return false;
+      },
+      onSave: (editedData) async {
+        await (MyDatabase.instance.update(MyDatabase.instance.journalEntry)
+              ..where((tbl) => tbl.id.equals(journalEntry.id)))
+            .write(editedData);
+      },
+    );
+  }
+}
 
 class JournalEntryForm extends StatefulWidget {
   const JournalEntryForm({
@@ -29,60 +114,13 @@ class JournalEntryForm extends StatefulWidget {
 
   @override
   State<JournalEntryForm> createState() => _JournalEntryFormState();
-
-  static Future<void> newEntry({
-    required BuildContext context,
-  }) async {
-    await Navigator.of(context).push(
-      MaterialPageRoute<void>(
-        builder: (context) => JournalEntryForm(
-          onSave: (entry) async {
-            await MyDatabase.instance
-                .into(MyDatabase.instance.journalEntry)
-                .insert(entry);
-          },
-        ),
-      ),
-    );
-  }
-
-  static Future<void> editEntry({
-    required BuildContext context,
-    required JournalEntryData journalEntry,
-  }) async {
-    await Navigator.of(context).push(
-      MaterialPageRoute<void>(
-        builder: (context) => JournalEntryForm(
-          creationTime: journalEntry.creationTime,
-          document: journalEntry.document,
-          tags: journalEntry.tags,
-          hidden: journalEntry.hidden,
-          onDelete: () async {
-            final shouldDelete = await showDialog<bool>(
-              context: context,
-              builder: (context) => ConfirmationDialog(),
-            );
-            if (shouldDelete != null && shouldDelete) {
-              await MyDatabase.instance.journalEntry
-                  .deleteWhere((tbl) => tbl.id.equals(journalEntry.id));
-              return true;
-            }
-            return false;
-          },
-          onSave: (editedData) async {
-            await (MyDatabase.instance.update(MyDatabase.instance.journalEntry)
-                  ..where((tbl) => tbl.id.equals(journalEntry.id)))
-                .write(editedData);
-          },
-        ),
-      ),
-    );
-  }
 }
 
 class _JournalEntryFormState extends State<JournalEntryForm> {
   late final _controller = FleatherController(
-    document: widget.document,
+    document: widget.document == null
+        ? null
+        : ParchmentDocument.fromDelta(widget.document!.toDelta()),
   );
   late DateTime _selectedDate =
       widget.creationTime?.toLocal() ?? DateTime.now();
@@ -111,6 +149,25 @@ class _JournalEntryFormState extends State<JournalEntryForm> {
       // ignore: use_build_context_synchronously
       Navigator.pop(context);
     }
+  }
+
+  bool _canPopWithoutConfirmation() {
+    if (isEmpty) {
+      // When current document is empty, we can pop
+      return true;
+    }
+    if (widget.document != null && widget.creationTime != null) {
+      // When current and previous document are same, we can pop safely
+      final documentEqual = widget.document!
+              .toString()
+              .compareTo(_controller.document.toString()) ==
+          0;
+      final dateEqual = widget.creationTime!.compareTo(_selectedDate) == 0;
+      if (documentEqual && dateEqual) {
+        return true;
+      }
+    }
+    return false;
   }
 
   @override
@@ -155,20 +212,37 @@ class _JournalEntryFormState extends State<JournalEntryForm> {
             icon: const Icon(Icons.delete),
           ),
           IconButton(
-            onPressed: () {
-              Navigator.of(context).pop();
+            onPressed: () async {
+              if (!isEmpty) {
+                await _saveEntry();
+              }
+              if (context.mounted) {
+                Navigator.of(context).pop();
+              }
             },
             icon: const Icon(Icons.save),
           )
         ],
       ),
       body: PopScope(
+        canPop: false,
         onPopInvokedWithResult: (didPop, result) async {
-          if (isEmpty) {
-            AppLogger.instance.i("Popping allowed since text is empty");
-          } else {
-            await _saveEntry();
-            AppLogger.instance.i("Saving this entry");
+          if (didPop) {
+            return;
+          }
+          if (_canPopWithoutConfirmation()) {
+            Navigator.of(context).pop();
+            return;
+          }
+          final shouldPop = await showDialog<bool>(
+                context: context,
+                builder: (context) => ConfirmationDialog(
+                  content: "Discard all the changes?",
+                ),
+              ) ??
+              false;
+          if (context.mounted && shouldPop) {
+            Navigator.pop(context);
           }
         },
         child: Column(

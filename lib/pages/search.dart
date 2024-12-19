@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:auto_route/auto_route.dart';
 import 'package:drift/drift.dart' as drift;
 import 'package:flutter/material.dart';
 
@@ -7,12 +8,12 @@ import '../components/journal_list.dart';
 import '../helpers/theme.dart';
 import '../models/core.dart';
 import '../models/drift.dart';
-import 'details.dart';
 
+@RoutePage()
 class SearchScreen extends StatefulWidget {
   const SearchScreen({
     super.key,
-    this.showHidden = false,
+    @queryParam this.showHidden = false,
   });
   final bool showHidden;
 
@@ -97,14 +98,8 @@ class _SearchScreenState extends State<SearchScreen> {
               entries: _journalEntries,
               showHidden: widget.showHidden,
               onTap: (JournalEntryData journalEntry) {
-                Navigator.of(context).push(
-                  MaterialPageRoute<void>(
-                    builder: (context) => DetailsScreen(
-                      entryId: journalEntry.id,
-                      showHidden: widget.showHidden,
-                    ),
-                  ),
-                );
+                AutoRouter.of(context).pushNamed(
+                    "/details?entryId=${journalEntry.id}&showHidden=${widget.showHidden}");
               },
             ),
     );
