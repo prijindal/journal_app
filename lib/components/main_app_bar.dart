@@ -71,8 +71,6 @@ class MainAppBar extends StatelessWidget implements PreferredSizeWidget {
 
   @override
   Widget build(BuildContext context) {
-    final settingsStorage = Provider.of<SettingsStorageNotifier>(context);
-    final currentLockedMode = settingsStorage.getHiddenLockedMode();
     return AppBar(
       title: const Text("Journals"),
       actions: [
@@ -84,11 +82,15 @@ class MainAppBar extends StatelessWidget implements PreferredSizeWidget {
             Icons.search,
           ),
         ),
-        IconButton(
-          onPressed: () => _toggleHidden(currentLockedMode, context),
-          icon: Icon(
-            showHidden ? Icons.visibility : Icons.visibility_off,
+        Selector<SettingsStorageNotifier, HiddenLockedMode>(
+          builder: (context, currentLockedMode, _) => IconButton(
+            onPressed: () => _toggleHidden(currentLockedMode, context),
+            icon: Icon(
+              showHidden ? Icons.visibility : Icons.visibility_off,
+            ),
           ),
+          selector: (_, settingsStorage) =>
+              settingsStorage.getHiddenLockedMode(),
         ),
         if (journalEntries != null &&
             selectedEntryIndex >= 0 &&

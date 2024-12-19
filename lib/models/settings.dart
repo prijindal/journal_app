@@ -52,7 +52,7 @@ class SettingsStorageNotifier with ChangeNotifier {
     init();
   }
 
-  static Future<void> writePin(String pin) async {
+  Future<void> writePin(String pin) async {
     AppLogger.instance.d("Writting $pin as $pinKey to shared_preferences");
     await SharedPreferencesAsync().setString(pinKey, pin);
     // TODO: Use flutter secure storage
@@ -60,7 +60,7 @@ class SettingsStorageNotifier with ChangeNotifier {
     AppLogger.instance.d("Written $pin as $pinKey to shared_preferences");
   }
 
-  static Future<String?> readPin() async {
+  Future<String?> readPin() async {
     AppLogger.instance.d("Reading $pinKey from shared_preferences");
     final pin = await SharedPreferencesAsync().getString(pinKey);
     // final pin = await storage.read(key: pinKey);

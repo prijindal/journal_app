@@ -12,29 +12,31 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider<SettingsStorageNotifier>(
-      child: const MyMaterialApp(),
       create: (context) => SettingsStorageNotifier(
         ThemeMode.system,
         ColorSeed.baseColor,
         HiddenLockedMode.unknown,
       ),
+      child: MyMaterialApp(),
     );
   }
 }
 
 class MyMaterialApp extends StatelessWidget {
-  const MyMaterialApp({super.key});
+  MyMaterialApp({super.key});
   // This widget is the root of your application.
+  final appRouter = AppRouter();
+
   @override
   Widget build(BuildContext context) {
-    final settingsStorage = Provider.of<SettingsStorageNotifier>(context);
-    final appRouter = AppRouter();
     AppLogger.instance.d("Building MyApp");
-    return MaterialApp.router(
-      routerConfig: appRouter.config(),
-      theme: lightTheme(settingsStorage.getBaseColor().color),
-      darkTheme: darkTheme(settingsStorage.getBaseColor().color),
-      themeMode: settingsStorage.getTheme(),
+    return Consumer<SettingsStorageNotifier>(
+      builder: (context, settingsStorage, _) => MaterialApp.router(
+        routerConfig: appRouter.config(),
+        theme: lightTheme(settingsStorage.getBaseColor().color),
+        darkTheme: darkTheme(settingsStorage.getBaseColor().color),
+        themeMode: settingsStorage.getTheme(),
+      ),
     );
   }
 }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:pinput/pinput.dart';
+import 'package:provider/provider.dart';
 
 import '../models/settings.dart';
 
@@ -16,6 +17,8 @@ class PinLockScreen extends StatelessWidget {
   final void Function(String)? onCompleted;
 
   static Future<bool> createNewPin(BuildContext context) async {
+    final settingsStorage =
+        Provider.of<SettingsStorageNotifier>(context, listen: false);
     final result = await showDialog<bool>(
       context: context,
       builder: (context) => PinLockScreen(
@@ -36,7 +39,7 @@ class PinLockScreen extends StatelessWidget {
             ),
           );
           if (result != null && result) {
-            await SettingsStorageNotifier.writePin(pin);
+            await settingsStorage.writePin(pin);
           }
           // ignore: use_build_context_synchronously
           Navigator.of(context).pop(result);
@@ -47,7 +50,9 @@ class PinLockScreen extends StatelessWidget {
   }
 
   static Future<bool> verifyPin(BuildContext context) async {
-    final dbPin = await SettingsStorageNotifier.readPin();
+    final settingsStorage =
+        Provider.of<SettingsStorageNotifier>(context, listen: false);
+    final dbPin = await settingsStorage.readPin();
     if (dbPin == null) {
       return false;
     }
