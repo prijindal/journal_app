@@ -1,8 +1,10 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import '../../components/journal_list.dart';
 import '../../models/core.dart';
+import '../../models/local_state.dart';
 import '../details.dart';
 
 const mediaBreakpoint = 700;
@@ -11,37 +13,16 @@ const mediaBreakpoint = 700;
 class JournalListScreen extends StatelessWidget {
   const JournalListScreen({
     super.key,
-    required this.showHidden,
-    required this.selectedEntries,
-    required this.selectedEntryId,
-    required this.onSetSelectedEntryIndex,
-    required this.onSelectedEntriesChange,
   });
-
-  final bool showHidden;
-  final List<String> selectedEntries;
-  final String? selectedEntryId;
-  final void Function(List<String>)? onSelectedEntriesChange;
-  final void Function(String?) onSetSelectedEntryIndex;
 
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (BuildContext context, BoxConstraints constraints) {
         if (constraints.maxWidth > mediaBreakpoint) {
-          return DesktopJournalListScreen(
-            showHidden: showHidden,
-            selectedEntries: selectedEntries,
-            onSelectedEntriesChange: onSelectedEntriesChange,
-            onSetSelectedEntryIndex: onSetSelectedEntryIndex,
-            selectedEntryId: selectedEntryId,
-          );
+          return DesktopJournalListScreen();
         } else {
-          return MobileJournalListScreen(
-            showHidden: showHidden,
-            selectedEntries: selectedEntries,
-            onSelectedEntriesChange: onSelectedEntriesChange,
-          );
+          return MobileJournalListScreen();
         }
       },
     );
@@ -51,25 +32,14 @@ class JournalListScreen extends StatelessWidget {
 class DesktopJournalListScreen extends StatelessWidget {
   const DesktopJournalListScreen({
     super.key,
-    required this.showHidden,
-    required this.selectedEntryId,
-    required this.selectedEntries,
-    required this.onSelectedEntriesChange,
-    required this.onSetSelectedEntryIndex,
   });
 
-  final bool showHidden;
-  final List<String> selectedEntries;
-  final String? selectedEntryId;
-  final void Function(List<String> p1)? onSelectedEntriesChange;
-  final void Function(String? p1) onSetSelectedEntryIndex;
-
-  Widget _buildRightHandWidget() {
+  Widget _buildRightHandWidget(String? selectedEntryId) {
     if (selectedEntryId != null) {
       return Expanded(
         child: JourneyDetailsViewWrapper(
           key: Key("JourneyDetailsViewWrapper$selectedEntryId"),
-          entryId: selectedEntryId!,
+          entryId: selectedEntryId,
         ),
       );
     } else {
@@ -81,23 +51,27 @@ class DesktopJournalListScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Flex(
-      direction: Axis.horizontal,
-      children: [
-        SizedBox(
-          width: mediaBreakpoint / 2,
-          child: JournalListWrapper(
-            key: Key("JournalListWrapper$showHidden"),
-            showHidden: showHidden,
-            selectedEntries: selectedEntries,
-            onSelectedEntriesChange: onSelectedEntriesChange,
-            onTap: (journalEntry) {
-              onSetSelectedEntryIndex(journalEntry.id);
-            },
+    return Consumer<LocalStateNotifier>(
+      builder: (_, localState, __) => Flex(
+        direction: Axis.horizontal,
+        children: [
+          SizedBox(
+            width: mediaBreakpoint / 2,
+            child: JournalListWrapper(
+              key: Key("JournalListWrapper${localState.showHidden}"),
+              showHidden: localState.showHidden,
+              selectedEntries: localState.selectedEntries,
+              onSelectedEntriesChange: (newEntries) {
+                localState.setSelectedEntries(newEntries);
+              },
+              onTap: (journalEntry) {
+                localState.setSelectedEntryId(journalEntry.id);
+              },
+            ),
           ),
-        ),
-        _buildRightHandWidget(),
-      ],
+          _buildRightHandWidget(localState.selectedEntryId),
+        ],
+      ),
     );
   }
 }
@@ -105,26 +79,23 @@ class DesktopJournalListScreen extends StatelessWidget {
 class MobileJournalListScreen extends StatelessWidget {
   const MobileJournalListScreen({
     super.key,
-    required this.showHidden,
-    required this.selectedEntries,
-    required this.onSelectedEntriesChange,
   });
-
-  final bool showHidden;
-  final List<String> selectedEntries;
-  final void Function(List<String> p1)? onSelectedEntriesChange;
 
   @override
   Widget build(BuildContext context) {
-    return JournalListWrapper(
-      key: Key("JournalListWrapper$showHidden"),
-      showHidden: showHidden,
-      selectedEntries: selectedEntries,
-      onSelectedEntriesChange: onSelectedEntriesChange,
-      onTap: (JournalEntryData journalEntry) {
-        AutoRouter.of(context).pushNamed(
-            "/details?entryId=${journalEntry.id}&showHidden=$showHidden");
-      },
+    return Consumer<LocalStateNotifier>(
+      builder: (_, localState, __) => JournalListWrapper(
+        key: Key("JournalListWrapper${localState.showHidden}"),
+        showHidden: localState.showHidden,
+        selectedEntries: localState.selectedEntries,
+        onSelectedEntriesChange: (newEntries) {
+          localState.setSelectedEntries(newEntries);
+        },
+        onTap: (JournalEntryData journalEntry) {
+          AutoRouter.of(context).pushNamed(
+              "/details?entryId=${journalEntry.id}&showHidden=${localState.showHidden}");
+        },
+      ),
     );
   }
 }

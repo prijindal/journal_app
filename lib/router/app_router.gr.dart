@@ -198,20 +198,10 @@ class HomeRoute extends _i15.PageRouteInfo<void> {
 
 /// generated route for
 /// [_i6.JournalCalendarScreen]
-class JournalCalendarRoute
-    extends _i15.PageRouteInfo<JournalCalendarRouteArgs> {
-  JournalCalendarRoute({
-    _i16.Key? key,
-    required bool showHidden,
-    String? searchText,
-    List<_i15.PageRouteInfo>? children,
-  }) : super(
+class JournalCalendarRoute extends _i15.PageRouteInfo<void> {
+  const JournalCalendarRoute({List<_i15.PageRouteInfo>? children})
+      : super(
           JournalCalendarRoute.name,
-          args: JournalCalendarRouteArgs(
-            key: key,
-            showHidden: showHidden,
-            searchText: searchText,
-          ),
           initialChildren: children,
         );
 
@@ -220,56 +210,17 @@ class JournalCalendarRoute
   static _i15.PageInfo page = _i15.PageInfo(
     name,
     builder: (data) {
-      final args = data.argsAs<JournalCalendarRouteArgs>();
-      return _i6.JournalCalendarScreen(
-        key: args.key,
-        showHidden: args.showHidden,
-        searchText: args.searchText,
-      );
+      return const _i6.JournalCalendarScreen();
     },
   );
 }
 
-class JournalCalendarRouteArgs {
-  const JournalCalendarRouteArgs({
-    this.key,
-    required this.showHidden,
-    this.searchText,
-  });
-
-  final _i16.Key? key;
-
-  final bool showHidden;
-
-  final String? searchText;
-
-  @override
-  String toString() {
-    return 'JournalCalendarRouteArgs{key: $key, showHidden: $showHidden, searchText: $searchText}';
-  }
-}
-
 /// generated route for
 /// [_i7.JournalListScreen]
-class JournalListRoute extends _i15.PageRouteInfo<JournalListRouteArgs> {
-  JournalListRoute({
-    _i16.Key? key,
-    required bool showHidden,
-    required List<String> selectedEntries,
-    required String? selectedEntryId,
-    required void Function(String?) onSetSelectedEntryIndex,
-    required void Function(List<String>)? onSelectedEntriesChange,
-    List<_i15.PageRouteInfo>? children,
-  }) : super(
+class JournalListRoute extends _i15.PageRouteInfo<void> {
+  const JournalListRoute({List<_i15.PageRouteInfo>? children})
+      : super(
           JournalListRoute.name,
-          args: JournalListRouteArgs(
-            key: key,
-            showHidden: showHidden,
-            selectedEntries: selectedEntries,
-            selectedEntryId: selectedEntryId,
-            onSetSelectedEntryIndex: onSetSelectedEntryIndex,
-            onSelectedEntriesChange: onSelectedEntriesChange,
-          ),
           initialChildren: children,
         );
 
@@ -278,45 +229,9 @@ class JournalListRoute extends _i15.PageRouteInfo<JournalListRouteArgs> {
   static _i15.PageInfo page = _i15.PageInfo(
     name,
     builder: (data) {
-      final args = data.argsAs<JournalListRouteArgs>();
-      return _i7.JournalListScreen(
-        key: args.key,
-        showHidden: args.showHidden,
-        selectedEntries: args.selectedEntries,
-        selectedEntryId: args.selectedEntryId,
-        onSetSelectedEntryIndex: args.onSetSelectedEntryIndex,
-        onSelectedEntriesChange: args.onSelectedEntriesChange,
-      );
+      return const _i7.JournalListScreen();
     },
   );
-}
-
-class JournalListRouteArgs {
-  const JournalListRouteArgs({
-    this.key,
-    required this.showHidden,
-    required this.selectedEntries,
-    required this.selectedEntryId,
-    required this.onSetSelectedEntryIndex,
-    required this.onSelectedEntriesChange,
-  });
-
-  final _i16.Key? key;
-
-  final bool showHidden;
-
-  final List<String> selectedEntries;
-
-  final String? selectedEntryId;
-
-  final void Function(String?) onSetSelectedEntryIndex;
-
-  final void Function(List<String>)? onSelectedEntriesChange;
-
-  @override
-  String toString() {
-    return 'JournalListRouteArgs{key: $key, showHidden: $showHidden, selectedEntries: $selectedEntries, selectedEntryId: $selectedEntryId, onSetSelectedEntryIndex: $onSetSelectedEntryIndex, onSelectedEntriesChange: $onSelectedEntriesChange}';
-  }
 }
 
 /// generated route for

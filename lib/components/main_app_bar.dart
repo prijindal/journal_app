@@ -6,28 +6,41 @@ import 'package:provider/provider.dart';
 
 import '../helpers/logger.dart';
 import '../models/drift.dart';
+import '../models/local_state.dart';
 import '../models/settings.dart';
 import '../pages/details.dart';
 import 'confirmation_dialog.dart';
 import 'pin_lock.dart';
 
-class MainAppBar extends StatelessWidget implements PreferredSizeWidget {
-  const MainAppBar({
-    super.key,
-    required this.showHidden,
-    required this.onChangeHidden,
-    required this.selectedEntryId,
-  });
+class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
+  const HomeAppBar({super.key});
 
-  final bool showHidden;
-  final void Function(bool) onChangeHidden;
-  final String? selectedEntryId;
   @override
   final Size preferredSize = const Size.fromHeight(kToolbarHeight);
 
+  @override
+  Widget build(BuildContext context) {
+    return Selector<LocalStateNotifier, bool>(
+      builder: (context, selectedEntriesEmpty, _) => selectedEntriesEmpty
+          ? const MainAppBar()
+          : const SelectedEntriesAppBar(),
+      selector: (_, localState) => localState.selectedEntries.isEmpty,
+    );
+  }
+}
+
+class MainAppBar extends StatelessWidget {
+  const MainAppBar({
+    super.key,
+  });
+
   Future<void> _toggleHidden(
-      HiddenLockedMode currentLockedMode, BuildContext context) async {
-    final newValue = !showHidden;
+    HiddenLockedMode currentLockedMode,
+    BuildContext context,
+  ) async {
+    final localStateNotifier =
+        Provider.of<LocalStateNotifier>(context, listen: false);
+    final newValue = !localStateNotifier.showHidden;
     if (newValue) {
       if (currentLockedMode == HiddenLockedMode.biometrics) {
         // If encryption mode is biometrics, authenticate
@@ -63,17 +76,19 @@ class MainAppBar extends StatelessWidget implements PreferredSizeWidget {
         }
       }
     }
-    onChangeHidden(newValue);
+    localStateNotifier.setShowHidden(newValue);
   }
 
   @override
   Widget build(BuildContext context) {
+    final localStateNotifier = Provider.of<LocalStateNotifier>(context);
     return AppBar(
       title: const Text("Journals"),
       actions: [
         IconButton(
           onPressed: () {
-            AutoRouter.of(context).pushNamed("/search?showHidden=$showHidden");
+            AutoRouter.of(context).pushNamed(
+                "/search?showHidden=${localStateNotifier.showHidden}");
           },
           icon: Icon(
             Icons.search,
@@ -83,14 +98,17 @@ class MainAppBar extends StatelessWidget implements PreferredSizeWidget {
           builder: (context, currentLockedMode, _) => IconButton(
             onPressed: () => _toggleHidden(currentLockedMode, context),
             icon: Icon(
-              showHidden ? Icons.visibility : Icons.visibility_off,
+              localStateNotifier.showHidden
+                  ? Icons.visibility
+                  : Icons.visibility_off,
             ),
           ),
           selector: (_, settingsStorage) =>
               settingsStorage.getHiddenLockedMode(),
         ),
-        if (selectedEntryId != null)
-          ...DetailsScreen.detailsIcons(selectedEntryId!, context),
+        if (localStateNotifier.selectedEntryId != null)
+          ...DetailsScreen.detailsIcons(
+              localStateNotifier.selectedEntryId!, context),
         IconButton(
           onPressed: () {
             AutoRouter.of(context).pushNamed("/settings");
@@ -105,30 +123,22 @@ class MainAppBar extends StatelessWidget implements PreferredSizeWidget {
   }
 }
 
-class SelectedEntriesAppBar extends StatelessWidget
-    implements PreferredSizeWidget {
+class SelectedEntriesAppBar extends StatelessWidget {
   const SelectedEntriesAppBar({
     super.key,
-    required this.onSelectedEntriesChange,
-    required this.selectedEntries,
   });
-
-  final List<String> selectedEntries;
-  final void Function(List<String>) onSelectedEntriesChange;
-
-  @override
-  final Size preferredSize = const Size.fromHeight(kToolbarHeight);
 
   @override
   Widget build(BuildContext context) {
+    final localStateNotifier = Provider.of<LocalStateNotifier>(context);
     return AppBar(
       leading: IconButton(
         onPressed: () {
-          onSelectedEntriesChange([]);
+          localStateNotifier.setSelectedEntries([]);
         },
         icon: Icon(Icons.arrow_back),
       ),
-      title: Text("${selectedEntries.length} Selected"),
+      title: Text("${localStateNotifier.selectedEntries.length} Selected"),
       actions: [
         IconButton(
           onPressed: () async {
@@ -136,15 +146,16 @@ class SelectedEntriesAppBar extends StatelessWidget
                 await (MyDatabase.instance.journalEntry.selectOnly()
                       ..addColumns([MyDatabase.instance.journalEntry.id]))
                     .get();
-            if (selectedEntries.length < journalEntries.length) {
+            if (localStateNotifier.selectedEntries.length <
+                journalEntries.length) {
               // Select all entries
-              onSelectedEntriesChange(journalEntries
+              localStateNotifier.setSelectedEntries(journalEntries
                   .map<String>(
                       (a) => a.read(MyDatabase.instance.journalEntry.id)!)
                   .toList());
             } else {
               // Unselect all entries
-              onSelectedEntriesChange([]);
+              localStateNotifier.setSelectedEntries([]);
             }
           },
           icon: Icon(Icons.select_all),
@@ -156,9 +167,9 @@ class SelectedEntriesAppBar extends StatelessWidget
               builder: (context) => ConfirmationDialog(),
             );
             if (shouldDelete != null && shouldDelete) {
-              await MyDatabase.instance.journalEntry
-                  .deleteWhere((tbl) => tbl.id.isIn(selectedEntries));
-              onSelectedEntriesChange([]);
+              await MyDatabase.instance.journalEntry.deleteWhere(
+                  (tbl) => tbl.id.isIn(localStateNotifier.selectedEntries));
+              localStateNotifier.setSelectedEntries([]);
             }
           },
           icon: Icon(Icons.delete),

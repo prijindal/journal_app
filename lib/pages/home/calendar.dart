@@ -2,14 +2,31 @@ import 'dart:async';
 
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import '../../components/calendars.dart';
 import '../../helpers/db_watchers.dart';
 import '../../models/core.dart';
+import '../../models/local_state.dart';
 
 @RoutePage()
-class JournalCalendarScreen extends StatefulWidget {
-  const JournalCalendarScreen({
+class JournalCalendarScreen extends StatelessWidget {
+  const JournalCalendarScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Selector<LocalStateNotifier, bool>(
+      selector: (_, localState) => localState.showHidden,
+      builder: (context, showHidden, _) => JournalCalendarWrapper(
+        key: Key("JournalCalendarScreen$showHidden"),
+        showHidden: showHidden,
+      ),
+    );
+  }
+}
+
+class JournalCalendarWrapper extends StatefulWidget {
+  const JournalCalendarWrapper({
     super.key,
     required this.showHidden,
     this.searchText,
@@ -19,10 +36,10 @@ class JournalCalendarScreen extends StatefulWidget {
   final bool showHidden;
 
   @override
-  State<JournalCalendarScreen> createState() => _JournalCalendarScreenState();
+  State<JournalCalendarWrapper> createState() => _JournalCalendarWrapperState();
 }
 
-class _JournalCalendarScreenState extends State<JournalCalendarScreen> {
+class _JournalCalendarWrapperState extends State<JournalCalendarWrapper> {
   List<JournalEntryData>? _journalEntries;
   StreamSubscription<List<JournalEntryData>>? _subscription;
 

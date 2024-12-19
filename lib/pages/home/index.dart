@@ -2,29 +2,39 @@ import 'dart:async';
 
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import '../../components/main_app_bar.dart';
 import '../../helpers/logger.dart';
 import '../../helpers/sync.dart';
+import '../../models/local_state.dart';
 import 'calendar.dart';
 import 'journallist.dart';
 
 const mediaBreakpoint = 700;
 
 @RoutePage()
-class HomeScreen extends StatefulWidget {
+class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
 
   @override
-  State<HomeScreen> createState() => _HomeScreenState();
+  Widget build(BuildContext context) {
+    return ChangeNotifierProvider<LocalStateNotifier>(
+      create: (context) => LocalStateNotifier(),
+      child: const _HomeView(),
+    );
+  }
 }
 
-class _HomeScreenState extends State<HomeScreen> {
-  int _currentPageIndex = 0;
+class _HomeView extends StatefulWidget {
+  const _HomeView();
 
-  bool _showHidden = false;
-  List<String> _selectedEntries = [];
-  String? _selectedEntryId;
+  @override
+  State<_HomeView> createState() => _HomeViewState();
+}
+
+class _HomeViewState extends State<_HomeView> {
+  int _currentPageIndex = 0;
 
   @override
   void initState() {
@@ -83,29 +93,6 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
-  PreferredSizeWidget _buildAppBar() {
-    return MainAppBar(
-      showHidden: _showHidden,
-      onChangeHidden: (newValue) {
-        setState(() {
-          _showHidden = newValue;
-        });
-      },
-      selectedEntryId: _selectedEntryId,
-    );
-  }
-
-  PreferredSizeWidget _buildSelectedEntriesAppBar() {
-    return SelectedEntriesAppBar(
-      selectedEntries: _selectedEntries,
-      onSelectedEntriesChange: (newEntries) {
-        setState(() {
-          _selectedEntries = newEntries;
-        });
-      },
-    );
-  }
-
   Widget _buildFab() {
     return FloatingActionButton(
       onPressed: () => AutoRouter.of(context).pushNamed("/newjournal"),
@@ -117,34 +104,15 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Widget _buildBody() {
     return [
-      JournalListScreen(
-        showHidden: _showHidden,
-        selectedEntries: _selectedEntries,
-        selectedEntryId: _selectedEntryId,
-        onSetSelectedEntryIndex: (index) {
-          setState(() {
-            _selectedEntryId = index;
-          });
-        },
-        onSelectedEntriesChange: (entries) {
-          setState(() {
-            _selectedEntries = entries;
-          });
-        },
-      ),
-      JournalCalendarScreen(
-        key: Key("JournalCalendarScreen$_showHidden"),
-        showHidden: _showHidden,
-      ),
+      const JournalListScreen(),
+      const JournalCalendarScreen(),
     ].elementAt(_currentPageIndex);
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: _selectedEntries.isEmpty
-          ? _buildAppBar()
-          : _buildSelectedEntriesAppBar(),
+      appBar: const HomeAppBar(),
       body: RefreshIndicator(
         onRefresh: _checkLoginAndSyncDb,
         child: _buildBody(),
