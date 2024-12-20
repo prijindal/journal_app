@@ -12,31 +12,16 @@ class JournalEntryTags extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
+    return Wrap(
+      spacing: 8.0,
       children: [
         if (journalEntry.hidden)
-          Padding(
-            padding: const EdgeInsets.fromLTRB(
-              0.0,
-              0,
-              8.0,
-              0,
-            ),
-            child: Icon(
-              Icons.visibility_off,
-              size: 20,
-            ),
+          Icon(
+            Icons.visibility_off,
+            size: 20,
           ),
         ...journalEntry.tags.map<Widget>(
-          (a) => Padding(
-            padding: const EdgeInsets.fromLTRB(
-              0.0,
-              0,
-              8.0,
-              0,
-            ),
-            child: Text('#$a'),
-          ),
+          (a) => Text('#$a'),
         )
       ],
     );

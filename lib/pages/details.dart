@@ -3,12 +3,13 @@ import 'dart:async';
 import 'package:auto_route/auto_route.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:drift/drift.dart' as drift;
-import 'package:fleather/fleather.dart';
+import 'package:fleather/fleather.dart' hide kToolbarHeight;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:share_plus/share_plus.dart';
 
 import '../components/journal_app_title.dart';
+import '../components/journal_entry_tags.dart';
 import '../helpers/logger.dart';
 import '../models/core.dart';
 import '../models/drift.dart';
@@ -156,62 +157,74 @@ class _DetailsScreenState extends State<DetailsScreen> {
               child: Text("Loading..."),
             );
           }
-          return CarouselSlider.builder(
-            carouselController: _carouselController,
-            options: CarouselOptions(
-              enableInfiniteScroll: false,
-              height: height,
-              initialPage:
-                  _journalEntries.indexWhere((a) => a.id == _selectedEntryId),
-              viewportFraction: 1.0,
-              enlargeCenterPage: false,
-              onPageChanged: (newPage, reason) {
-                setState(() {
-                  final entry = _journalEntries[newPage];
-                  setState(() {
-                    _selectedEntryId = entry.id;
-                  });
-                });
-              },
-            ),
-            itemCount: _journalEntries.length,
-            itemBuilder:
-                (BuildContext context, int itemIndex, int pageViewIndex) =>
-                    Container(
-              padding:
-                  const EdgeInsets.symmetric(vertical: 0, horizontal: 18.0),
-              width: width,
-              child: Column(
-                children: [
-                  Flexible(
-                    child: JourneyDetailsView(
-                      journalEntry: _journalEntries[itemIndex],
-                    ),
+          return Column(
+            mainAxisSize: MainAxisSize.max,
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              CarouselSlider.builder(
+                carouselController: _carouselController,
+                options: CarouselOptions(
+                  enableInfiniteScroll: false,
+                  height: height - kToolbarHeight - kToolbarHeight,
+                  initialPage: _journalEntries
+                      .indexWhere((a) => a.id == _selectedEntryId),
+                  viewportFraction: 1.0,
+                  enlargeCenterPage: false,
+                  onPageChanged: (newPage, reason) {
+                    setState(() {
+                      final entry = _journalEntries[newPage];
+                      setState(() {
+                        _selectedEntryId = entry.id;
+                      });
+                    });
+                  },
+                ),
+                itemCount: _journalEntries.length,
+                itemBuilder:
+                    (BuildContext context, int itemIndex, int pageViewIndex) =>
+                        Container(
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 0, horizontal: 18.0),
+                  width: width,
+                  child: JourneyDetailsView(
+                    journalEntry: _journalEntries[itemIndex],
                   ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      IconButton(
-                        onPressed: _currentIndex <= 0
-                            ? null
-                            : () {
-                                _carouselController.previousPage();
-                              },
-                        icon: Icon(Icons.arrow_left),
-                      ),
-                      IconButton(
-                        onPressed: (_currentIndex + 1) >= _journalEntries.length
-                            ? null
-                            : () {
-                                _carouselController.nextPage();
-                              },
-                        icon: Icon(Icons.arrow_right),
-                      )
-                    ],
-                  ),
-                ],
+                ),
               ),
-            ),
+              SizedBox(
+                height: kToolbarHeight,
+                width: width,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    IconButton(
+                      onPressed: _currentIndex <= 0
+                          ? null
+                          : () {
+                              _carouselController.previousPage();
+                            },
+                      icon: Icon(Icons.arrow_left),
+                    ),
+                    Flexible(
+                      child: Padding(
+                        padding: const EdgeInsets.only(
+                          bottom: 8.0,
+                        ),
+                        child: JournalEntryTags(journalEntry: _currentEntry!),
+                      ),
+                    ),
+                    IconButton(
+                      onPressed: (_currentIndex + 1) >= _journalEntries.length
+                          ? null
+                          : () {
+                              _carouselController.nextPage();
+                            },
+                      icon: Icon(Icons.arrow_right),
+                    )
+                  ],
+                ),
+              ),
+            ],
           );
         },
       ),
@@ -254,8 +267,12 @@ class _JourneyDetailsViewWrapperState extends State<JourneyDetailsViewWrapper> {
         child: Text("Loading..."),
       );
     }
-    return JourneyDetailsView(
-      journalEntry: _journalEntryData!,
+    return ListView(
+      children: [
+        JourneyDetailsView(
+          journalEntry: _journalEntryData!,
+        ),
+      ],
     );
   }
 }
@@ -270,19 +287,14 @@ class JourneyDetailsView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListView(
-      // crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        FleatherEditor(
-          scrollable: true,
-          readOnly: true,
-          showCursor: false,
-          enableInteractiveSelection: true,
-          controller: FleatherController(
-            document: journalEntry.document,
-          ),
-        ),
-      ],
+    return FleatherEditor(
+      scrollable: true,
+      readOnly: true,
+      showCursor: false,
+      enableInteractiveSelection: true,
+      controller: FleatherController(
+        document: journalEntry.document,
+      ),
     );
   }
 }

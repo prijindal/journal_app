@@ -35,6 +35,7 @@ class JournalEntryContainerTile extends StatelessWidget {
           selected: selected,
           title: JournalDate(creationTime: journalEntry.creationTime),
           subtitle: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               FleatherEditor(
                 readOnly: true,
