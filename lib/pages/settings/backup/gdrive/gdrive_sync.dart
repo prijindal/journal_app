@@ -168,6 +168,7 @@ class GdriveSync with ChangeNotifier {
     }
     _checkExistingMetadataFile();
     if (_metadataFile == null) {
+      // ignore: use_build_context_synchronously
       upload(context);
       return;
     } else {
@@ -182,8 +183,10 @@ class GdriveSync with ChangeNotifier {
           );
         }
       } else if (lastUpdatedTime.compareTo(_metadataFile!) > 0) {
+        // ignore: use_build_context_synchronously
         upload(context);
       } else {
+        // ignore: use_build_context_synchronously
         download(context);
       }
     }
