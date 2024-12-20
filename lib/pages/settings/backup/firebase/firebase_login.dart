@@ -7,11 +7,11 @@ import 'package:firebase_ui_auth/firebase_ui_auth.dart';
 import 'package:firebase_ui_oauth_google/firebase_ui_oauth_google.dart';
 import 'package:flutter/material.dart';
 
-import '../helpers/constants.dart';
+import '../../../../helpers/constants.dart';
 
 @RoutePage()
-class LoginScreen extends StatelessWidget {
-  const LoginScreen({super.key});
+class FirebaseLoginScreen extends StatelessWidget {
+  const FirebaseLoginScreen({super.key});
 
   static List<AuthProvider<AuthListener, AuthCredential>>? authProviders = [
     EmailAuthProvider(),
@@ -25,8 +25,13 @@ class LoginScreen extends StatelessWidget {
       stream: FirebaseAuth.instance.authStateChanges(),
       builder: (context, snapshot) {
         if (!snapshot.hasData) {
-          return SignInScreen(
-            providers: authProviders,
+          return Scaffold(
+            appBar: AppBar(
+              title: Text("Login with firebase"),
+            ),
+            body: SignInScreen(
+              providers: authProviders,
+            ),
           );
         }
 

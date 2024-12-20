@@ -6,8 +6,8 @@ import 'package:provider/provider.dart';
 
 import '../../components/main_app_bar.dart';
 import '../../helpers/logger.dart';
-import '../../helpers/sync.dart';
 import '../../models/local_state.dart';
+import '../settings/backup/firebase/firebase_sync.dart';
 import 'calendar.dart';
 import 'journallist.dart';
 
@@ -47,7 +47,7 @@ class _HomeViewState extends State<_HomeView> {
 
   Future<void> _syncDb() async {
     try {
-      await syncDb();
+      await syncDbToFirebase();
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
@@ -71,19 +71,18 @@ class _HomeViewState extends State<_HomeView> {
   Future<void> _checkLoginAndSyncDb() async {
     final isInitialized = isFirebaseInitialized();
     if (isInitialized) {
-      final user = await getUser();
+      final user = await getFirebaseUser();
       if (user != null) {
         await _syncDb();
       } else {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: const Text("Please login to allow sync"),
+              content: const Text("Please setup backup to allow sync"),
               action: SnackBarAction(
-                label: "Login",
+                label: "Backup",
                 onPressed: () async {
-                  await AutoRouter.of(context).pushNamed("/login");
-                  await _syncDb();
+                  await AutoRouter.of(context).pushNamed("/settings/backup");
                 },
               ),
             ),
