@@ -33,6 +33,9 @@ Future<void> jsonToDb(String jsonEncoded) async {
           a["tags"] = (a["tags"] as List<dynamic>)
               .map<String>((a) => a as String)
               .toList();
+          a["updationTime"] = (a["updationTime"] ?? DateTime.now());
+          a["creationTime"] = (a["creationTime"] ?? DateTime.now());
+          a["hidden"] = (a["hidden"] ?? false);
           return JournalEntryData.fromJson(a as Map<String, dynamic>);
         },
       ),
