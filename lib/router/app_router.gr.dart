@@ -8,31 +8,33 @@
 // coverage:ignore-file
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
-import 'package:auto_route/auto_route.dart' as _i16;
-import 'package:flutter/material.dart' as _i17;
+import 'package:auto_route/auto_route.dart' as _i17;
+import 'package:flutter/material.dart' as _i18;
 import 'package:journal_app/pages/details.dart' as _i2;
 import 'package:journal_app/pages/editentry.dart' as _i3;
-import 'package:journal_app/pages/home/calendar.dart' as _i9;
-import 'package:journal_app/pages/home/index.dart' as _i8;
-import 'package:journal_app/pages/home/journallist.dart' as _i10;
-import 'package:journal_app/pages/newentry.dart' as _i11;
-import 'package:journal_app/pages/search.dart' as _i12;
+import 'package:journal_app/pages/home/calendar.dart' as _i10;
+import 'package:journal_app/pages/home/index.dart' as _i9;
+import 'package:journal_app/pages/home/journallist.dart' as _i11;
+import 'package:journal_app/pages/newentry.dart' as _i12;
+import 'package:journal_app/pages/search.dart' as _i13;
 import 'package:journal_app/pages/settings/backup/firebase/firebase_login.dart'
     as _i5;
 import 'package:journal_app/pages/settings/backup/firebase/firebase_profile.dart'
     as _i6;
 import 'package:journal_app/pages/settings/backup/firebase/firebase_screen.dart'
     as _i4;
+import 'package:journal_app/pages/settings/backup/gdrive/gdrive_screen.dart'
+    as _i7;
 import 'package:journal_app/pages/settings/backup/index.dart' as _i1;
-import 'package:journal_app/pages/settings/help.dart' as _i7;
-import 'package:journal_app/pages/settings/index.dart' as _i14;
-import 'package:journal_app/pages/settings/security.dart' as _i13;
-import 'package:journal_app/pages/settings/styling.dart' as _i15;
+import 'package:journal_app/pages/settings/help.dart' as _i8;
+import 'package:journal_app/pages/settings/index.dart' as _i15;
+import 'package:journal_app/pages/settings/security.dart' as _i14;
+import 'package:journal_app/pages/settings/styling.dart' as _i16;
 
 /// generated route for
 /// [_i1.BackupSettingsScreen]
-class BackupSettingsRoute extends _i16.PageRouteInfo<void> {
-  const BackupSettingsRoute({List<_i16.PageRouteInfo>? children})
+class BackupSettingsRoute extends _i17.PageRouteInfo<void> {
+  const BackupSettingsRoute({List<_i17.PageRouteInfo>? children})
       : super(
           BackupSettingsRoute.name,
           initialChildren: children,
@@ -40,7 +42,7 @@ class BackupSettingsRoute extends _i16.PageRouteInfo<void> {
 
   static const String name = 'BackupSettingsRoute';
 
-  static _i16.PageInfo page = _i16.PageInfo(
+  static _i17.PageInfo page = _i17.PageInfo(
     name,
     builder: (data) {
       return const _i1.BackupSettingsScreen();
@@ -50,12 +52,12 @@ class BackupSettingsRoute extends _i16.PageRouteInfo<void> {
 
 /// generated route for
 /// [_i2.DetailsScreen]
-class DetailsRoute extends _i16.PageRouteInfo<DetailsRouteArgs> {
+class DetailsRoute extends _i17.PageRouteInfo<DetailsRouteArgs> {
   DetailsRoute({
-    _i17.Key? key,
+    _i18.Key? key,
     bool showHidden = false,
     String? entryId,
-    List<_i16.PageRouteInfo>? children,
+    List<_i17.PageRouteInfo>? children,
   }) : super(
           DetailsRoute.name,
           args: DetailsRouteArgs(
@@ -72,7 +74,7 @@ class DetailsRoute extends _i16.PageRouteInfo<DetailsRouteArgs> {
 
   static const String name = 'DetailsRoute';
 
-  static _i16.PageInfo page = _i16.PageInfo(
+  static _i17.PageInfo page = _i17.PageInfo(
     name,
     builder: (data) {
       final queryParams = data.queryParams;
@@ -100,7 +102,7 @@ class DetailsRouteArgs {
     this.entryId,
   });
 
-  final _i17.Key? key;
+  final _i18.Key? key;
 
   final bool showHidden;
 
@@ -114,11 +116,11 @@ class DetailsRouteArgs {
 
 /// generated route for
 /// [_i3.EditEntryScreen]
-class EditEntryRoute extends _i16.PageRouteInfo<EditEntryRouteArgs> {
+class EditEntryRoute extends _i17.PageRouteInfo<EditEntryRouteArgs> {
   EditEntryRoute({
-    _i17.Key? key,
+    _i18.Key? key,
     required String entryId,
-    List<_i16.PageRouteInfo>? children,
+    List<_i17.PageRouteInfo>? children,
   }) : super(
           EditEntryRoute.name,
           args: EditEntryRouteArgs(
@@ -131,7 +133,7 @@ class EditEntryRoute extends _i16.PageRouteInfo<EditEntryRouteArgs> {
 
   static const String name = 'EditEntryRoute';
 
-  static _i16.PageInfo page = _i16.PageInfo(
+  static _i17.PageInfo page = _i17.PageInfo(
     name,
     builder: (data) {
       final pathParams = data.inheritedPathParams;
@@ -152,7 +154,7 @@ class EditEntryRouteArgs {
     required this.entryId,
   });
 
-  final _i17.Key? key;
+  final _i18.Key? key;
 
   final String entryId;
 
@@ -164,8 +166,8 @@ class EditEntryRouteArgs {
 
 /// generated route for
 /// [_i4.FirebaseBackupScreen]
-class FirebaseBackupRoute extends _i16.PageRouteInfo<void> {
-  const FirebaseBackupRoute({List<_i16.PageRouteInfo>? children})
+class FirebaseBackupRoute extends _i17.PageRouteInfo<void> {
+  const FirebaseBackupRoute({List<_i17.PageRouteInfo>? children})
       : super(
           FirebaseBackupRoute.name,
           initialChildren: children,
@@ -173,7 +175,7 @@ class FirebaseBackupRoute extends _i16.PageRouteInfo<void> {
 
   static const String name = 'FirebaseBackupRoute';
 
-  static _i16.PageInfo page = _i16.PageInfo(
+  static _i17.PageInfo page = _i17.PageInfo(
     name,
     builder: (data) {
       return const _i4.FirebaseBackupScreen();
@@ -183,8 +185,8 @@ class FirebaseBackupRoute extends _i16.PageRouteInfo<void> {
 
 /// generated route for
 /// [_i5.FirebaseLoginScreen]
-class FirebaseLoginRoute extends _i16.PageRouteInfo<void> {
-  const FirebaseLoginRoute({List<_i16.PageRouteInfo>? children})
+class FirebaseLoginRoute extends _i17.PageRouteInfo<void> {
+  const FirebaseLoginRoute({List<_i17.PageRouteInfo>? children})
       : super(
           FirebaseLoginRoute.name,
           initialChildren: children,
@@ -192,7 +194,7 @@ class FirebaseLoginRoute extends _i16.PageRouteInfo<void> {
 
   static const String name = 'FirebaseLoginRoute';
 
-  static _i16.PageInfo page = _i16.PageInfo(
+  static _i17.PageInfo page = _i17.PageInfo(
     name,
     builder: (data) {
       return const _i5.FirebaseLoginScreen();
@@ -202,8 +204,8 @@ class FirebaseLoginRoute extends _i16.PageRouteInfo<void> {
 
 /// generated route for
 /// [_i6.FirebaseProfileScreen]
-class FirebaseProfileRoute extends _i16.PageRouteInfo<void> {
-  const FirebaseProfileRoute({List<_i16.PageRouteInfo>? children})
+class FirebaseProfileRoute extends _i17.PageRouteInfo<void> {
+  const FirebaseProfileRoute({List<_i17.PageRouteInfo>? children})
       : super(
           FirebaseProfileRoute.name,
           initialChildren: children,
@@ -211,7 +213,7 @@ class FirebaseProfileRoute extends _i16.PageRouteInfo<void> {
 
   static const String name = 'FirebaseProfileRoute';
 
-  static _i16.PageInfo page = _i16.PageInfo(
+  static _i17.PageInfo page = _i17.PageInfo(
     name,
     builder: (data) {
       return const _i6.FirebaseProfileScreen();
@@ -220,9 +222,28 @@ class FirebaseProfileRoute extends _i16.PageRouteInfo<void> {
 }
 
 /// generated route for
-/// [_i7.HelpSettingsScreen]
-class HelpSettingsRoute extends _i16.PageRouteInfo<void> {
-  const HelpSettingsRoute({List<_i16.PageRouteInfo>? children})
+/// [_i7.GDriveBackupScreen]
+class GDriveBackupRoute extends _i17.PageRouteInfo<void> {
+  const GDriveBackupRoute({List<_i17.PageRouteInfo>? children})
+      : super(
+          GDriveBackupRoute.name,
+          initialChildren: children,
+        );
+
+  static const String name = 'GDriveBackupRoute';
+
+  static _i17.PageInfo page = _i17.PageInfo(
+    name,
+    builder: (data) {
+      return const _i7.GDriveBackupScreen();
+    },
+  );
+}
+
+/// generated route for
+/// [_i8.HelpSettingsScreen]
+class HelpSettingsRoute extends _i17.PageRouteInfo<void> {
+  const HelpSettingsRoute({List<_i17.PageRouteInfo>? children})
       : super(
           HelpSettingsRoute.name,
           initialChildren: children,
@@ -230,18 +251,18 @@ class HelpSettingsRoute extends _i16.PageRouteInfo<void> {
 
   static const String name = 'HelpSettingsRoute';
 
-  static _i16.PageInfo page = _i16.PageInfo(
+  static _i17.PageInfo page = _i17.PageInfo(
     name,
     builder: (data) {
-      return const _i7.HelpSettingsScreen();
+      return const _i8.HelpSettingsScreen();
     },
   );
 }
 
 /// generated route for
-/// [_i8.HomeScreen]
-class HomeRoute extends _i16.PageRouteInfo<void> {
-  const HomeRoute({List<_i16.PageRouteInfo>? children})
+/// [_i9.HomeScreen]
+class HomeRoute extends _i17.PageRouteInfo<void> {
+  const HomeRoute({List<_i17.PageRouteInfo>? children})
       : super(
           HomeRoute.name,
           initialChildren: children,
@@ -249,18 +270,18 @@ class HomeRoute extends _i16.PageRouteInfo<void> {
 
   static const String name = 'HomeRoute';
 
-  static _i16.PageInfo page = _i16.PageInfo(
+  static _i17.PageInfo page = _i17.PageInfo(
     name,
     builder: (data) {
-      return const _i8.HomeScreen();
+      return const _i9.HomeScreen();
     },
   );
 }
 
 /// generated route for
-/// [_i9.JournalCalendarScreen]
-class JournalCalendarRoute extends _i16.PageRouteInfo<void> {
-  const JournalCalendarRoute({List<_i16.PageRouteInfo>? children})
+/// [_i10.JournalCalendarScreen]
+class JournalCalendarRoute extends _i17.PageRouteInfo<void> {
+  const JournalCalendarRoute({List<_i17.PageRouteInfo>? children})
       : super(
           JournalCalendarRoute.name,
           initialChildren: children,
@@ -268,18 +289,18 @@ class JournalCalendarRoute extends _i16.PageRouteInfo<void> {
 
   static const String name = 'JournalCalendarRoute';
 
-  static _i16.PageInfo page = _i16.PageInfo(
+  static _i17.PageInfo page = _i17.PageInfo(
     name,
     builder: (data) {
-      return const _i9.JournalCalendarScreen();
+      return const _i10.JournalCalendarScreen();
     },
   );
 }
 
 /// generated route for
-/// [_i10.JournalListScreen]
-class JournalListRoute extends _i16.PageRouteInfo<void> {
-  const JournalListRoute({List<_i16.PageRouteInfo>? children})
+/// [_i11.JournalListScreen]
+class JournalListRoute extends _i17.PageRouteInfo<void> {
+  const JournalListRoute({List<_i17.PageRouteInfo>? children})
       : super(
           JournalListRoute.name,
           initialChildren: children,
@@ -287,18 +308,18 @@ class JournalListRoute extends _i16.PageRouteInfo<void> {
 
   static const String name = 'JournalListRoute';
 
-  static _i16.PageInfo page = _i16.PageInfo(
+  static _i17.PageInfo page = _i17.PageInfo(
     name,
     builder: (data) {
-      return const _i10.JournalListScreen();
+      return const _i11.JournalListScreen();
     },
   );
 }
 
 /// generated route for
-/// [_i11.NewEntryScreen]
-class NewEntryRoute extends _i16.PageRouteInfo<void> {
-  const NewEntryRoute({List<_i16.PageRouteInfo>? children})
+/// [_i12.NewEntryScreen]
+class NewEntryRoute extends _i17.PageRouteInfo<void> {
+  const NewEntryRoute({List<_i17.PageRouteInfo>? children})
       : super(
           NewEntryRoute.name,
           initialChildren: children,
@@ -306,21 +327,21 @@ class NewEntryRoute extends _i16.PageRouteInfo<void> {
 
   static const String name = 'NewEntryRoute';
 
-  static _i16.PageInfo page = _i16.PageInfo(
+  static _i17.PageInfo page = _i17.PageInfo(
     name,
     builder: (data) {
-      return const _i11.NewEntryScreen();
+      return const _i12.NewEntryScreen();
     },
   );
 }
 
 /// generated route for
-/// [_i12.SearchScreen]
-class SearchRoute extends _i16.PageRouteInfo<SearchRouteArgs> {
+/// [_i13.SearchScreen]
+class SearchRoute extends _i17.PageRouteInfo<SearchRouteArgs> {
   SearchRoute({
-    _i17.Key? key,
+    _i18.Key? key,
     bool showHidden = false,
-    List<_i16.PageRouteInfo>? children,
+    List<_i17.PageRouteInfo>? children,
   }) : super(
           SearchRoute.name,
           args: SearchRouteArgs(
@@ -333,7 +354,7 @@ class SearchRoute extends _i16.PageRouteInfo<SearchRouteArgs> {
 
   static const String name = 'SearchRoute';
 
-  static _i16.PageInfo page = _i16.PageInfo(
+  static _i17.PageInfo page = _i17.PageInfo(
     name,
     builder: (data) {
       final queryParams = data.queryParams;
@@ -343,7 +364,7 @@ class SearchRoute extends _i16.PageRouteInfo<SearchRouteArgs> {
                 'showHidden',
                 false,
               )));
-      return _i12.SearchScreen(
+      return _i13.SearchScreen(
         key: args.key,
         showHidden: args.showHidden,
       );
@@ -357,7 +378,7 @@ class SearchRouteArgs {
     this.showHidden = false,
   });
 
-  final _i17.Key? key;
+  final _i18.Key? key;
 
   final bool showHidden;
 
@@ -368,9 +389,9 @@ class SearchRouteArgs {
 }
 
 /// generated route for
-/// [_i13.SecuritySettingsScreen]
-class SecuritySettingsRoute extends _i16.PageRouteInfo<void> {
-  const SecuritySettingsRoute({List<_i16.PageRouteInfo>? children})
+/// [_i14.SecuritySettingsScreen]
+class SecuritySettingsRoute extends _i17.PageRouteInfo<void> {
+  const SecuritySettingsRoute({List<_i17.PageRouteInfo>? children})
       : super(
           SecuritySettingsRoute.name,
           initialChildren: children,
@@ -378,18 +399,18 @@ class SecuritySettingsRoute extends _i16.PageRouteInfo<void> {
 
   static const String name = 'SecuritySettingsRoute';
 
-  static _i16.PageInfo page = _i16.PageInfo(
+  static _i17.PageInfo page = _i17.PageInfo(
     name,
     builder: (data) {
-      return const _i13.SecuritySettingsScreen();
+      return const _i14.SecuritySettingsScreen();
     },
   );
 }
 
 /// generated route for
-/// [_i14.SettingsScreen]
-class SettingsRoute extends _i16.PageRouteInfo<void> {
-  const SettingsRoute({List<_i16.PageRouteInfo>? children})
+/// [_i15.SettingsScreen]
+class SettingsRoute extends _i17.PageRouteInfo<void> {
+  const SettingsRoute({List<_i17.PageRouteInfo>? children})
       : super(
           SettingsRoute.name,
           initialChildren: children,
@@ -397,18 +418,18 @@ class SettingsRoute extends _i16.PageRouteInfo<void> {
 
   static const String name = 'SettingsRoute';
 
-  static _i16.PageInfo page = _i16.PageInfo(
+  static _i17.PageInfo page = _i17.PageInfo(
     name,
     builder: (data) {
-      return const _i14.SettingsScreen();
+      return const _i15.SettingsScreen();
     },
   );
 }
 
 /// generated route for
-/// [_i15.StylingSettingsScreen]
-class StylingSettingsRoute extends _i16.PageRouteInfo<void> {
-  const StylingSettingsRoute({List<_i16.PageRouteInfo>? children})
+/// [_i16.StylingSettingsScreen]
+class StylingSettingsRoute extends _i17.PageRouteInfo<void> {
+  const StylingSettingsRoute({List<_i17.PageRouteInfo>? children})
       : super(
           StylingSettingsRoute.name,
           initialChildren: children,
@@ -416,10 +437,10 @@ class StylingSettingsRoute extends _i16.PageRouteInfo<void> {
 
   static const String name = 'StylingSettingsRoute';
 
-  static _i16.PageInfo page = _i16.PageInfo(
+  static _i17.PageInfo page = _i17.PageInfo(
     name,
     builder: (data) {
-      return const _i15.StylingSettingsScreen();
+      return const _i16.StylingSettingsScreen();
     },
   );
 }

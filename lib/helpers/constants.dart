@@ -5,6 +5,7 @@ const hiddenLockedMode = "HIDDEN_LOCKED_MODE";
 final pinKey = "PIN";
 const dbFileName = "journal_app.sqlite";
 const dbExportName = "journal_app.db.json";
+const dbMetadataName = "journal_app.metadata.json";
 
 const String googleSignInClientIdFromEnv = String.fromEnvironment(
     'GOOGLE_SIGNIN_CLIENT_ID',

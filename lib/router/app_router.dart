@@ -73,5 +73,10 @@ class AppRouter extends RootStackRouter {
           path: "/firebase/profile",
           page: FirebaseProfileRoute.page,
         ),
+        CustomRoute<void>(
+          path: "/gdrive/backup",
+          page: GDriveBackupRoute.page,
+          transitionsBuilder: TransitionsBuilders.slideLeft,
+        ),
       ];
 }

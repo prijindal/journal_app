@@ -1,9 +1,12 @@
+import 'dart:io';
+
 import 'package:auto_route/annotations.dart';
 import 'package:flutter/material.dart';
 
 import '../../../helpers/fileio.dart';
 import 'firebase/firebase_backup_tile.dart';
 import 'firebase/firebase_sync.dart';
+import 'gdrive/gdrive_backup_tile.dart';
 
 @RoutePage()
 class BackupSettingsScreen extends StatelessWidget {
@@ -46,6 +49,8 @@ class CloudBackupTile extends StatelessWidget {
           dense: true,
         ),
         if (isFirebaseInitialized()) const FirebaseBackupTile(),
+        if (isFirebaseInitialized() && (Platform.isAndroid || Platform.isIOS))
+          const GDriveBackupTile(),
       ],
     );
   }
