@@ -37,9 +37,13 @@ class $JournalEntryTable extends JournalEntry
   @override
   late final GeneratedColumn<DateTime> creationTime = GeneratedColumn<DateTime>(
       'creation_time', aliasedName, false,
-      type: DriftSqlType.dateTime,
-      requiredDuringInsert: false,
-      defaultValue: currentDateAndTime);
+      type: DriftSqlType.dateTime, requiredDuringInsert: true);
+  static const VerificationMeta _updationTimeMeta =
+      const VerificationMeta('updationTime');
+  @override
+  late final GeneratedColumn<DateTime> updationTime = GeneratedColumn<DateTime>(
+      'updation_time', aliasedName, false,
+      type: DriftSqlType.dateTime, requiredDuringInsert: true);
   static const VerificationMeta _hiddenMeta = const VerificationMeta('hidden');
   @override
   late final GeneratedColumn<bool> hidden = GeneratedColumn<bool>(
@@ -51,7 +55,7 @@ class $JournalEntryTable extends JournalEntry
       defaultValue: Constant(false));
   @override
   List<GeneratedColumn> get $columns =>
-      [id, document, tags, creationTime, hidden];
+      [id, document, tags, creationTime, updationTime, hidden];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -72,6 +76,16 @@ class $JournalEntryTable extends JournalEntry
           _creationTimeMeta,
           creationTime.isAcceptableOrUnknown(
               data['creation_time']!, _creationTimeMeta));
+    } else if (isInserting) {
+      context.missing(_creationTimeMeta);
+    }
+    if (data.containsKey('updation_time')) {
+      context.handle(
+          _updationTimeMeta,
+          updationTime.isAcceptableOrUnknown(
+              data['updation_time']!, _updationTimeMeta));
+    } else if (isInserting) {
+      context.missing(_updationTimeMeta);
     }
     if (data.containsKey('hidden')) {
       context.handle(_hiddenMeta,
@@ -96,6 +110,8 @@ class $JournalEntryTable extends JournalEntry
           .read(DriftSqlType.string, data['${effectivePrefix}tags'])!),
       creationTime: attachedDatabase.typeMapping.read(
           DriftSqlType.dateTime, data['${effectivePrefix}creation_time'])!,
+      updationTime: attachedDatabase.typeMapping.read(
+          DriftSqlType.dateTime, data['${effectivePrefix}updation_time'])!,
       hidden: attachedDatabase.typeMapping
           .read(DriftSqlType.bool, data['${effectivePrefix}hidden'])!,
     );
@@ -118,12 +134,14 @@ class JournalEntryData extends DataClass
   final ParchmentDocument document;
   final List<String> tags;
   final DateTime creationTime;
+  final DateTime updationTime;
   final bool hidden;
   const JournalEntryData(
       {required this.id,
       required this.document,
       required this.tags,
       required this.creationTime,
+      required this.updationTime,
       required this.hidden});
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -138,6 +156,7 @@ class JournalEntryData extends DataClass
           Variable<String>($JournalEntryTable.$convertertags.toSql(tags));
     }
     map['creation_time'] = Variable<DateTime>(creationTime);
+    map['updation_time'] = Variable<DateTime>(updationTime);
     map['hidden'] = Variable<bool>(hidden);
     return map;
   }
@@ -148,6 +167,7 @@ class JournalEntryData extends DataClass
       document: Value(document),
       tags: Value(tags),
       creationTime: Value(creationTime),
+      updationTime: Value(updationTime),
       hidden: Value(hidden),
     );
   }
@@ -160,6 +180,7 @@ class JournalEntryData extends DataClass
       document: serializer.fromJson<ParchmentDocument>(json['document']),
       tags: serializer.fromJson<List<String>>(json['tags']),
       creationTime: serializer.fromJson<DateTime>(json['creationTime']),
+      updationTime: serializer.fromJson<DateTime>(json['updationTime']),
       hidden: serializer.fromJson<bool>(json['hidden']),
     );
   }
@@ -171,6 +192,7 @@ class JournalEntryData extends DataClass
       'document': serializer.toJson<ParchmentDocument>(document),
       'tags': serializer.toJson<List<String>>(tags),
       'creationTime': serializer.toJson<DateTime>(creationTime),
+      'updationTime': serializer.toJson<DateTime>(updationTime),
       'hidden': serializer.toJson<bool>(hidden),
     };
   }
@@ -180,12 +202,14 @@ class JournalEntryData extends DataClass
           ParchmentDocument? document,
           List<String>? tags,
           DateTime? creationTime,
+          DateTime? updationTime,
           bool? hidden}) =>
       JournalEntryData(
         id: id ?? this.id,
         document: document ?? this.document,
         tags: tags ?? this.tags,
         creationTime: creationTime ?? this.creationTime,
+        updationTime: updationTime ?? this.updationTime,
         hidden: hidden ?? this.hidden,
       );
   JournalEntryData copyWithCompanion(JournalEntryCompanion data) {
@@ -196,6 +220,9 @@ class JournalEntryData extends DataClass
       creationTime: data.creationTime.present
           ? data.creationTime.value
           : this.creationTime,
+      updationTime: data.updationTime.present
+          ? data.updationTime.value
+          : this.updationTime,
       hidden: data.hidden.present ? data.hidden.value : this.hidden,
     );
   }
@@ -207,13 +234,15 @@ class JournalEntryData extends DataClass
           ..write('document: $document, ')
           ..write('tags: $tags, ')
           ..write('creationTime: $creationTime, ')
+          ..write('updationTime: $updationTime, ')
           ..write('hidden: $hidden')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => Object.hash(id, document, tags, creationTime, hidden);
+  int get hashCode =>
+      Object.hash(id, document, tags, creationTime, updationTime, hidden);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -222,6 +251,7 @@ class JournalEntryData extends DataClass
           other.document == this.document &&
           other.tags == this.tags &&
           other.creationTime == this.creationTime &&
+          other.updationTime == this.updationTime &&
           other.hidden == this.hidden);
 }
 
@@ -230,6 +260,7 @@ class JournalEntryCompanion extends UpdateCompanion<JournalEntryData> {
   final Value<ParchmentDocument> document;
   final Value<List<String>> tags;
   final Value<DateTime> creationTime;
+  final Value<DateTime> updationTime;
   final Value<bool> hidden;
   final Value<int> rowid;
   const JournalEntryCompanion({
@@ -237,6 +268,7 @@ class JournalEntryCompanion extends UpdateCompanion<JournalEntryData> {
     this.document = const Value.absent(),
     this.tags = const Value.absent(),
     this.creationTime = const Value.absent(),
+    this.updationTime = const Value.absent(),
     this.hidden = const Value.absent(),
     this.rowid = const Value.absent(),
   });
@@ -244,15 +276,19 @@ class JournalEntryCompanion extends UpdateCompanion<JournalEntryData> {
     this.id = const Value.absent(),
     required ParchmentDocument document,
     this.tags = const Value.absent(),
-    this.creationTime = const Value.absent(),
+    required DateTime creationTime,
+    required DateTime updationTime,
     this.hidden = const Value.absent(),
     this.rowid = const Value.absent(),
-  }) : document = Value(document);
+  })  : document = Value(document),
+        creationTime = Value(creationTime),
+        updationTime = Value(updationTime);
   static Insertable<JournalEntryData> custom({
     Expression<String>? id,
     Expression<String>? document,
     Expression<String>? tags,
     Expression<DateTime>? creationTime,
+    Expression<DateTime>? updationTime,
     Expression<bool>? hidden,
     Expression<int>? rowid,
   }) {
@@ -261,6 +297,7 @@ class JournalEntryCompanion extends UpdateCompanion<JournalEntryData> {
       if (document != null) 'document': document,
       if (tags != null) 'tags': tags,
       if (creationTime != null) 'creation_time': creationTime,
+      if (updationTime != null) 'updation_time': updationTime,
       if (hidden != null) 'hidden': hidden,
       if (rowid != null) 'rowid': rowid,
     });
@@ -271,6 +308,7 @@ class JournalEntryCompanion extends UpdateCompanion<JournalEntryData> {
       Value<ParchmentDocument>? document,
       Value<List<String>>? tags,
       Value<DateTime>? creationTime,
+      Value<DateTime>? updationTime,
       Value<bool>? hidden,
       Value<int>? rowid}) {
     return JournalEntryCompanion(
@@ -278,6 +316,7 @@ class JournalEntryCompanion extends UpdateCompanion<JournalEntryData> {
       document: document ?? this.document,
       tags: tags ?? this.tags,
       creationTime: creationTime ?? this.creationTime,
+      updationTime: updationTime ?? this.updationTime,
       hidden: hidden ?? this.hidden,
       rowid: rowid ?? this.rowid,
     );
@@ -300,6 +339,9 @@ class JournalEntryCompanion extends UpdateCompanion<JournalEntryData> {
     if (creationTime.present) {
       map['creation_time'] = Variable<DateTime>(creationTime.value);
     }
+    if (updationTime.present) {
+      map['updation_time'] = Variable<DateTime>(updationTime.value);
+    }
     if (hidden.present) {
       map['hidden'] = Variable<bool>(hidden.value);
     }
@@ -316,6 +358,7 @@ class JournalEntryCompanion extends UpdateCompanion<JournalEntryData> {
           ..write('document: $document, ')
           ..write('tags: $tags, ')
           ..write('creationTime: $creationTime, ')
+          ..write('updationTime: $updationTime, ')
           ..write('hidden: $hidden, ')
           ..write('rowid: $rowid')
           ..write(')'))
@@ -339,7 +382,8 @@ typedef $$JournalEntryTableCreateCompanionBuilder = JournalEntryCompanion
   Value<String> id,
   required ParchmentDocument document,
   Value<List<String>> tags,
-  Value<DateTime> creationTime,
+  required DateTime creationTime,
+  required DateTime updationTime,
   Value<bool> hidden,
   Value<int> rowid,
 });
@@ -349,6 +393,7 @@ typedef $$JournalEntryTableUpdateCompanionBuilder = JournalEntryCompanion
   Value<ParchmentDocument> document,
   Value<List<String>> tags,
   Value<DateTime> creationTime,
+  Value<DateTime> updationTime,
   Value<bool> hidden,
   Value<int> rowid,
 });
@@ -378,6 +423,9 @@ class $$JournalEntryTableFilterComposer
   ColumnFilters<DateTime> get creationTime => $composableBuilder(
       column: $table.creationTime, builder: (column) => ColumnFilters(column));
 
+  ColumnFilters<DateTime> get updationTime => $composableBuilder(
+      column: $table.updationTime, builder: (column) => ColumnFilters(column));
+
   ColumnFilters<bool> get hidden => $composableBuilder(
       column: $table.hidden, builder: (column) => ColumnFilters(column));
 }
@@ -404,6 +452,10 @@ class $$JournalEntryTableOrderingComposer
       column: $table.creationTime,
       builder: (column) => ColumnOrderings(column));
 
+  ColumnOrderings<DateTime> get updationTime => $composableBuilder(
+      column: $table.updationTime,
+      builder: (column) => ColumnOrderings(column));
+
   ColumnOrderings<bool> get hidden => $composableBuilder(
       column: $table.hidden, builder: (column) => ColumnOrderings(column));
 }
@@ -428,6 +480,9 @@ class $$JournalEntryTableAnnotationComposer
 
   GeneratedColumn<DateTime> get creationTime => $composableBuilder(
       column: $table.creationTime, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get updationTime => $composableBuilder(
+      column: $table.updationTime, builder: (column) => column);
 
   GeneratedColumn<bool> get hidden =>
       $composableBuilder(column: $table.hidden, builder: (column) => column);
@@ -463,6 +518,7 @@ class $$JournalEntryTableTableManager extends RootTableManager<
             Value<ParchmentDocument> document = const Value.absent(),
             Value<List<String>> tags = const Value.absent(),
             Value<DateTime> creationTime = const Value.absent(),
+            Value<DateTime> updationTime = const Value.absent(),
             Value<bool> hidden = const Value.absent(),
             Value<int> rowid = const Value.absent(),
           }) =>
@@ -471,6 +527,7 @@ class $$JournalEntryTableTableManager extends RootTableManager<
             document: document,
             tags: tags,
             creationTime: creationTime,
+            updationTime: updationTime,
             hidden: hidden,
             rowid: rowid,
           ),
@@ -478,7 +535,8 @@ class $$JournalEntryTableTableManager extends RootTableManager<
             Value<String> id = const Value.absent(),
             required ParchmentDocument document,
             Value<List<String>> tags = const Value.absent(),
-            Value<DateTime> creationTime = const Value.absent(),
+            required DateTime creationTime,
+            required DateTime updationTime,
             Value<bool> hidden = const Value.absent(),
             Value<int> rowid = const Value.absent(),
           }) =>
@@ -487,6 +545,7 @@ class $$JournalEntryTableTableManager extends RootTableManager<
             document: document,
             tags: tags,
             creationTime: creationTime,
+            updationTime: updationTime,
             hidden: hidden,
             rowid: rowid,
           ),

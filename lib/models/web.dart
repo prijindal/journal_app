@@ -2,6 +2,7 @@ import 'package:drift/drift.dart';
 import 'package:drift/wasm.dart';
 
 import '../helpers/constants.dart';
+import '../helpers/logger.dart';
 import './core.dart';
 
 DatabaseConnection connectOnWeb() {
@@ -16,8 +17,9 @@ DatabaseConnection connectOnWeb() {
       // Depending how central local persistence is to your app, you may want
       // to show a warning to the user if only unrealiable implemetentations
       // are available.
-      // print('Using ${result.chosenImplementation} due to missing browser '
-      //     'features: ${result.missingFeatures}');
+      AppLogger.instance
+          .d('Using ${result.chosenImplementation} due to missing browser '
+              'features: ${result.missingFeatures}');
     }
 
     return result.resolvedExecutor;

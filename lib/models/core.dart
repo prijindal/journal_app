@@ -19,8 +19,8 @@ class JournalEntry extends Table {
   TextColumn get tags => text()
       .map(const StringListConverter())
       .withDefault(Constant(jsonEncode([])))();
-  DateTimeColumn get creationTime =>
-      dateTime().withDefault(currentDateAndTime)();
+  DateTimeColumn get creationTime => dateTime()();
+  DateTimeColumn get updationTime => dateTime()();
   BoolColumn get hidden => boolean().withDefault(Constant(false))();
 
   @override

@@ -13,7 +13,6 @@ Future<String> extractDbJson() async {
   String encoded = jsonEncode(
     {
       "entries": entries,
-      "created_at": DateTime.now().toIso8601String(),
     },
   );
   AppLogger.instance.i("Extracted data from database");

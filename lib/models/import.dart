@@ -43,8 +43,11 @@ Future<void> importFromJourney() async {
             final journalEntry = JournalEntryCompanion(
               document: Value(document),
               tags: Value(["Imported"]),
-              creationTime: Value(DateTime.fromMillisecondsSinceEpoch(
-                  fileContent["date_journal"] as int)),
+              creationTime: Value(
+                DateTime.fromMillisecondsSinceEpoch(
+                    fileContent["date_journal"] as int),
+              ),
+              updationTime: Value(DateTime.now()),
             );
             await MyDatabase.instance
                 .into(MyDatabase.instance.journalEntry)

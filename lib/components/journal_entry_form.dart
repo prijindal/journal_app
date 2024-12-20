@@ -49,6 +49,7 @@ class _JournalEntryFormState extends State<JournalEntryForm> {
         document: drift.Value(_controller.document),
         hidden: drift.Value(_hidden),
         tags: drift.Value(_tags),
+        updationTime: drift.Value(DateTime.now()),
       ),
     );
   }
