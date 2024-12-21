@@ -4,6 +4,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:journal_app/models/settings.dart';
 import 'package:journal_app/pages/home/index.dart';
+import 'package:journal_app/pages/settings/backup/firebase/firebase_sync.dart';
+import 'package:journal_app/pages/settings/backup/gdrive/gdrive_sync.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:provider/provider.dart';
 
@@ -26,7 +28,18 @@ void main() {
       });
       // Load app widget.
       await tester.pumpWidget(
-        ChangeNotifierProvider<SettingsStorageNotifier>(
+        MultiProvider(
+          providers: [
+            ChangeNotifierProvider<SettingsStorageNotifier>(
+              create: (context) => SettingsStorageNotifier(),
+            ),
+            ChangeNotifierProvider<GdriveSync>(
+              create: (_) => GdriveSync(),
+            ),
+            ChangeNotifierProvider<FirebaseSync>(
+              create: (_) => FirebaseSync(),
+            ),
+          ],
           child: MaterialApp(
             title: 'Routing Test',
             home: StackRouterScope(
@@ -35,7 +48,6 @@ void main() {
               child: HomeScreen(),
             ),
           ),
-          create: (context) => SettingsStorageNotifier(),
         ),
       );
 
