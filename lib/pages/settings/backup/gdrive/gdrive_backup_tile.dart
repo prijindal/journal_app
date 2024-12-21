@@ -1,6 +1,6 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
-import 'package:google_sign_in/google_sign_in.dart';
+import 'package:provider/provider.dart';
 
 import '../../../../helpers/logger.dart';
 import 'gdrive_sync.dart';
@@ -13,23 +13,10 @@ class GDriveBackupTile extends StatefulWidget {
 }
 
 class _GDriveBackupTileState extends State<GDriveBackupTile> {
-  GoogleSignInAccount? _currentUser;
-
   @override
   void initState() {
-    _checkGoogleSignIn();
+    Provider.of<GdriveSync>(context, listen: false).checkGoogleSignIn();
     super.initState();
-  }
-
-  void _checkGoogleSignIn() async {
-    if (await googleSignIn.isSignedIn()) {
-      final currentUser = googleSignIn.currentUser;
-      if (currentUser != null) {
-        setState(() {
-          _currentUser = currentUser;
-        });
-      }
-    }
   }
 
   void _login() async {
@@ -37,7 +24,8 @@ class _GDriveBackupTileState extends State<GDriveBackupTile> {
     try {
       final signedIn = await googleSignIn.signIn();
       if (signedIn != null) {
-        _checkGoogleSignIn();
+        // ignore: use_build_context_synchronously
+        Provider.of<GdriveSync>(context, listen: false).checkGoogleSignIn();
       } else {
         scaffoldMessenger.showSnackBar(
           const SnackBar(
@@ -59,7 +47,8 @@ class _GDriveBackupTileState extends State<GDriveBackupTile> {
 
   @override
   Widget build(BuildContext context) {
-    return _currentUser != null
+    final gDriveSync = Provider.of<GdriveSync>(context);
+    return gDriveSync.currentUser != null
         ? Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -68,8 +57,9 @@ class _GDriveBackupTileState extends State<GDriveBackupTile> {
                   'assets/icon/gdrive.png',
                   width: 48,
                 ),
-                title: Text(_currentUser!.displayName ?? _currentUser!.email),
-                subtitle: Text(_currentUser!.email),
+                title: Text(gDriveSync.currentUser!.displayName ??
+                    gDriveSync.currentUser!.email),
+                subtitle: Text(gDriveSync.currentUser!.email),
                 onTap: () async {
                   await AutoRouter.of(context).pushNamed(
                     "/gdrive/backup",

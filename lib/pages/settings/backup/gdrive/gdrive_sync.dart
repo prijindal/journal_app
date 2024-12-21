@@ -14,6 +14,7 @@ final googleSignIn = GoogleSignIn(
   scopes: [
     DriveApi.driveAppdataScope,
   ],
+  forceCodeForRefreshToken: true,
 );
 
 class GdriveSync with ChangeNotifier {
@@ -28,7 +29,21 @@ class GdriveSync with ChangeNotifier {
   bool get loaded => _loaded;
 
   Future<void> checkGoogleSignIn() async {
-    final currentUser = await googleSignIn.signInSilently();
+    final alreadySignedIn = await googleSignIn.isSignedIn();
+    GoogleSignInAccount? currentUser;
+    if (alreadySignedIn) {
+      AppLogger.instance.i("Google user already exist");
+      currentUser = googleSignIn.currentUser;
+    } else {
+      AppLogger.instance
+          .i("Google user doesn't exist, trying to sign in silently");
+      currentUser = await googleSignIn.signInSilently();
+    }
+    if (currentUser == null) {
+      AppLogger.instance
+          .i("Google user doesn't exist, trying to reauthenticate");
+      currentUser = await googleSignIn.signInSilently(reAuthenticate: true);
+    }
     if (currentUser != null) {
       final headers = await currentUser.authHeaders;
       final client = GoogleHttpClient(headers);
@@ -156,8 +171,11 @@ class GdriveSync with ChangeNotifier {
       } else {
         final fileContent = await _getDriveFile(dbExportName);
         if (fileContent != null) {
-          final byteContent = await fileContent.stream.toList();
-          final content = String.fromCharCodes(byteContent[0]);
+          final byteContents = await fileContent.stream.toList();
+          String content = "";
+          for (var byteContent in byteContents) {
+            content += String.fromCharCodes(byteContent);
+          }
           await jsonToDb(content);
           if (context.mounted) {
             // ignore: use_build_context_synchronously

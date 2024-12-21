@@ -1,7 +1,6 @@
 import 'dart:io';
 
 import 'package:auto_route/auto_route.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import '../../../helpers/fileio.dart';
@@ -50,8 +49,7 @@ class CloudBackupTile extends StatelessWidget {
           dense: true,
         ),
         if (isFirebaseInitialized()) const FirebaseBackupTile(),
-        if (isFirebaseInitialized() &&
-            (kIsWeb || Platform.isAndroid || Platform.isIOS))
+        if (isFirebaseInitialized() && (Platform.isAndroid || Platform.isIOS))
           const GDriveBackupTile(),
       ],
     );
