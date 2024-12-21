@@ -15,7 +15,7 @@ class GDriveBackupTile extends StatefulWidget {
 class _GDriveBackupTileState extends State<GDriveBackupTile> {
   @override
   void initState() {
-    Provider.of<GdriveSync>(context, listen: false).checkGoogleSignIn();
+    Provider.of<GdriveSync>(context, listen: false).checkSignIn();
     super.initState();
   }
 
@@ -24,8 +24,9 @@ class _GDriveBackupTileState extends State<GDriveBackupTile> {
     try {
       final signedIn = await googleSignIn.signIn();
       if (signedIn != null) {
+        await googleSignIn.signIn();
         // ignore: use_build_context_synchronously
-        Provider.of<GdriveSync>(context, listen: false).checkGoogleSignIn();
+        Provider.of<GdriveSync>(context, listen: false).checkSignIn();
       } else {
         scaffoldMessenger.showSnackBar(
           const SnackBar(

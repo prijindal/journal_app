@@ -1,5 +1,4 @@
 import 'package:auto_route/auto_route.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -16,14 +15,14 @@ class FirebaseBackupScreen extends StatefulWidget {
 class _FirebaseBackupScreenState extends State<FirebaseBackupScreen> {
   @override
   void initState() {
-    Provider.of<FirebaseSync>(context, listen: false).syncMetadata();
+    Provider.of<FirebaseSync>(context, listen: false).checkSignIn();
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
     final firebaseSync = Provider.of<FirebaseSync>(context);
-    final user = firebaseSync.user;
+    final user = firebaseSync.currentUser;
     return Scaffold(
       appBar: AppBar(
         title: const Text("Settings -> Backup -> Firebase"),
@@ -45,24 +44,27 @@ class _FirebaseBackupScreenState extends State<FirebaseBackupScreen> {
             },
           ),
           ListTile(
-            title: const Text("Sync database"),
-            onTap: () => firebaseSync.syncDbToFirebase(context),
+            title: Text(firebaseSync.syncStatus.title),
+            subtitle: firebaseSync.lastUpdatedAt == null
+                ? null
+                : Text("Backup last done on ${firebaseSync.lastUpdatedAt!}"),
           ),
           ListTile(
-            title: const Text("Upload Database"),
-            onTap: () => firebaseSync.uploadFileToFirebase(context),
+            title: const Text("Upload"),
+            onTap: () => firebaseSync.upload(context),
           ),
           ListTile(
-            title: const Text("Download database"),
-            subtitle: firebaseSync.metadata == null
-                ? const Text("Database not synced yet")
-                : Text("Last Synced at ${firebaseSync.metadata!.updated}"),
-            onTap: () => firebaseSync.downloadFileFromFirebase(context),
+            title: const Text("Download"),
+            onTap: () => firebaseSync.download(context),
+          ),
+          ListTile(
+            title: const Text("Sync"),
+            onTap: () => firebaseSync.sync(context),
           ),
           ListTile(
             title: const Text("Logout"),
             onTap: () async {
-              await FirebaseAuth.instance.signOut();
+              await firebaseSync.signOut();
             },
           )
         ],

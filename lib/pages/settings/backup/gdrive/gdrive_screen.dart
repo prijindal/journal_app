@@ -15,7 +15,7 @@ class GDriveBackupScreen extends StatefulWidget {
 class _GDriveBackupScreenState extends State<GDriveBackupScreen> {
   @override
   void initState() {
-    Provider.of<GdriveSync>(context, listen: false).checkGoogleSignIn();
+    Provider.of<GdriveSync>(context, listen: false).checkSignIn();
     super.initState();
   }
 
@@ -38,11 +38,10 @@ class _GDriveBackupScreenState extends State<GDriveBackupScreen> {
             subtitle: Text(gdriveSync.currentUser?.email ?? "Not found"),
           ),
           ListTile(
-            title: gdriveSync.loaded == false
-                ? Text("Loading...")
-                : gdriveSync.metadataFile == null
-                    ? Text("Backup not done yet")
-                    : Text("Backup last done on ${gdriveSync.metadataFile!}"),
+            title: Text(gdriveSync.syncStatus.title),
+            subtitle: gdriveSync.lastUpdatedAt == null
+                ? null
+                : Text("Backup last done on ${gdriveSync.lastUpdatedAt!}"),
           ),
           ListTile(
             title: Text("Upload"),
@@ -54,8 +53,14 @@ class _GDriveBackupScreenState extends State<GDriveBackupScreen> {
           ),
           ListTile(
             title: Text("Sync"),
-            onTap: () => gdriveSync.syncDbToGdrive(context),
+            onTap: () => gdriveSync.sync(context),
           ),
+          ListTile(
+            title: const Text("Logout"),
+            onTap: () async {
+              await gdriveSync.signOut();
+            },
+          )
         ],
       ),
     );

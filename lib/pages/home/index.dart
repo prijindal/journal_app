@@ -47,9 +47,8 @@ class _HomeViewState extends State<_HomeView> {
 
   Future<void> _sync() async {
     final [firebaseSyncStatus, gDriveSyncStatus] = await Future.wait([
-      Provider.of<FirebaseSync>(context, listen: false)
-          .syncDbToFirebase(context),
-      Provider.of<GdriveSync>(context, listen: false).syncDbToGdrive(context),
+      Provider.of<FirebaseSync>(context, listen: false).sync(context),
+      Provider.of<GdriveSync>(context, listen: false).sync(context),
     ]);
     if (firebaseSyncStatus == false && gDriveSyncStatus == false) {
       if (context.mounted) {

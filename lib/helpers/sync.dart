@@ -44,3 +44,20 @@ Future<void> jsonToDb(String jsonEncoded) async {
   });
   AppLogger.instance.d("Loaded data into database");
 }
+
+Future<DateTime> getLastUpdatedTime() async {
+  final lastUpdatedRows = await (MyDatabase.instance.journalEntry.select()
+        ..limit(1)
+        ..orderBy([
+          (t) => OrderingTerm(
+                expression: t.updationTime,
+                mode: OrderingMode.desc,
+              ),
+        ]))
+      .get();
+  if (lastUpdatedRows.isEmpty) {
+    return DateTime.now();
+  }
+  final lastUpdatedTime = lastUpdatedRows.first.updationTime;
+  return lastUpdatedTime;
+}
