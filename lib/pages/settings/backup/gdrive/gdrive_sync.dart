@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:drift/drift.dart' as drift;
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -8,6 +10,7 @@ import '../../../../helpers/google_http_client.dart';
 import '../../../../helpers/logger.dart';
 import '../../../../helpers/sync.dart';
 import '../../../../models/drift.dart';
+import '../firebase/firebase_sync.dart';
 
 final googleSignIn = GoogleSignIn(
   clientId: googleSignInClientId,
@@ -212,6 +215,12 @@ class GdriveSync with ChangeNotifier {
 
   Future<bool> syncDbToGdrive(BuildContext context) async {
     try {
+      if (!isFirebaseInitialized()) {
+        return false;
+      }
+      if ((!Platform.isAndroid && !Platform.isIOS)) {
+        return false;
+      }
       await checkGoogleSignIn();
       if (_currentUser == null) {
         return false;
