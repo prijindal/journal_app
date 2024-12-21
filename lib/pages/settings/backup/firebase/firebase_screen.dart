@@ -1,10 +1,8 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
-import '../../../../helpers/constants.dart';
-import '../../../../helpers/logger.dart';
 import 'firebase_sync.dart';
 
 @RoutePage()
@@ -16,30 +14,16 @@ class FirebaseBackupScreen extends StatefulWidget {
 }
 
 class _FirebaseBackupScreenState extends State<FirebaseBackupScreen> {
-  FullMetadata? metadata;
-
   @override
   void initState() {
-    _syncMetadata();
+    Provider.of<FirebaseSync>(context, listen: false).syncMetadata();
     super.initState();
-  }
-
-  Future<void> _syncMetadata() async {
-    try {
-      final user = FirebaseAuth.instance.currentUser;
-      final ref = FirebaseStorage.instance.ref("${user!.uid}/$dbExportName");
-      final metadata = await ref.getMetadata();
-      setState(() {
-        this.metadata = metadata;
-      });
-    } catch (e, stack) {
-      parseErrorToString(e, stack);
-    }
   }
 
   @override
   Widget build(BuildContext context) {
-    final user = FirebaseAuth.instance.currentUser;
+    final firebaseSync = Provider.of<FirebaseSync>(context);
+    final user = firebaseSync.user;
     return Scaffold(
       appBar: AppBar(
         title: const Text("Settings -> Backup -> Firebase"),
@@ -62,83 +46,18 @@ class _FirebaseBackupScreenState extends State<FirebaseBackupScreen> {
           ),
           ListTile(
             title: const Text("Sync database"),
-            onTap: () async {
-              try {
-                await syncDbToFirebase();
-                if (context.mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text("Sync successfully"),
-                    ),
-                  );
-                }
-                await _syncMetadata();
-              } catch (e, stack) {
-                if (context.mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(
-                        parseErrorToString(e, stack, "Error while syncing"),
-                      ),
-                    ),
-                  );
-                }
-              }
-            },
+            onTap: () => firebaseSync.syncDbToFirebase(context),
           ),
           ListTile(
             title: const Text("Upload Database"),
-            onTap: () async {
-              try {
-                await uploadFileToFirebase();
-                if (context.mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text("File uploaded successfully"),
-                    ),
-                  );
-                }
-                await _syncMetadata();
-              } catch (e, stack) {
-                if (context.mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(
-                        parseErrorToString(e, stack, "Error while syncing"),
-                      ),
-                    ),
-                  );
-                }
-              }
-            },
+            onTap: () => firebaseSync.uploadFileToFirebase(context),
           ),
           ListTile(
             title: const Text("Download database"),
-            subtitle: metadata == null
+            subtitle: firebaseSync.metadata == null
                 ? const Text("Database not synced yet")
-                : Text("Last Synced at ${metadata!.updated}"),
-            onTap: () async {
-              try {
-                await downloadFileFromFirebase();
-                if (context.mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text("File downloaded successfully"),
-                    ),
-                  );
-                }
-              } catch (e, stack) {
-                if (context.mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(
-                        parseErrorToString(e, stack, "Error while syncing"),
-                      ),
-                    ),
-                  );
-                }
-              }
-            },
+                : Text("Last Synced at ${firebaseSync.metadata!.updated}"),
+            onTap: () => firebaseSync.downloadFileFromFirebase(context),
           ),
           ListTile(
             title: const Text("Logout"),

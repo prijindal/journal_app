@@ -35,11 +35,7 @@ void main() {
               child: HomeScreen(),
             ),
           ),
-          create: (context) => SettingsStorageNotifier(
-            ThemeMode.system,
-            ColorSeed.baseColor,
-            HiddenLockedMode.unknown,
-          ),
+          create: (context) => SettingsStorageNotifier(),
         ),
       );
 

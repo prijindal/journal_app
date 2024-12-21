@@ -4,6 +4,8 @@ import 'package:provider/provider.dart';
 import '../helpers/logger.dart';
 import '../helpers/theme.dart';
 import '../models/settings.dart';
+import '../pages/settings/backup/firebase/firebase_sync.dart';
+import '../pages/settings/backup/gdrive/gdrive_sync.dart';
 import '../router/app_router.dart';
 
 class MyApp extends StatelessWidget {
@@ -11,12 +13,18 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider<SettingsStorageNotifier>(
-      create: (context) => SettingsStorageNotifier(
-        ThemeMode.system,
-        ColorSeed.baseColor,
-        HiddenLockedMode.unknown,
-      ),
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider<SettingsStorageNotifier>(
+          create: (context) => SettingsStorageNotifier(),
+        ),
+        ChangeNotifierProvider<GdriveSync>(
+          create: (_) => GdriveSync(),
+        ),
+        ChangeNotifierProvider<FirebaseSync>(
+          create: (_) => FirebaseSync(),
+        ),
+      ],
       child: MyMaterialApp(),
     );
   }

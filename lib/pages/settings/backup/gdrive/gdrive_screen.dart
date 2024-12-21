@@ -5,26 +5,14 @@ import 'package:provider/provider.dart';
 import 'gdrive_sync.dart';
 
 @RoutePage()
-class GDriveBackupScreen extends StatelessWidget {
+class GDriveBackupScreen extends StatefulWidget {
   const GDriveBackupScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return ChangeNotifierProvider<GdriveSync>(
-      create: (context) => GdriveSync(),
-      child: GDriveBackupScreenList(),
-    );
-  }
+  State<GDriveBackupScreen> createState() => _GDriveBackupScreenState();
 }
 
-class GDriveBackupScreenList extends StatefulWidget {
-  const GDriveBackupScreenList({super.key});
-
-  @override
-  State<GDriveBackupScreenList> createState() => _GDriveBackupScreenState();
-}
-
-class _GDriveBackupScreenState extends State<GDriveBackupScreenList> {
+class _GDriveBackupScreenState extends State<GDriveBackupScreen> {
   @override
   void initState() {
     Provider.of<GdriveSync>(context, listen: false).checkGoogleSignIn();
@@ -66,7 +54,7 @@ class _GDriveBackupScreenState extends State<GDriveBackupScreenList> {
           ),
           ListTile(
             title: Text("Sync"),
-            onTap: () => gdriveSync.sync(context),
+            onTap: () => gdriveSync.syncDbToGdrive(context),
           ),
         ],
       ),

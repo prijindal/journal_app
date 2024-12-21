@@ -5,9 +5,9 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../components/main_app_bar.dart';
-import '../../helpers/logger.dart';
 import '../../models/local_state.dart';
 import '../settings/backup/firebase/firebase_sync.dart';
+import '../settings/backup/gdrive/gdrive_sync.dart';
 import 'calendar.dart';
 import 'journallist.dart';
 
@@ -39,55 +39,32 @@ class _HomeViewState extends State<_HomeView> {
   @override
   void initState() {
     Timer(
-      const Duration(seconds: 5),
-      _checkLoginAndSyncDb,
+      const Duration(seconds: 1),
+      _sync,
     );
     super.initState();
   }
 
-  Future<void> _syncDb() async {
-    try {
-      await syncDbToFirebase();
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text("Sync successfully"),
-          ),
-        );
-      }
-    } catch (e, stack) {
-      if (mounted) {
+  Future<void> _sync() async {
+    final [firebaseSyncStatus, gDriveSyncStatus] = await Future.wait([
+      Provider.of<FirebaseSync>(context, listen: false)
+          .syncDbToFirebase(context),
+      Provider.of<GdriveSync>(context, listen: false).syncDbToGdrive(context),
+    ]);
+    if (firebaseSyncStatus == false && gDriveSyncStatus == false) {
+      if (context.mounted) {
+        // ignore: use_build_context_synchronously
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(
-              parseErrorToString(e, stack, "Error while syncing"),
+            content: const Text("Please setup backup to allow sync"),
+            action: SnackBarAction(
+              label: "Backup",
+              onPressed: () async {
+                await AutoRouter.of(context).pushNamed("/settings/backup");
+              },
             ),
           ),
         );
-      }
-    }
-  }
-
-  Future<void> _checkLoginAndSyncDb() async {
-    final isInitialized = isFirebaseInitialized();
-    if (isInitialized) {
-      final user = await getFirebaseUser();
-      if (user != null) {
-        await _syncDb();
-      } else {
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: const Text("Please setup backup to allow sync"),
-              action: SnackBarAction(
-                label: "Backup",
-                onPressed: () async {
-                  await AutoRouter.of(context).pushNamed("/settings/backup");
-                },
-              ),
-            ),
-          );
-        }
       }
     }
   }
@@ -112,10 +89,7 @@ class _HomeViewState extends State<_HomeView> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: const HomeAppBar(),
-      body: RefreshIndicator(
-        onRefresh: _checkLoginAndSyncDb,
-        child: _buildBody(),
-      ),
+      body: _buildBody(),
       floatingActionButton: _buildFab(),
       bottomNavigationBar: NavigationBar(
         onDestinationSelected: (int index) {

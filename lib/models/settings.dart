@@ -44,11 +44,13 @@ class SettingsStorageNotifier with ChangeNotifier {
 
   final SharedPreferencesAsync asyncPrefs = SharedPreferencesAsync();
 
-  SettingsStorageNotifier(
-    this._themeMode,
-    this._baseColor,
-    this._hiddenLockedMode,
-  ) {
+  SettingsStorageNotifier({
+    ThemeMode themeMode = ThemeMode.system,
+    ColorSeed baseColor = ColorSeed.baseColor,
+    HiddenLockedMode hiddenLockedMode = HiddenLockedMode.unknown,
+  })  : _baseColor = baseColor,
+        _themeMode = themeMode,
+        _hiddenLockedMode = hiddenLockedMode {
     init();
   }
 

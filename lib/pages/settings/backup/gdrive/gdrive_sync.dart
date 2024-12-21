@@ -5,6 +5,7 @@ import 'package:googleapis/drive/v3.dart';
 
 import '../../../../helpers/constants.dart';
 import '../../../../helpers/google_http_client.dart';
+import '../../../../helpers/logger.dart';
 import '../../../../helpers/sync.dart';
 import '../../../../models/drift.dart';
 
@@ -109,86 +110,139 @@ class GdriveSync with ChangeNotifier {
 
   Future<void> upload(BuildContext context) async {
     if (_driveApi == null) return;
-    await _uploadFile(dbExportName, await extractDbJson());
-    final lastUpdatedTime = await _getLastUpdatedTime();
-    await _uploadFile(
-      dbMetadataName,
-      lastUpdatedTime.toIso8601String(),
-    );
-    await _checkExistingMetadataFile();
-    if (context.mounted) {
-      // ignore: use_build_context_synchronously
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("File uploaded successfully"),
-        ),
+    try {
+      await _uploadFile(dbExportName, await extractDbJson());
+      final lastUpdatedTime = await _getLastUpdatedTime();
+      await _uploadFile(
+        dbMetadataName,
+        lastUpdatedTime.toIso8601String(),
       );
+      await _checkExistingMetadataFile();
+      if (context.mounted) {
+        // ignore: use_build_context_synchronously
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text("File uploaded successfully"),
+          ),
+        );
+      }
+    } catch (e, stackTrace) {
+      AppLogger.instance.e(e, error: e, stackTrace: stackTrace);
+      if (context.mounted) {
+        // ignore: use_build_context_synchronously
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text("Some error occurred while uploading"),
+          ),
+        );
+      }
+      rethrow;
     }
   }
 
   Future<void> download(BuildContext context) async {
     if (_driveApi == null) return;
-    await _checkExistingMetadataFile();
-    if (_metadataFile == null) {
+    try {
+      await _checkExistingMetadataFile();
+      if (_metadataFile == null) {
+        if (context.mounted) {
+          // ignore: use_build_context_synchronously
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text("File not found"),
+            ),
+          );
+        }
+      } else {
+        final fileContent = await _getDriveFile(dbExportName);
+        if (fileContent != null) {
+          final byteContent = await fileContent.stream.toList();
+          final content = String.fromCharCodes(byteContent[0]);
+          await jsonToDb(content);
+          if (context.mounted) {
+            // ignore: use_build_context_synchronously
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text("File downloaded successfully"),
+              ),
+            );
+          }
+        } else {
+          if (context.mounted) {
+            // ignore: use_build_context_synchronously
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text("File content empty on cloud"),
+              ),
+            );
+          }
+        }
+      }
+    } catch (e, stackTrace) {
+      AppLogger.instance.e(e, error: e, stackTrace: stackTrace);
       if (context.mounted) {
         // ignore: use_build_context_synchronously
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text("File not found"),
+            content: Text("Some error occurred while downloading"),
           ),
         );
       }
-    } else {
-      final fileContent = await _getDriveFile(dbExportName);
-      if (fileContent != null) {
-        final byteContent = await fileContent.stream.toList();
-        final content = String.fromCharCodes(byteContent[0]);
-        await jsonToDb(content);
-        if (context.mounted) {
-          // ignore: use_build_context_synchronously
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text("File downloaded successfully"),
-            ),
-          );
-        }
-      }
+      rethrow;
     }
   }
 
-  Future<void> sync(BuildContext context) async {
-    await checkGoogleSignIn();
-    if (_driveApi == null) {
-      // ignore: use_build_context_synchronously
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("Can't sync"),
-        ),
-      );
-    }
-    _checkExistingMetadataFile();
-    if (_metadataFile == null) {
-      // ignore: use_build_context_synchronously
-      upload(context);
-      return;
-    } else {
-      final lastUpdatedTime = await _getLastUpdatedTime();
-      if (lastUpdatedTime.compareTo(_metadataFile!) == 0) {
-        if (context.mounted) {
-          // ignore: use_build_context_synchronously
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text("No need to sync"),
-            ),
-          );
-        }
-      } else if (lastUpdatedTime.compareTo(_metadataFile!) > 0) {
+  Future<bool> syncDbToGdrive(BuildContext context) async {
+    try {
+      await checkGoogleSignIn();
+      if (_currentUser == null) {
+        return false;
+      }
+      if (_driveApi == null) {
+        // ignore: use_build_context_synchronously
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text("Can't sync"),
+          ),
+        );
+        return false;
+      }
+      _checkExistingMetadataFile();
+      if (_metadataFile == null) {
         // ignore: use_build_context_synchronously
         upload(context);
+        return true;
       } else {
-        // ignore: use_build_context_synchronously
-        download(context);
+        final lastUpdatedTime = await _getLastUpdatedTime();
+        if (lastUpdatedTime.compareTo(_metadataFile!) == 0) {
+          if (context.mounted) {
+            // ignore: use_build_context_synchronously
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text("No need to sync"),
+              ),
+            );
+          }
+        } else if (lastUpdatedTime.compareTo(_metadataFile!) > 0) {
+          // ignore: use_build_context_synchronously
+          upload(context);
+        } else {
+          // ignore: use_build_context_synchronously
+          download(context);
+        }
+        return true;
       }
+    } catch (e, stackTrace) {
+      AppLogger.instance.e(e, error: e, stackTrace: stackTrace);
+      if (context.mounted) {
+        // ignore: use_build_context_synchronously
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text("Some error occurred while syncing"),
+          ),
+        );
+      }
+      rethrow;
     }
   }
 }
