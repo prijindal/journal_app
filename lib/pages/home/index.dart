@@ -40,15 +40,27 @@ class _HomeViewState extends State<_HomeView> {
   void initState() {
     Timer(
       const Duration(seconds: 1),
-      _sync,
+      () => _initSync(),
+    );
+    Timer(
+      const Duration(seconds: 3),
+      () => _sync(),
     );
     super.initState();
   }
 
+  Future<void> _initSync() async {
+    // This is just to initialize firebase and gdrive sync after firebase init is called
+    Provider.of<FirebaseSync>(context, listen: false);
+    Provider.of<GdriveSync>(context, listen: false);
+  }
+
   Future<void> _sync() async {
     final [firebaseSyncStatus, gDriveSyncStatus] = await Future.wait([
-      Provider.of<FirebaseSync>(context, listen: false).sync(context),
-      Provider.of<GdriveSync>(context, listen: false).sync(context),
+      Provider.of<FirebaseSync>(context, listen: false)
+          .sync(context, suppressErrors: true),
+      Provider.of<GdriveSync>(context, listen: false)
+          .sync(context, suppressErrors: true),
     ]);
     if (firebaseSyncStatus == false && gDriveSyncStatus == false) {
       if (context.mounted) {

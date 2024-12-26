@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:typed_data';
 
 import 'package:firebase_auth/firebase_auth.dart' as auth;
@@ -5,21 +6,41 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 
 import '../../../../components/backup/sync.dart';
+import '../../../../helpers/logger.dart';
 
 class FirebaseSync extends SyncBase<auth.User> {
+  auth.User? _user;
+  StreamSubscription<auth.User?>? _subscription;
+
+  FirebaseSync() {
+    AppLogger.instance.d("Registering subscription");
+    _subscription =
+        auth.FirebaseAuth.instance.authStateChanges().listen((user) {
+      AppLogger.instance.d("Signed in");
+      _user = user;
+      notifyListeners();
+    });
+  }
+
+  @override
+  void dispose() {
+    _subscription?.cancel();
+    super.dispose();
+  }
+
   @override
   bool get isSupported => Firebase.apps.isNotEmpty;
 
   @override
-  auth.User? get currentUser => auth.FirebaseAuth.instance.currentUser;
+  auth.User? get currentUser => _user;
 
   @override
   Future<void> signOut() => auth.FirebaseAuth.instance.signOut();
 
   @override
   Future<void> checkSignIn() async {
+    AppLogger.instance.d("Checking sign in");
     if (currentUser != null) {
-      notifyListeners();
       syncLastUpdatedAt();
     }
   }
@@ -28,8 +49,17 @@ class FirebaseSync extends SyncBase<auth.User> {
   Future<List<int>?> getFile(String fileName) async {
     if (currentUser == null) return null;
     final ref = FirebaseStorage.instance.ref("${currentUser!.uid}/$fileName");
-    final dbBytes = await ref.getData();
-    return dbBytes;
+    try {
+      final dbBytes = await ref.getData();
+      return dbBytes;
+    } on FirebaseException catch (e) {
+      if (e.code == "object-not-found") {
+        return null;
+      } else {
+        AppLogger.instance.e(e.message);
+        rethrow;
+      }
+    }
   }
 
   @override

@@ -1,10 +1,12 @@
 import 'dart:convert';
 
+import 'package:archive/archive.dart';
 import 'package:drift/drift.dart';
 import 'package:fleather/fleather.dart';
 
 import '../models/core.dart';
 import '../models/drift.dart';
+import 'constants.dart';
 import 'logger.dart';
 
 Future<String> extractDbJson() async {
@@ -43,6 +45,34 @@ Future<void> jsonToDb(String jsonEncoded) async {
     );
   });
   AppLogger.instance.d("Loaded data into database");
+}
+
+Future<List<int>> extractDbArchive({String? password}) async {
+  final string = await extractDbJson();
+  final encoder = ZipEncoder(password: password);
+  final archive = Archive();
+  archive.add(ArchiveFile.string(dbExportJsonName, string));
+  final encoded = encoder.encode(
+    archive,
+    level: DeflateLevel.bestCompression,
+  );
+  return encoded;
+}
+
+Future<void> archiveToDb(List<int> archiveEncoded, {String? password}) async {
+  final decoder = ZipDecoder();
+  final archive = decoder.decodeBytes(archiveEncoded, password: password);
+  final file = archive.findFile(dbExportJsonName);
+  if (file == null) {
+    throw ArchiveException("Invalid archive, no valid file found in the zip");
+  }
+  final byteContent = file.readBytes();
+  if (byteContent == null) {
+    throw ArchiveException(
+        "Invalid archive, content of file in archive is empty");
+  }
+  final content = String.fromCharCodes(byteContent);
+  await jsonToDb(content);
 }
 
 Future<DateTime> getLastUpdatedTime() async {

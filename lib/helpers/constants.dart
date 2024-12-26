@@ -4,7 +4,8 @@ const appColorSeed = "APP_COLOR_SEED";
 const hiddenLockedMode = "HIDDEN_LOCKED_MODE";
 final pinKey = "PIN";
 const dbFileName = "journal_app.sqlite";
-const dbExportName = "journal_app.db.json";
+const dbExportJsonName = "journal_app.db.json";
+const dbExportArchiveName = "journal_app.db.zip";
 const dbLastUpdatedName = "journal_app.last_updated_date.txt";
 
 const String googleSignInClientIdFromEnv = String.fromEnvironment(

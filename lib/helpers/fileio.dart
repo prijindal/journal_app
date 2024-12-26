@@ -10,15 +10,15 @@ import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 
 import 'constants.dart';
+import 'dbio.dart';
 import 'logger.dart';
-import 'sync.dart';
 
 void downloadContent(BuildContext context) async {
   final encoded = await extractDbJson();
   if (Platform.isAndroid || Platform.isIOS) {
     final params = SaveFileDialogParams(
       data: Uint8List.fromList(encoded.codeUnits),
-      fileName: dbExportName,
+      fileName: dbExportJsonName,
     );
     final filePath = await FlutterFileDialog.saveFile(params: params);
     if (context.mounted) {
@@ -37,7 +37,7 @@ void downloadContent(BuildContext context) async {
         downloadDirectory = downloadFolder.path;
       }
     }
-    final path = p.join(downloadDirectory, dbExportName);
+    final path = p.join(downloadDirectory, dbExportJsonName);
     final stream = Stream.fromIterable(encoded.codeUnits);
     await download(stream, path);
     if (context.mounted) {

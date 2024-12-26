@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 
-import '../../helpers/constants.dart';
+import '../../helpers/constants.dart'
+    show dbExportArchiveName, dbLastUpdatedName;
+import '../../helpers/dbio.dart';
 import '../../helpers/logger.dart';
-import '../../helpers/sync.dart';
 
 enum SyncStatus {
   waiting("Waiting for init"),
@@ -58,7 +59,7 @@ abstract class SyncBase<U> with ChangeNotifier {
   }
 
   Future<void> _upload() async {
-    await uploadFile(dbExportName, (await extractDbJson()).codeUnits);
+    await uploadFile(dbExportArchiveName, await extractDbArchive());
     final lastUpdatedTime = await getLastUpdatedTime();
     await uploadFile(
       dbLastUpdatedName,
@@ -73,12 +74,11 @@ abstract class SyncBase<U> with ChangeNotifier {
     if (_lastUpdatedAt == null) {
       return false;
     }
-    final fileContent = await getFile(dbExportName);
+    final fileContent = await getFile(dbExportArchiveName);
     if (fileContent == null) {
       return false;
     }
-    final content = String.fromCharCodes(fileContent);
-    await jsonToDb(content);
+    await archiveToDb(fileContent);
     return true;
   }
 
@@ -172,10 +172,14 @@ abstract class SyncBase<U> with ChangeNotifier {
     }
   }
 
-  Future<bool> sync(BuildContext context) async {
+  Future<bool> sync(BuildContext context, {bool suppressErrors = false}) async {
     try {
       final syncReason = await _sync();
       if (context.mounted) {
+        AppLogger.instance.i(syncReason.title);
+        if (syncReason.status == false && suppressErrors == true) {
+          return false;
+        }
         // ignore: use_build_context_synchronously
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
