@@ -21,12 +21,11 @@ class _GDriveBackupTileState extends State<GDriveBackupTile> {
 
   void _login() async {
     final scaffoldMessenger = ScaffoldMessenger.of(context);
+    final gDriveSync = Provider.of<GdriveSync>(context, listen: false);
     try {
-      final signedIn = await googleSignIn.signIn();
-      if (signedIn != null) {
-        await googleSignIn.signIn();
-        // ignore: use_build_context_synchronously
-        Provider.of<GdriveSync>(context, listen: false).checkSignIn();
+      final signedIn = await gDriveSync.signIn();
+      if (signedIn) {
+        gDriveSync.checkSignIn();
       } else {
         scaffoldMessenger.showSnackBar(
           const SnackBar(

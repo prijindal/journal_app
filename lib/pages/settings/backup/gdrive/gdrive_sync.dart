@@ -10,16 +10,16 @@ import '../../../../helpers/constants.dart';
 import '../../../../helpers/google_http_client.dart';
 import '../../../../helpers/logger.dart';
 
-final googleSignIn = GoogleSignIn(
-  clientId: googleSignInClientId,
-  scopes: [
-    DriveApi.driveAppdataScope,
-  ],
-  forceCodeForRefreshToken: true,
-);
-
 class GdriveSync extends SyncBase<GoogleSignInAccount> {
   DriveApi? _driveApi;
+
+  static GoogleSignIn googleSignIn = GoogleSignIn(
+    clientId: googleSignInClientId,
+    scopes: [
+      DriveApi.driveAppdataScope,
+    ],
+    forceCodeForRefreshToken: false,
+  );
 
   @override
   GoogleSignInAccount? get currentUser => googleSignIn.currentUser;
@@ -30,6 +30,11 @@ class GdriveSync extends SyncBase<GoogleSignInAccount> {
 
   @override
   Future<void> signOut() => googleSignIn.signOut();
+
+  Future<bool> signIn() async {
+    final signedInUser = await googleSignIn.signIn();
+    return signedInUser != null;
+  }
 
   @override
   Future<void> checkSignIn() async {
@@ -49,6 +54,10 @@ class GdriveSync extends SyncBase<GoogleSignInAccount> {
       currentUser = await googleSignIn.signInSilently(reAuthenticate: true);
     }
     if (currentUser != null) {
+      final canAccess = await googleSignIn.canAccessScopes(googleSignIn.scopes);
+      if (!canAccess) {
+        await GdriveSync.googleSignIn.requestScopes(googleSignIn.scopes);
+      }
       final headers = await currentUser.authHeaders;
       final client = GoogleHttpClient(headers);
       final driveApi = DriveApi(client);
