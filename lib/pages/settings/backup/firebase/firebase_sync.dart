@@ -14,12 +14,14 @@ class FirebaseSync extends SyncBase<auth.User> {
 
   FirebaseSync() {
     AppLogger.instance.d("Registering subscription");
-    _subscription =
-        auth.FirebaseAuth.instance.authStateChanges().listen((user) {
-      AppLogger.instance.d("Signed in");
-      _user = user;
-      notifyListeners();
-    });
+    if (isSupported) {
+      _subscription =
+          auth.FirebaseAuth.instance.authStateChanges().listen((user) {
+        AppLogger.instance.d("Signed in");
+        _user = user;
+        notifyListeners();
+      });
+    }
   }
 
   @override
