@@ -59,8 +59,9 @@ abstract class SyncBase<U> with ChangeNotifier {
   }
 
   Future<void> _upload() async {
-    await uploadFile(dbExportArchiveName, await extractDbArchive());
-    final lastUpdatedTime = await getLastUpdatedTime();
+    await uploadFile(
+        dbExportArchiveName, await DatabaseIO.instance.extractDbArchive());
+    final lastUpdatedTime = await DatabaseIO.instance.getLastUpdatedTime();
     await uploadFile(
       dbLastUpdatedName,
       lastUpdatedTime.toIso8601String().codeUnits,
@@ -78,7 +79,7 @@ abstract class SyncBase<U> with ChangeNotifier {
     if (fileContent == null) {
       return false;
     }
-    await archiveToDb(fileContent);
+    await DatabaseIO.instance.archiveToDb(fileContent);
     return true;
   }
 
@@ -103,7 +104,8 @@ abstract class SyncBase<U> with ChangeNotifier {
       notifyListeners();
       return SyncReason.uploaded;
     } else {
-      final lastUpdatedTimeLocal = await getLastUpdatedTime();
+      final lastUpdatedTimeLocal =
+          await DatabaseIO.instance.getLastUpdatedTime();
       SyncReason reason = SyncReason.unknown;
       if (lastUpdatedTimeLocal.compareTo(lastUpdatedAt!) == 0) {
         reason = SyncReason.alreadySynced;

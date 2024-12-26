@@ -14,7 +14,7 @@ import 'dbio.dart';
 import 'logger.dart';
 
 void downloadContent(BuildContext context) async {
-  final encoded = await extractDbJson();
+  final encoded = await DatabaseIO.instance.extractDbJson();
   if (Platform.isAndroid || Platform.isIOS) {
     final params = SaveFileDialogParams(
       data: Uint8List.fromList(encoded.codeUnits),
@@ -61,7 +61,7 @@ void uploadContent(BuildContext context) async {
     }
     if (jsonEncoded != null) {
       try {
-        await jsonToDb(jsonEncoded);
+        await DatabaseIO.instance.jsonToDb(jsonEncoded);
         if (context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
