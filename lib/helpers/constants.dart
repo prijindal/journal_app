@@ -3,7 +3,8 @@ const appColorSeed = "APP_COLOR_SEED";
 
 const hiddenLockedMode = "HIDDEN_LOCKED_MODE";
 final pinKey = "PIN";
-const encryptionKey = "ENCYRYPTION_KEY";
+const backupEncryptionStatus = "BACKUP_ENCYRYPTION_STATUS";
+const backupEncryptionKey = "BACKUP_ENCYRYPTION_KEY";
 const dbFileName = "journal_app.sqlite";
 const dbExportJsonName = "journal_app.db.json";
 const dbExportArchiveName = "journal_app.db.zip";

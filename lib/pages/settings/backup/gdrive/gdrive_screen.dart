@@ -39,9 +39,9 @@ class _GDriveBackupScreenState extends State<GDriveBackupScreen> {
           ),
           ListTile(
             title: Text(gdriveSync.syncStatus.title),
-            subtitle: gdriveSync.lastUpdatedAt == null
+            subtitle: gdriveSync.metadata == null
                 ? null
-                : Text("Backup last done on ${gdriveSync.lastUpdatedAt!}"),
+                : Text(gdriveSync.metadata!.toString()),
           ),
           ListTile(
             title: Text("Upload"),

@@ -45,9 +45,9 @@ class _FirebaseBackupScreenState extends State<FirebaseBackupScreen> {
           ),
           ListTile(
             title: Text(firebaseSync.syncStatus.title),
-            subtitle: firebaseSync.lastUpdatedAt == null
+            subtitle: firebaseSync.metadata == null
                 ? null
-                : Text("Backup last done on ${firebaseSync.lastUpdatedAt!}"),
+                : Text(firebaseSync.metadata!.toString()),
           ),
           ListTile(
             title: const Text("Upload"),

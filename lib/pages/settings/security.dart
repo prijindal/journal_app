@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:local_auth/local_auth.dart';
 import 'package:provider/provider.dart';
 
+import '../../components/backup_encryption_tile.dart';
 import '../../components/pin_lock.dart';
 import '../../helpers/logger.dart';
 import '../../models/settings.dart';
@@ -26,6 +27,11 @@ class SecuritySettingsScreen extends StatelessWidget {
           dense: true,
         ),
         const LockHiddenSettingsTile(),
+        const ListTile(
+          title: Text("Backup Encryption"),
+          dense: true,
+        ),
+        const BackupEncryptionTile(),
       ]),
     );
   }

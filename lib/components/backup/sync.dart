@@ -1,9 +1,35 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 
 import '../../helpers/constants.dart'
     show dbExportArchiveName, dbLastUpdatedName;
 import '../../helpers/dbio.dart';
 import '../../helpers/logger.dart';
+
+class SyncMetadata {
+  final DateTime lastUpdatedAt;
+  final String? encryptedKeyHash;
+
+  SyncMetadata({
+    required this.lastUpdatedAt,
+    this.encryptedKeyHash,
+  });
+
+  Map<String, dynamic> toJson() => {
+        'lastUpdatedAt': lastUpdatedAt.toIso8601String(),
+        'encryptedKeyHash': encryptedKeyHash,
+      };
+
+  factory SyncMetadata.fromJson(dynamic json) => SyncMetadata(
+        lastUpdatedAt: DateTime.parse(json['lastUpdatedAt'] as String),
+        encryptedKeyHash: json['encryptedKeyHash'] as String?,
+      );
+
+  @override
+  String toString() =>
+      'SyncMetadata(lastUpdatedAt: $lastUpdatedAt, encryptedKeyHash: $encryptedKeyHash)';
+}
 
 enum SyncStatus {
   waiting("Waiting for init"),
@@ -22,6 +48,7 @@ enum SyncReason {
   unsupported(false, "Platform is not supported"),
   notFound(false, "File not found"),
   signedOut(false, "User is not signed in"),
+  encryptionKeyMismatch(false, "Encryption keys are mismatched"),
 
   uploaded(true, "File uploaded successfully"),
   downloaded(true, "File downloaded successfully"),
@@ -35,12 +62,12 @@ enum SyncReason {
 // U: User definition
 abstract class SyncBase<U> with ChangeNotifier {
   SyncStatus _syncStatus = SyncStatus.waiting;
-  DateTime? _lastUpdatedAt;
+  SyncMetadata? _syncMetadata;
 
   U? get currentUser;
   bool get isSupported => throw UnimplementedError();
   SyncStatus get syncStatus => _syncStatus;
-  DateTime? get lastUpdatedAt => _lastUpdatedAt;
+  SyncMetadata? get metadata => _syncMetadata;
   Future<void> checkSignIn();
   Future<void> signOut();
 
@@ -52,7 +79,8 @@ abstract class SyncBase<U> with ChangeNotifier {
     notifyListeners();
     final bytes = await getFile(dbLastUpdatedName);
     if (bytes != null) {
-      _lastUpdatedAt = DateTime.parse(String.fromCharCodes(bytes));
+      _syncMetadata =
+          SyncMetadata.fromJson(jsonDecode(String.fromCharCodes(bytes)));
     }
     _syncStatus = SyncStatus.metadataSynced;
     notifyListeners();
@@ -62,21 +90,31 @@ abstract class SyncBase<U> with ChangeNotifier {
     await uploadFile(
         dbExportArchiveName, await DatabaseIO.instance.extractDbArchive());
     final lastUpdatedTime = await DatabaseIO.instance.getLastUpdatedTime();
+    final encryptionKeyHash = await DatabaseIO.instance.readEncryptionKeyHash();
+    final metadata = SyncMetadata(
+      lastUpdatedAt: lastUpdatedTime,
+      encryptedKeyHash: encryptionKeyHash,
+    );
     await uploadFile(
       dbLastUpdatedName,
-      lastUpdatedTime.toIso8601String().codeUnits,
+      jsonEncode(metadata.toJson()).codeUnits,
     );
-    _lastUpdatedAt = lastUpdatedTime;
+    _syncMetadata = metadata;
     notifyListeners();
   }
 
   Future<bool> _download() async {
     await syncLastUpdatedAt();
-    if (_lastUpdatedAt == null) {
+    if (_syncMetadata == null) {
       return false;
     }
     final fileContent = await getFile(dbExportArchiveName);
     if (fileContent == null) {
+      return false;
+    }
+    final currentEncryptionHash =
+        await DatabaseIO.instance.readEncryptionKeyHash();
+    if (_syncMetadata!.encryptedKeyHash != currentEncryptionHash) {
       return false;
     }
     await DatabaseIO.instance.archiveToDb(fileContent);
@@ -98,7 +136,7 @@ abstract class SyncBase<U> with ChangeNotifier {
       return SyncReason.signedOut;
     }
     await syncLastUpdatedAt();
-    if (lastUpdatedAt == null) {
+    if (metadata == null) {
       await _upload();
       _syncStatus = SyncStatus.syncDone;
       notifyListeners();
@@ -107,12 +145,18 @@ abstract class SyncBase<U> with ChangeNotifier {
       final lastUpdatedTimeLocal =
           await DatabaseIO.instance.getLastUpdatedTime();
       SyncReason reason = SyncReason.unknown;
-      if (lastUpdatedTimeLocal.compareTo(lastUpdatedAt!) == 0) {
+      if (lastUpdatedTimeLocal.compareTo(_syncMetadata!.lastUpdatedAt) == 0) {
         reason = SyncReason.alreadySynced;
-      } else if (lastUpdatedTimeLocal.compareTo(lastUpdatedAt!) > 0) {
+      } else if (lastUpdatedTimeLocal.compareTo(_syncMetadata!.lastUpdatedAt) >
+          0) {
         _upload();
         reason = SyncReason.uploaded;
       } else {
+        final currentEncryptionHash =
+            await DatabaseIO.instance.readEncryptionKeyHash();
+        if (_syncMetadata!.encryptedKeyHash != currentEncryptionHash) {
+          return SyncReason.encryptionKeyMismatch;
+        }
         _download();
         reason = SyncReason.downloaded;
       }

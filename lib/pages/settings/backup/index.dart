@@ -5,6 +5,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
+import '../../../components/backup_encryption_tile.dart';
 import '../../../helpers/fileio.dart';
 import '../../../helpers/logger.dart';
 import 'firebase/firebase_backup_tile.dart';
@@ -67,6 +68,7 @@ class CloudBackupTile extends StatelessWidget {
         if (isFirebaseInitialized() &&
             (kIsWeb || Platform.isAndroid || Platform.isIOS))
           const GDriveBackupTile(),
+        const BackupEncryptionTile(),
       ],
     );
   }
