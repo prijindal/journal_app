@@ -1,7 +1,7 @@
 import 'dart:io';
 
 import 'package:firebase_core/firebase_core.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:googleapis/drive/v3.dart';
 
@@ -26,7 +26,8 @@ class GdriveSync extends SyncBase<GoogleSignInAccount> {
 
   @override
   bool get isSupported =>
-      Firebase.apps.isNotEmpty && (Platform.isAndroid || Platform.isIOS);
+      Firebase.apps.isNotEmpty &&
+      (kIsWeb || Platform.isAndroid || Platform.isIOS);
 
   @override
   Future<void> signOut() => googleSignIn.signOut();
