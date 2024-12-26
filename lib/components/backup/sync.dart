@@ -103,22 +103,22 @@ abstract class SyncBase<U> with ChangeNotifier {
     notifyListeners();
   }
 
-  Future<bool> _download() async {
+  Future<SyncReason> _download() async {
     await syncLastUpdatedAt();
     if (_syncMetadata == null) {
-      return false;
+      return SyncReason.notFound;
     }
     final fileContent = await getFile(dbExportArchiveName);
     if (fileContent == null) {
-      return false;
+      return SyncReason.notFound;
     }
     final currentEncryptionHash =
         await DatabaseIO.instance.readEncryptionKeyHash();
     if (_syncMetadata!.encryptedKeyHash != currentEncryptionHash) {
-      return false;
+      return SyncReason.encryptionKeyMismatch;
     }
     await DatabaseIO.instance.archiveToDb(fileContent);
-    return true;
+    return SyncReason.downloaded;
   }
 
   Future<SyncReason> _sync() async {
@@ -199,7 +199,7 @@ abstract class SyncBase<U> with ChangeNotifier {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              status ? SyncReason.downloaded.title : SyncReason.notFound.title,
+              status.title,
             ),
           ),
         );
