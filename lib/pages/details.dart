@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:auto_route/auto_route.dart';
 import 'package:carousel_slider/carousel_slider.dart';
-import 'package:drift/drift.dart' as drift;
 import 'package:fleather/fleather.dart' hide kToolbarHeight;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -10,6 +9,7 @@ import 'package:share_plus/share_plus.dart';
 
 import '../components/journal_app_title.dart';
 import '../components/journal_entry_tags.dart';
+import '../helpers/db_watchers.dart';
 import '../helpers/logger.dart';
 import '../models/core.dart';
 import '../models/drift.dart';
@@ -71,6 +71,7 @@ class DetailsScreen extends StatefulWidget {
 
 class _DetailsScreenState extends State<DetailsScreen> {
   List<JournalEntryData> _journalEntries = [];
+  StreamSubscription<List<JournalEntryData>>? _subscription;
   String? _selectedEntryId;
   final CarouselSliderController _carouselController =
       CarouselSliderController();
@@ -81,29 +82,25 @@ class _DetailsScreenState extends State<DetailsScreen> {
     super.initState();
   }
 
+  @override
+  void dispose() {
+    _subscription?.cancel();
+    super.dispose();
+  }
+
   Future<void> _fetch() async {
-    await _fetchEntries();
+    await _addWatcher();
     _setInitialEntry();
   }
 
-  Future<void> _fetchEntries() async {
-    final query = MyDatabase.instance.journalEntry.select();
-    if (!widget.showHidden) {
-      query.where((tbl) => tbl.hidden.equals(false));
+  Future<void> _addWatcher() async {
+    if (_subscription != null) {
+      _subscription?.cancel();
     }
-    final entries = await (query
-          ..orderBy(
-            [
-              (t) => drift.OrderingTerm(
-                    expression: t.creationTime,
-                    mode: drift.OrderingMode.desc,
-                  ),
-            ],
-          ))
-        .get();
-
-    setState(() {
-      _journalEntries = entries;
+    _subscription = journalListSubscribe(listen: (entries) {
+      setState(() {
+        _journalEntries = entries;
+      });
     });
   }
 
@@ -243,21 +240,28 @@ class JourneyDetailsViewWrapper extends StatefulWidget {
 
 class _JourneyDetailsViewWrapperState extends State<JourneyDetailsViewWrapper> {
   JournalEntryData? _journalEntryData;
+  StreamSubscription<JournalEntryData>? _subscription;
 
   @override
   void initState() {
-    _loadData();
+    _addWatcher();
     super.initState();
   }
 
-  void _loadData() async {
-    final journalEntry =
-        await (MyDatabase.instance.select(MyDatabase.instance.journalEntry)
-              ..where((tbl) => tbl.id.equals(widget.entryId)))
-            .getSingle();
-    setState(() {
-      _journalEntryData = journalEntry;
-    });
+  void _addWatcher() async {
+    _subscription = journalEntrySubscribe(
+        entryId: widget.entryId,
+        listen: (entry) {
+          setState(() {
+            _journalEntryData = entry;
+          });
+        });
+  }
+
+  @override
+  void dispose() {
+    _subscription?.cancel();
+    super.dispose();
   }
 
   @override

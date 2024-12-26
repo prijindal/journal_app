@@ -32,3 +32,12 @@ StreamSubscription<List<JournalEntryData>> journalListSubscribe({
       .listen(listen);
   return subscription;
 }
+
+StreamSubscription<JournalEntryData> journalEntrySubscribe(
+    {required String entryId,
+    required void Function(JournalEntryData) listen}) {
+  var query = MyDatabase.instance.select(MyDatabase.instance.journalEntry)
+    ..where((tbl) => tbl.id.equals(entryId));
+  final subscription = query.watchSingle().listen(listen);
+  return subscription;
+}
