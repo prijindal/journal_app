@@ -5,10 +5,9 @@ import 'package:drift/drift.dart' as drift;
 import "../models/core.dart";
 import "../models/drift.dart";
 
-StreamSubscription<List<JournalEntryData>> journalListSubscribe({
+Stream<List<JournalEntryData>> journalListSubscribe({
   bool showHidden = false,
   String? searchText,
-  required void Function(List<JournalEntryData>) listen,
 }) {
   var query = MyDatabase.instance.journalEntry.select();
   if (!showHidden) {
@@ -19,7 +18,7 @@ StreamSubscription<List<JournalEntryData>> journalListSubscribe({
       ..where((tbl) =>
           tbl.tags.contains(searchText) | tbl.document.contains(searchText));
   }
-  final subscription = (query
+  return (query
         ..orderBy(
           [
             (t) => drift.OrderingTerm(
@@ -28,16 +27,13 @@ StreamSubscription<List<JournalEntryData>> journalListSubscribe({
                 ),
           ],
         ))
-      .watch()
-      .listen(listen);
-  return subscription;
+      .watch();
 }
 
-StreamSubscription<JournalEntryData> journalEntrySubscribe(
-    {required String entryId,
-    required void Function(JournalEntryData) listen}) {
+Stream<JournalEntryData> journalEntrySubscribe({
+  required String entryId,
+}) {
   var query = MyDatabase.instance.select(MyDatabase.instance.journalEntry)
     ..where((tbl) => tbl.id.equals(entryId));
-  final subscription = query.watchSingle().listen(listen);
-  return subscription;
+  return query.watchSingle();
 }

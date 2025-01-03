@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:grouped_list/grouped_list.dart';
 import 'package:intl/intl.dart';
@@ -8,7 +6,7 @@ import '../helpers/db_watchers.dart';
 import '../models/core.dart';
 import 'journal_entry_tile.dart';
 
-class JournalListWrapper extends StatefulWidget {
+class JournalListWrapper extends StatelessWidget {
   const JournalListWrapper({
     super.key,
     required this.showHidden,
@@ -25,47 +23,20 @@ class JournalListWrapper extends StatefulWidget {
   final void Function(List<String>)? onSelectedEntriesChange;
 
   @override
-  State<JournalListWrapper> createState() => _JournalListWrapperState();
-}
-
-class _JournalListWrapperState extends State<JournalListWrapper> {
-  List<JournalEntryData>? _journalEntries;
-  StreamSubscription<List<JournalEntryData>>? _subscription;
-
-  @override
-  void initState() {
-    _addWatcher();
-    super.initState();
-  }
-
-  @override
-  void dispose() {
-    _subscription?.cancel();
-    super.dispose();
-  }
-
-  void _addWatcher() {
-    if (_subscription != null) {
-      _subscription?.cancel();
-    }
-    _subscription = journalListSubscribe(
-      showHidden: widget.showHidden,
-      searchText: widget.searchText,
-      listen: (event) {
-        setState(() {
-          _journalEntries = event;
-        });
-      },
-    );
-  }
-
-  @override
   Widget build(BuildContext context) {
-    return JournalList(
-      entries: _journalEntries,
-      onTap: widget.onTap,
-      onSelectedEntriesChange: widget.onSelectedEntriesChange,
-      selectedEntries: widget.selectedEntries,
+    return StreamBuilder<List<JournalEntryData>>(
+      stream: journalListSubscribe(
+        showHidden: showHidden,
+        searchText: searchText,
+      ),
+      builder: (context, journalEntries) {
+        return JournalList(
+          entries: journalEntries.data,
+          onTap: onTap,
+          onSelectedEntriesChange: onSelectedEntriesChange,
+          selectedEntries: selectedEntries,
+        );
+      },
     );
   }
 }

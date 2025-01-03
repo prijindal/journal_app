@@ -97,7 +97,9 @@ class _DetailsScreenState extends State<DetailsScreen> {
     if (_subscription != null) {
       _subscription?.cancel();
     }
-    _subscription = journalListSubscribe(listen: (entries) {
+    _subscription = journalListSubscribe(
+      showHidden: widget.showHidden,
+    ).listen((entries) {
       setState(() {
         _journalEntries = entries;
       });
@@ -229,44 +231,12 @@ class _DetailsScreenState extends State<DetailsScreen> {
   }
 }
 
-class JourneyDetailsViewWrapper extends StatefulWidget {
+class JourneyDetailsViewWrapper extends StatelessWidget {
   const JourneyDetailsViewWrapper({super.key, required this.entryId});
   final String entryId;
 
-  @override
-  State<JourneyDetailsViewWrapper> createState() =>
-      _JourneyDetailsViewWrapperState();
-}
-
-class _JourneyDetailsViewWrapperState extends State<JourneyDetailsViewWrapper> {
-  JournalEntryData? _journalEntryData;
-  StreamSubscription<JournalEntryData>? _subscription;
-
-  @override
-  void initState() {
-    _addWatcher();
-    super.initState();
-  }
-
-  void _addWatcher() async {
-    _subscription = journalEntrySubscribe(
-        entryId: widget.entryId,
-        listen: (entry) {
-          setState(() {
-            _journalEntryData = entry;
-          });
-        });
-  }
-
-  @override
-  void dispose() {
-    _subscription?.cancel();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    if (_journalEntryData == null) {
+  Widget _build(BuildContext context, JournalEntryData? journalEntryData) {
+    if (journalEntryData == null) {
       return Center(
         child: Text("Loading..."),
       );
@@ -274,9 +244,21 @@ class _JourneyDetailsViewWrapperState extends State<JourneyDetailsViewWrapper> {
     return ListView(
       children: [
         JourneyDetailsView(
-          journalEntry: _journalEntryData!,
+          journalEntry: journalEntryData,
         ),
       ],
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return StreamBuilder<JournalEntryData>(
+      stream: journalEntrySubscribe(
+        entryId: entryId,
+      ),
+      builder: (context, journalEntryData) {
+        return _build(context, journalEntryData.data);
+      },
     );
   }
 }

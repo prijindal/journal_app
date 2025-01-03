@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -25,7 +23,7 @@ class JournalCalendarScreen extends StatelessWidget {
   }
 }
 
-class JournalCalendarWrapper extends StatefulWidget {
+class JournalCalendarWrapper extends StatelessWidget {
   const JournalCalendarWrapper({
     super.key,
     required this.showHidden,
@@ -35,44 +33,8 @@ class JournalCalendarWrapper extends StatefulWidget {
   final String? searchText;
   final bool showHidden;
 
-  @override
-  State<JournalCalendarWrapper> createState() => _JournalCalendarWrapperState();
-}
-
-class _JournalCalendarWrapperState extends State<JournalCalendarWrapper> {
-  List<JournalEntryData>? _journalEntries;
-  StreamSubscription<List<JournalEntryData>>? _subscription;
-
-  @override
-  void initState() {
-    _addWatcher();
-    super.initState();
-  }
-
-  @override
-  void dispose() {
-    _subscription?.cancel();
-    super.dispose();
-  }
-
-  void _addWatcher() {
-    if (_subscription != null) {
-      _subscription?.cancel();
-    }
-    _subscription = journalListSubscribe(
-      showHidden: widget.showHidden,
-      searchText: widget.searchText,
-      listen: (event) {
-        setState(() {
-          _journalEntries = event;
-        });
-      },
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    if (_journalEntries == null) {
+  Widget _build(BuildContext context, List<JournalEntryData>? journalEntries) {
+    if (journalEntries == null) {
       return const Center(
         key: Key("JournalCalendarLoading"),
         child: Text(
@@ -81,7 +43,21 @@ class _JournalCalendarWrapperState extends State<JournalCalendarWrapper> {
       );
     }
     return JournalCalendar(
-      entries: _journalEntries!,
+      entries: journalEntries,
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return StreamBuilder<List<JournalEntryData>>(
+      stream: journalListSubscribe(
+        showHidden: showHidden,
+        searchText: searchText,
+      ),
+      builder: (context, journalEntries) => _build(
+        context,
+        journalEntries.data,
+      ),
     );
   }
 }
